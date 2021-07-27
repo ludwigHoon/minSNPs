@@ -28,6 +28,7 @@ calculate.simpson <- function(pattern) { # nolint
 #' @param criteria either `simpson` or `percent`
 #' @param goi group of interest, if creteria is percent,
 #' must be specified, ignored otherwise
+#' @param accept_multiallelic whether include positions with > 2 states
 #' @param number_of_result number of results to return
 #' @param max_depth maximum depth to go before terminating
 #' @param included_positions included positions
@@ -37,9 +38,9 @@ calculate.simpson <- function(pattern) { # nolint
 #' @import BiocParallel
 #' @return Will return the resolution-optimised SNPs set, based on the criteria.
 find_optimised_snps <- function(seqc, criteria = "simpson", goi = c(),
-    number_of_result = 1, max_depth = 1, included_positions = c(),
-    excluded_positions = c(), iterate_included = FALSE,
-    bp = BiocParallel::SerialParam()) {
+    accept_multiallelic = FALSE, number_of_result = 1, max_depth = 1,
+    included_positions = c(), excluded_positions = c(),
+    iterate_included = FALSE, bp = BiocParallel::SerialParam()) {
 
-    
+    print("...")
 }
