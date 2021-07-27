@@ -6,8 +6,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>process_allele is used to returned the processed allelic
-profiles. — process_allele • minSNPs</title>
+<title>process_allele is used to returned the processed allelic profiles, by
+removing the allele profile with duplicate name and length different
+from most. 1st allele profile with the duplicated name is returned,
+the longer length is taken as normal should there be 2 modes. — process_allele • minSNPs</title>
 
 
 <!-- jquery -->
@@ -40,10 +42,14 @@ profiles. — process_allele • minSNPs</title>
 
 
 
-<meta property="og:title" content="process_allele is used to returned the processed allelic
-profiles. — process_allele" />
-<meta property="og:description" content="process_allele is used to returned the processed allelic
-profiles." />
+<meta property="og:title" content="process_allele is used to returned the processed allelic profiles, by
+removing the allele profile with duplicate name and length different
+from most. 1st allele profile with the duplicated name is returned,
+the longer length is taken as normal should there be 2 modes. — process_allele" />
+<meta property="og:description" content="process_allele is used to returned the processed allelic profiles, by
+removing the allele profile with duplicate name and length different
+from most. 1st allele profile with the duplicated name is returned,
+the longer length is taken as normal should there be 2 modes." />
 
 
 
@@ -109,18 +115,28 @@ profiles." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><code>process_allele</code> is used to returned the processed allelic
-profiles.</h1>
+    <h1><code>process_allele</code> is used to returned the processed allelic profiles, by
+removing the allele profile with duplicate name and length different
+from most. 1st allele profile with the duplicated name is returned,
+the longer length is taken as normal should there be 2 modes.</h1>
     
     <div class="hidden name"><code>process_allele.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>process_allele</code> is used to returned the processed allelic
-profiles.</p>
+    <p><code>process_allele</code> is used to returned the processed allelic profiles, by
+removing the allele profile with duplicate name and length different
+from most. 1st allele profile with the duplicated name is returned,
+the longer length is taken as normal should there be 2 modes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>process_allele</span><span class='op'>(</span><span class='va'>seqc</span>, bp <span class='op'>=</span> <span class='fu'>BiocParallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/BiocParallel/man/SerialParam-class.html'>SerialParam</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>process_allele</span><span class='op'>(</span>
+  <span class='va'>seqc</span>,
+  bp <span class='op'>=</span> <span class='fu'>BiocParallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/BiocParallel/man/SerialParam-class.html'>SerialParam</a></span><span class='op'>(</span><span class='op'>)</span>,
+  dash_ignore <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  accepted_char <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"A"</span>, <span class='st'>"C"</span>, <span class='st'>"T"</span>, <span class='st'>"G"</span><span class='op'>)</span>,
+  ignore_case <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -134,6 +150,18 @@ use provided read.fasta to import the fasta file.</p></td>
       <th>bp</th>
       <td><p>is the biocparallel backend, default to serialParam,
 most likely sufficient in most scenario</p></td>
+    </tr>
+    <tr>
+      <th>dash_ignore</th>
+      <td><p>whether to treat '-' as another type</p></td>
+    </tr>
+    <tr>
+      <th>accepted_char</th>
+      <td><p>character to accept, default to c("A", "C", "T", "G")</p></td>
+    </tr>
+    <tr>
+      <th>ignore_case</th>
+      <td><p>whether to be case insensitive, default to TRUE</p></td>
     </tr>
     </table>
 

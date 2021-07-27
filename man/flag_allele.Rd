@@ -2,9 +2,9 @@
 % Please edit documentation in R/process.R
 \name{flag_allele}
 \alias{flag_allele}
-\title{\code{flag_allele} is used to find out a list of samples
-that has been flagged and will not be included in computation
-of minimum SNPs.}
+\title{\code{flag_allele} is used to find out a list of samples that has been
+flagged with length different from most and will not be included in
+computation of minimum SNPs.}
 \usage{
 flag_allele(seqc, bp = BiocParallel::SerialParam())
 }
@@ -19,7 +19,8 @@ most likely sufficient in most scenario}
 Will return a list of ignored samples.
 }
 \description{
-\code{flag_allele} is used to find out a list of samples
-that has been flagged and will not be included in computation
-of minimum SNPs.
+\code{flag_allele} is used to find out a list of samples that has been
+flagged with length different from most and will not be included in
+computation of minimum SNPs.
 }
+\keyword{internal}

@@ -2,10 +2,18 @@
 % Please edit documentation in R/process.R
 \name{process_allele}
 \alias{process_allele}
-\title{\code{process_allele} is used to returned the processed allelic
-profiles.}
+\title{\code{process_allele} is used to returned the processed allelic profiles, by
+removing the allele profile with duplicate name and length different
+from most. 1st allele profile with the duplicated name is returned,
+the longer length is taken as normal should there be 2 modes.}
 \usage{
-process_allele(seqc, bp = BiocParallel::SerialParam())
+process_allele(
+  seqc,
+  bp = BiocParallel::SerialParam(),
+  dash_ignore = TRUE,
+  accepted_char = c("A", "C", "T", "G"),
+  ignore_case = TRUE
+)
 }
 \arguments{
 \item{seqc}{a list containing list of nucleotides. To keep it simple,
@@ -13,11 +21,19 @@ use provided read.fasta to import the fasta file.}
 
 \item{bp}{is the biocparallel backend, default to serialParam,
 most likely sufficient in most scenario}
+
+\item{dash_ignore}{whether to treat '-' as another type}
+
+\item{accepted_char}{character to accept, default to c("A", "C", "T", "G")}
+
+\item{ignore_case}{whether to be case insensitive, default to TRUE}
 }
 \value{
 Will return the processed allelic profiles.
 }
 \description{
-\code{process_allele} is used to returned the processed allelic
-profiles.
+\code{process_allele} is used to returned the processed allelic profiles, by
+removing the allele profile with duplicate name and length different
+from most. 1st allele profile with the duplicated name is returned,
+the longer length is taken as normal should there be 2 modes.
 }

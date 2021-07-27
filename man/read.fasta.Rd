@@ -3,7 +3,7 @@
 \name{read.fasta}
 \alias{read.fasta}
 \title{\code{read.fasta} is used to read fasta file, implementation
-similar to seqinr, but much simpler and allow for spaces in sample name}
+similar to seqinr, but much simpler and allow for spaces in sample name.}
 \usage{
 read.fasta(file, force_to_lower = TRUE)
 }
@@ -18,5 +18,5 @@ Will return fastaDNA.
 }
 \description{
 \code{read.fasta} is used to read fasta file, implementation
-similar to seqinr, but much simpler and allow for spaces in sample name
+similar to seqinr, but much simpler and allow for spaces in sample name.
 }

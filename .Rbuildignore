@@ -3,3 +3,5 @@
 ^\.ipynb_checkpoints
 ^others
 .*\.ipynb
+^\.github
+^docs

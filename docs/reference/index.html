@@ -131,39 +131,19 @@
       <tr>
         
         <td>
-          <p><code><a href="flag_allele.html">flag_allele()</a></code> </p>
-        </td>
-        <td><p><code>flag_allele</code> is used to find out a list of samples
-that has been flagged and will not be included in computation
-of minimum SNPs.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="flag_position.html">flag_position()</a></code> </p>
-        </td>
-        <td><p><code>flag_position</code> is used to find out positions that will be ignored in
-calculation (either not A,C,G,T or '-'), can be case sensitive or insensitive</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="process_allele.html">process_allele()</a></code> </p>
         </td>
-        <td><p><code>process_allele</code> is used to returned the processed allelic
-profiles.</p></td>
+        <td><p><code>process_allele</code> is used to returned the processed allelic profiles, by
+removing the allele profile with duplicate name and length different
+from most. 1st allele profile with the duplicated name is returned,
+the longer length is taken as normal should there be 2 modes.</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="read.fasta.html">read.fasta()</a></code> </p>
         </td>
         <td><p><code>read.fasta</code> is used to read fasta file, implementation
-similar to seqinr, but much simpler and allow for spaces in sample name</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="usual_length.html">usual_length()</a></code> </p>
-        </td>
-        <td><p><code>usual_length</code> is used to find out
-the length of the sequences (W/O deletion).</p></td>
+similar to seqinr, but much simpler and allow for spaces in sample name.</p></td>
       </tr>
     </tbody>
     </table>

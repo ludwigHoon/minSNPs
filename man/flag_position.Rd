@@ -3,7 +3,8 @@
 \name{flag_position}
 \alias{flag_position}
 \title{\code{flag_position} is used to find out positions that will be ignored in
-calculation (either not A,C,G,T or '-'), can be case sensitive or insensitive}
+calculation (either not A,C,G,T or '-'), can be case sensitive
+or insensitive.}
 \usage{
 flag_position(
   pro_seqc,
@@ -26,5 +27,7 @@ Will return a list of positions that need to be ignored.
 }
 \description{
 \code{flag_position} is used to find out positions that will be ignored in
-calculation (either not A,C,G,T or '-'), can be case sensitive or insensitive
+calculation (either not A,C,G,T or '-'), can be case sensitive
+or insensitive.
 }
+\keyword{internal}
