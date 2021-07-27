@@ -82,7 +82,6 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
 #' @param force_to_lower whether to transform sequences
 #' to lower case, default to TRUE
 #' @return Will return fastaDNA.
-#' @import foreach
 #' @export
 read.fasta <- function(file, force_to_lower=TRUE) { # nolint
     lines <- readLines(file)
