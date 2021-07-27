@@ -1,19 +1,17 @@
-Package: MinSNPs
+Package: minSNPs
 Title: Search resolution-optimised SNPs
 Version: 0.0.1
 Authors@R: person("Ludwig KianSoon", "Hoon", email = "ldwgkshoon@gmail.com", role = c("aut", "cre"), comment = c(ORCID ="0000-0002-2310-3403"))
 Description: This is a R implementation of minimum SNPs software as described in Price E.P., Inman-Bamber, J., Thiruvenkataswamy, V., Huygens, F and Giffard, P.M. 2007, Computer-aided identification of polymorphism sets diagnostic for groups of bacterial and viral genetic variants. BMC Bioinformatics 8:278.
-Depends: R (>= 3.4.1), foreach
+Depends: R (>= 3.4.0), foreach
 License: MIT + file LICENSE
 Imports: 
-    rlist,
     BiocParallel
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Suggests: 
-    RUnit,
     knitr,
-    rmarkdown,
-    testthat
+    testthat,
+    pkgdown
 VignetteBuilder: knitr

@@ -1,27 +1,31 @@
 #' \code{usual_length} is used to find out
 #' the length of the sequences (W/O deletion).
-#' @param seq a list containing list of nucleotides. To keep it simple,
+#' @param seqc a list containing list of nucleotides. To keep it simple,
 #' use provided read.fasta to import the fasta file.
-#' @return Will return the length of most of the samples.
-#' @example tests/integrated.R
+#' @param bp is the biocparallel backend, default to serialParam,
+#' most likely sufficient in most scenario
+#' @import BiocParallel
+#' @return Will return the length of most of the samples,
+#' the higher number is taken as tie breaker
 #' @export
-usual_length <- function(seq) {
-    sequences_length <- unlist(lapply(seq, length))
-    uniqv <- unique(sequences_length)
-    return(unlist(uniqv[which.max(tabulate(match(seq, uniqv)))]))
+usual_length <- function(seqc, bp=BiocParallel::SerialParam()) {
+    sequences_length <-
+        unlist(BiocParallel::bplapply(seqc, length, BPPARAM = bp))
+    uniqv <- sort(unique(sequences_length), decreasing = TRUE)
+    return(unlist(uniqv[which.max(tabulate(match(sequences_length, uniqv)))]))
 }
 
 #' \code{flag_allele} is used to find out a list of samples
 #' that has been flagged and will not be included in computation
 #' of minimum SNPs.
-#' @inheritParams usualLength
+#' @inheritParams usual_length
 #' @return Will return a list of ignored samples.
 #' @export
-flag_allele <- function(seq) {
-    normal_length <- usual_length(seq)
-    ignore_list <- lapply(seq, function(x, norm_length) {
+flag_allele <- function(seqc, bp=BiocParallel::SerialParam()) {
+    normal_length <- usual_length(seqc)
+    ignore_list <- BiocParallel::bplapply(seqc, function(x, norm_length) {
         return(length(x) != norm_length)
-    }, norm_length = normal_length)
+    }, norm_length = normal_length, BPPARAM = bp)
     names(which(ignore_list == TRUE))
 
     return(names(which(ignore_list == TRUE)))
@@ -29,29 +33,27 @@ flag_allele <- function(seq) {
 
 #' \code{process_allele} is used to returned the processed allelic
 #' profiles.
-#' @inheritParams usualLength
+#' @inheritParams usual_length
 #' @return Will return the processed allelic profiles.
 #' @export
-process_allele <- function(seq) {
-    ignored <- flag_allele(seq)
-    processed <- seq
+process_allele <- function(seqc, bp=BiocParallel::SerialParam()) {
+    ignored <- flag_allele(seqc)
+    processed <- seqc
     cat("Ignored samples:", "\n")
-    for (a in ignored) {
-        cat(a, "\n")
-        processed[[a]] <- NULL
-    }
+    cat(paste(ignored, collapse = ", "), "\n")
+    processed <- within(processed, rm(list = ignored))
     return(processed)
 }
 
 #' \code{flag_position} is used to find out positions that will be ignored in
 #' calculation (either not A,C,G,T or '-'), can be case sensitive or insensitive
-#' @param pro_seq Sequences after processed, i.e. all with the same length
+#' @param pro_seqc Sequences after processed, i.e. all with the same length
 #' @param dash_ignore whether to treat '-' as another type
 #' @param accepted_char character to accept, default to c("A", "C", "T", "G")
 #' @param ignore_case whether to be case insensitive, default to TRUE
 #' @return Will return a list of positions that need to be ignored.
 #' @export
-flag_position <- function(pro_seq, dash_ignore=TRUE,
+flag_position <- function(pro_seqc, dash_ignore=TRUE,
     accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE) {
 
     if (dash_ignore == FALSE) {
@@ -60,10 +62,10 @@ flag_position <- function(pro_seq, dash_ignore=TRUE,
 
     if (ignore_case) {
         accepted_char <- tolower(accepted_char)
-        seq <- lapply(seq, tolower)
+        seqc <- lapply(seqc, tolower)
     }
 
-    ignored_position <- lapply(seq, function(iso, charset) {
+    ignored_position <- lapply(seqc, function(iso, charset) {
         return(which(! iso %in% charset))
     }, charset = accepted_char)
 
@@ -80,18 +82,19 @@ flag_position <- function(pro_seq, dash_ignore=TRUE,
 #' @param force_to_lower whether to transform sequences
 #' to lower case, default to TRUE
 #' @return Will return fastaDNA.
+#' @import foreach
 #' @export
 read.fasta <- function(file, force_to_lower=TRUE) { # nolint
     lines <- readLines(file)
     ind <- which(substr(lines, 1L, 1L) == ">")
-    nseq <- length(ind)
-    if (nseq == 0) {
+    nseqc <- length(ind)
+    if (nseqc == 0) {
         stop("no line starting with a > character found")
     }
     start <- ind + 1
     end <- ind - 1
     end <- c(end[-1], length(lines))
-    sequences <- lapply(seq_len(nseq), function(i) {
+    sequences <- lapply(seq_len(nseqc), function(i) {
         paste(lines[start[i]:end[i]], collapse = "")
         }
     )
@@ -100,11 +103,11 @@ read.fasta <- function(file, force_to_lower=TRUE) { # nolint
         sequences <- tolower(sequences)
     }
     sequences <- as.list(sequences)
-    sequences <- lapply(sequences, function(seq) {
-        return(unlist(strsplit(seq, split = "")))
+    sequences <- lapply(sequences, function(seqc) {
+        return(unlist(strsplit(seqc, split = "")))
     })
 
-    names_sequences <- lapply(seq_len(nseq), function(i) {
+    names_sequences <- lapply(seq_len(nseqc), function(i) {
         firstword <- lines[ind[i]]
         return(trimws(substr(firstword, 2, nchar(firstword))))
     })

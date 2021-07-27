@@ -1,4 +1,4 @@
 library(testthat)
-library(MinSNPs)
+library(minSNPs)
 
-test_check("MinSNPs")
+test_check("minSNPs")
