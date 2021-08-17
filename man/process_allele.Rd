@@ -17,7 +17,7 @@ process_allele(
 }
 \arguments{
 \item{seqc}{a list containing list of nucleotides. To keep it simple,
-use provided read.fasta to import the fasta file.}
+use provided read_fasta to import the fasta file.}
 
 \item{bp}{is the biocparallel backend, default to serialParam,
 most likely sufficient in most scenario}

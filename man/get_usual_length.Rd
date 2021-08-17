@@ -5,11 +5,11 @@
 \title{\code{get_usual_length} is used to find out
 the length of the sequences (W/O deletion).}
 \usage{
-get_usual_length(seqc, bp = BiocParallel::SerialParam())
+get_usual_length(seqc, bp = SerialParam())
 }
 \arguments{
 \item{seqc}{a list containing list of nucleotides. To keep it simple,
-use provided read.fasta to import the fasta file.}
+use provided read_fasta to import the fasta file.}
 
 \item{bp}{is the biocparallel backend, default to serialParam,
 most likely sufficient in most scenario}

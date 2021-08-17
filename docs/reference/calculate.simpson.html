@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • minSNPs</title>
+<title>calculate.simpson is used to calculate Simpson's index. — calculate.simpson • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="calculate.simpson is used to calculate Simpson's index. — calculate.simpson" />
+<meta property="og:description" content="calculate.simpson is used to calculate Simpson's index." />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -105,45 +106,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      
+    <h1><code>calculate.simpson</code> is used to calculate Simpson's index.</h1>
+    
+    <div class="hidden name"><code>calculate.simpson.Rd</code></div>
     </div>
 
-    <div id="minsnps-v001" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.1">
-<a href="#minsnps-v001" class="anchor"></a>minSNPs v0.0.1</h1>
-<p>Rebuilding and cleaning part of minSNPs that read fasta and processes the samples.</p>
-<div id="functions-and-variables-now-conform-to-snake-case" class="section level2">
-<h2 class="hasAnchor">
-<a href="#functions-and-variables-now-conform-to-snake-case" class="anchor"></a>Functions and variables now conform to snake case.</h2>
-<ul>
-<li>
-<code>get_usual_length</code> will replace <code>usualLength</code>
-</li>
-<li>
-<code>flag_allele</code> will replace <code>flagAllel</code>
-</li>
-<li>
-<code>flag_position</code> will replace <code>flagPosition</code>
-</li>
-<li>
-<code>process_allele</code> will replace <code>processAllele</code>
-</li>
-<li>
-<code>read_fasta</code> will be used to read fasta file, the sequence name can contain spaces.</li>
-<li>
-<code>write_fasta</code> will be used to write fasta file, the sequence name can contain spaces.</li>
-</ul>
-</div>
-</div>
-  </div>
+    <div class="ref-description">
+    <p><code>calculate.simpson</code> is used to calculate Simpson's index.</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>calculate.simpson</span><span class='op'>(</span><span class='va'>pattern</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>pattern</th>
+      <td><p>list of sequences</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Will return the Simpson's index of the list of patterns.</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

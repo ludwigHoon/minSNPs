@@ -12,7 +12,7 @@ calculate.percent(pattern, goi)
 \item{goi}{group of interest}
 }
 \value{
-Will return fastaDNA.
+Will return the dissimilarity index of the list of patterns.
 }
 \description{
 \code{calculate.percent} is used to calculate dissimilarity index.

@@ -1,11 +1,14 @@
-#' \code{read.fasta} is used to read fasta file, implementation
+#' \code{read_fasta}
+#'
+#' @description
+#' \code{read_fasta} is used to read fasta file, implementation
 #' similar to seqinr, but much simpler and allow for spaces in sample name.
 #' @param file file path
-#' @param force_to_lower whether to transform sequences
-#' to lower case, default to TRUE
-#' @return Will return fastaDNA.
+#' @param force_to_upper whether to transform sequences
+#' to upper case, default to TRUE
+#' @return Will return list of named character vectors.
 #' @export
-read.fasta <- function(file, force_to_lower=TRUE) { # nolint
+read_fasta <- function(file, force_to_upper=TRUE) {
     lines <- readLines(file)
     ind <- which(substr(lines, 1L, 1L) == ">")
     nseqc <- length(ind)
@@ -20,8 +23,8 @@ read.fasta <- function(file, force_to_lower=TRUE) { # nolint
         }
     )
 
-    if (force_to_lower) {
-        sequences <- tolower(sequences)
+    if (force_to_upper) {
+        sequences <- toupper(sequences)
     }
     sequences <- as.list(sequences)
     sequences <- lapply(sequences, function(seqc) {
@@ -45,23 +48,64 @@ read.fasta <- function(file, force_to_lower=TRUE) { # nolint
     return(sequences)
 }
 
+#' \code{write_fasta}
+#'
+#' @description
+#' \code{write_fasta} is used to write
+#' the named character vectors to fasta file.
+#' @inheritParams get_usual_length
+#' @param filename filename of the output file
+#' @return will write the alignments to file
+#' @export
+write_fasta <- function(seqc, filename) {
+    outfile <- file(description = filename, open = "w")
+
+    all_seq_names <- names(seqc)
+
+    write_one_seq <- function(name, seq) {
+        writeLines(paste(">", name, sep = ""), outfile)
+        this_seq <- as.vector(as.list(seqc)[[name]])
+        l <- length(this_seq)
+        q <- floor(l / 60)
+        r <- l - (60 * q)
+        if (q > 0) {
+            sapply(seq_len(q), function(x) {
+                writeLines(this_seq[(60 * (x - 1) + 1):(60 * x)], outfile)
+            })
+        }
+        if (r > 0) {
+            writeLines(paste(this_seq[(60 * q + 1):l], collapse = ""), outfile)
+        }
+    }
+
+    lapply(all_seq_names, write_one_seq, seq = seqc)
+
+    close(outfile)
+}
+
+#' \code{get_usual_length}
+#'
+#' @description
 #' \code{get_usual_length} is used to find out
 #' the length of the sequences (W/O deletion).
 #' @param seqc a list containing list of nucleotides. To keep it simple,
-#' use provided read.fasta to import the fasta file.
+#' use provided read_fasta to import the fasta file.
 #' @param bp is the biocparallel backend, default to serialParam,
 #' most likely sufficient in most scenario
-#' @import BiocParallel
+#' @importFrom BiocParallel bplapply SerialParam
 #' @keywords internal
 #' @return Will return the length of most of the samples,
 #' the higher number is taken as tie breaker
-get_usual_length <- function(seqc, bp=BiocParallel::SerialParam()) {
+get_usual_length <- function(seqc, bp=SerialParam()) {
     sequences_length <-
-        unlist(BiocParallel::bplapply(seqc, length, BPPARAM = bp))
+        unlist(bplapply(seqc, length, BPPARAM = bp))
     uniqv <- sort(unique(sequences_length), decreasing = TRUE)
     return(unlist(uniqv[which.max(tabulate(match(sequences_length, uniqv)))]))
 }
 
+#' \code{flag_allele}
+#'
+#' @description
 #' \code{flag_allele} is used to find out a list of samples that has been
 #' flagged with length different from most and will not be included in
 #' computation of minimum SNPs.
@@ -78,6 +122,9 @@ flag_allele <- function(seqc, bp=BiocParallel::SerialParam()) {
     return(names(which(ignore_list == TRUE)))
 }
 
+#' \code{flag_position}
+#'
+#' @description
 #' \code{flag_position} is used to find out positions that will be ignored in
 #' calculation (either not A,C,G,T or '-'), can be case sensitive
 #' or insensitive.
@@ -95,12 +142,14 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
     }
 
     if (ignore_case) {
-        accepted_char <- tolower(accepted_char)
-        pro_seqc <- lapply(pro_seqc, tolower)
+        accepted_char <- toupper(accepted_char)
+        pro_seqc <- lapply(pro_seqc, function(iso) {
+            toupper(as.vector(iso))
+        })
     }
 
-    ignored_position <- lapply(pro_seqc, function(iso, charset) {
-        return(which(! iso %in% charset))
+    ignored_position <- lapply(as.list(pro_seqc), function(iso, charset) {
+        return(which(! as.vector(iso) %in% charset))
     }, charset = accepted_char)
 
     result <- sort(unique(unlist(ignored_position)))
@@ -108,6 +157,9 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
     return(result)
 }
 
+#' \code{remove_dup_allele}
+#'
+#' @description
 #' \code{remove_dup_allele} is used to remove allele with the same name.
 #' @inheritParams get_usual_length
 #' @keywords internal
@@ -119,6 +171,9 @@ remove_dup_allele <- function(seqc) {
     return(seqc[unique_sequences])
 }
 
+#' \code{process_allele}
+#'
+#' @description
 #' \code{process_allele} is used to returned the processed allelic profiles, by
 #' removing the allele profile with duplicate name and length different
 #' from most. 1st allele profile with the duplicated name is returned,
@@ -139,7 +194,7 @@ process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
     cat("Ignored samples:", "\n")
     cat(paste(ignored, collapse = ", "), "\n")
 
-    processed$seqc <- within(processed$seqc, rm(list = ignored))
+    processed$seqc <- within(as.list(processed$seqc), rm(list = ignored))
 
     ignored_position <- flag_position(processed$seqc,
         dash_ignore = dash_ignore, accepted_char = accepted_char,

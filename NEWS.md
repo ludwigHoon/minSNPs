@@ -5,4 +5,5 @@ Rebuilding and cleaning part of minSNPs that read fasta and processes the sample
 - `flag_allele` will replace `flagAllel`
 - `flag_position` will replace `flagPosition`
 - `process_allele` will replace `processAllele`
-- `read.fasta` will remain the same, but its implementation is no longer dependent on external package.
+- `read_fasta` will be used to read fasta file, the sequence name can contain spaces.
+- `write_fasta` will be used to write fasta file, the sequence name can contain spaces.

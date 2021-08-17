@@ -14,7 +14,7 @@ generate_pattern(seqc, ordered_index = c(), append_to = list())
 \item{append_to}{existing patterns to append to}
 }
 \value{
-Will return fastaDNA.
+Will return concatenated list of string for searching.
 }
 \description{
 \code{generate_pattern} is used to generate pattern for calculation.

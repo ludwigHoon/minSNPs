@@ -1,23 +1,42 @@
-
-setup <- function() {
-  chlamydia <<- read.fasta(file =
+setup_built_in_read <- function() {
+  chlamydia <<- read_fasta(file =
     system.file("extdata", "Chlamydia_mapped.fasta", package = "minSNPs"))
-  error_file_1 <<- read.fasta(file =
+  error_file_1 <<- read_fasta(file =
     system.file("extdata", "Chlamydia_1.fasta", package = "minSNPs"))
-  error_file_2 <<- read.fasta(file =
+  error_file_2 <<- read_fasta(file =
     system.file("extdata", "Chlamydia_2.fasta", package = "minSNPs"))
 }
 
+setup_biostrings <- function() {
+  chlamydia <<- Biostrings::readBStringSet(file =
+    system.file("extdata", "Chlamydia_mapped.fasta", package = "minSNPs"))
+  error_file_1 <<- Biostrings::readBStringSet(file =
+    system.file("extdata", "Chlamydia_1.fasta", package = "minSNPs"))
+  error_file_2 <<- Biostrings::readBStringSet(file =
+    system.file("extdata", "Chlamydia_2.fasta", package = "minSNPs"))
+}
+
+set_test <- function(tests) {
+  setup_built_in_read()
+  tests()
+
+  setup_biostrings()
+  tests()
+}
+
 test_that("read fasta file", {
-  setup()
-  expect_equal(length(names(chlamydia)), 56)
-  expect_equal(length(names(error_file_1)), 56)
-  expect_equal(length(names(error_file_2)), 58)
+  all_test <- function() {
+    expect_equal(length(names(chlamydia)), 56)
+    expect_equal(length(names(error_file_1)), 56)
+    expect_equal(length(names(error_file_2)), 58)
+  }
+
+  set_test(all_test)
 })
 
 
 test_that("usual length", {
-  setup()
+  all_test <- function() {
   # Normal File
   expect_equal(get_usual_length(chlamydia), 19570)
 
@@ -49,10 +68,15 @@ test_that("usual length", {
   expect_equal(get_usual_length(error_file_2[55]), 19570)
   expect_equal(get_usual_length(error_file_2[56]), 19563)
   expect_equal(get_usual_length(error_file_2[55:56]), 19570)
+  }
+
+  set_test(all_test)
+
 })
 
 test_that("flagging allele", {
-  setup()
+  all_test <- function() {
+
   expect_vector(flag_allele(chlamydia), ptype = character(), size = 0)
 
   expect_vector(flag_allele(error_file_1), ptype = character(), size = 2)
@@ -65,26 +89,34 @@ test_that("flagging allele", {
   expect_vector(flag_allele(error_file_2[50:56]), ptype = character(), size = 1)
   expect_equal(unique(flag_allele(error_file_2)),
     c("A_D213", "Ia_SotoGIa3", "D_SotoGD1"))
+
+  }
+
+  set_test(all_test)
 })
 
 test_that("flagging duplicated allele name", {
-  setup()
+  all_test <- function() {
   expect_equal(remove_dup_allele(chlamydia), chlamydia)
   expect_equal(remove_dup_allele(error_file_1), error_file_1)
   expect_equal(length(remove_dup_allele(error_file_2)), 56)
   expect_equal(remove_dup_allele(error_file_2)["A_D213"], error_file_2[1])
+  }
+
+  set_test(all_test)
 })
 
 test_that("flagging position", {
-  setup()
+
+  all_test <- function() {
   expect_vector(flag_position(chlamydia), ptype = integer(), size = 0)
-  # By default read.fasta force to lower case
-  expect_vector(flag_position(chlamydia, ignore_case = FALSE),
-    ptype = integer(), size = 19570)
+  # By default read_fasta force to upper case
+  expect_vector(flag_position(chlamydia, ignore_case = FALSE,
+    accepted_char = c("a", "c", "t", "g")), ptype = integer(), size = 19570)
   expect_vector(flag_position(chlamydia, accepted_char = c("A", "C", "T", "G"),
-    ignore_case = FALSE), ptype = integer(), size = 19570)
+    ignore_case = FALSE), ptype = integer(), size = 0)
   expect_equal(flag_position(chlamydia[1], accepted_char = c("A", "C", "T"),
-    ignore_case = TRUE), which(chlamydia[[1]] == "g"))
+    ignore_case = TRUE), which(as.vector(chlamydia[[1]]) == "G"))
 
   expect_equal(flag_position(error_file_1), c(22, 24))
   expect_equal(flag_position(error_file_1, dash_ignore = FALSE), c(22))
@@ -92,10 +124,12 @@ test_that("flagging position", {
   expect_equal(flag_position(error_file_2[1:56]), c(1, 2, 3, 4, 120, 121))
   expect_equal(flag_position(error_file_2[1:56], dash_ignore = FALSE),
     c(1, 2, 120, 121))
+  }
+  set_test(all_test)
 })
 
 test_that("Overall", {
-  setup()
+  all_test <- function() {
   expect_equal(length(process_allele(chlamydia)[["seqc"]]), 56)
   expect_vector(process_allele(chlamydia)[["ignored_allele"]],
     ptype = character(), size = 0)
@@ -113,4 +147,6 @@ test_that("Overall", {
     ptype = character(), size = 3)
   expect_true(all(process_allele(error_file_2)[["ignored_position"]] %in%
     c(1, 2, 3, 4, 120, 121)))
+  }
+  set_test(all_test)
 })

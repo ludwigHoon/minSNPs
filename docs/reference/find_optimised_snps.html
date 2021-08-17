@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • minSNPs</title>
+<title>find_optimised_snps is used to find optimised SNPs set. — find_optimised_snps • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="find_optimised_snps is used to find optimised SNPs set. — find_optimised_snps" />
+<meta property="og:description" content="find_optimised_snps is used to find optimised SNPs set." />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -105,45 +106,85 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      
+    <h1><code>find_optimised_snps</code> is used to find optimised SNPs set.</h1>
+    
+    <div class="hidden name"><code>find_optimised_snps.Rd</code></div>
     </div>
 
-    <div id="minsnps-v001" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.1">
-<a href="#minsnps-v001" class="anchor"></a>minSNPs v0.0.1</h1>
-<p>Rebuilding and cleaning part of minSNPs that read fasta and processes the samples.</p>
-<div id="functions-and-variables-now-conform-to-snake-case" class="section level2">
-<h2 class="hasAnchor">
-<a href="#functions-and-variables-now-conform-to-snake-case" class="anchor"></a>Functions and variables now conform to snake case.</h2>
-<ul>
-<li>
-<code>get_usual_length</code> will replace <code>usualLength</code>
-</li>
-<li>
-<code>flag_allele</code> will replace <code>flagAllel</code>
-</li>
-<li>
-<code>flag_position</code> will replace <code>flagPosition</code>
-</li>
-<li>
-<code>process_allele</code> will replace <code>processAllele</code>
-</li>
-<li>
-<code>read_fasta</code> will be used to read fasta file, the sequence name can contain spaces.</li>
-<li>
-<code>write_fasta</code> will be used to write fasta file, the sequence name can contain spaces.</li>
-</ul>
-</div>
-</div>
-  </div>
+    <div class="ref-description">
+    <p><code>find_optimised_snps</code> is used to find optimised SNPs set.</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>find_optimised_snps</span><span class='op'>(</span>
+  <span class='va'>seqc</span>,
+  criteria <span class='op'>=</span> <span class='st'>"simpson"</span>,
+  goi <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
+  accept_multiallelic <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  number_of_result <span class='op'>=</span> <span class='fl'>1</span>,
+  max_depth <span class='op'>=</span> <span class='fl'>1</span>,
+  included_positions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
+  excluded_positions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
+  iterate_included <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  bp <span class='op'>=</span> <span class='fu'>SerialParam</span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>seqc</th>
+      <td><p>list of sequences</p></td>
+    </tr>
+    <tr>
+      <th>criteria</th>
+      <td><p>either `simpson` or `percent`</p></td>
+    </tr>
+    <tr>
+      <th>goi</th>
+      <td><p>group of interest, if creteria is percent,
+must be specified, ignored otherwise</p></td>
+    </tr>
+    <tr>
+      <th>accept_multiallelic</th>
+      <td><p>whether include positions with &gt; 2 states</p></td>
+    </tr>
+    <tr>
+      <th>number_of_result</th>
+      <td><p>number of results to return</p></td>
+    </tr>
+    <tr>
+      <th>max_depth</th>
+      <td><p>maximum depth to go before terminating</p></td>
+    </tr>
+    <tr>
+      <th>included_positions</th>
+      <td><p>included positions</p></td>
+    </tr>
+    <tr>
+      <th>excluded_positions</th>
+      <td><p>excluded positions</p></td>
+    </tr>
+    <tr>
+      <th>iterate_included</th>
+      <td><p>whether to calculate index
+at each level of the included SNPs</p></td>
+    </tr>
+    <tr>
+      <th>bp</th>
+      <td><p>BiocParallel backend</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Will return the resolution-optimised SNPs set, based on the criteria.</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

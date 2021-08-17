@@ -2,7 +2,7 @@
 % Please edit documentation in R/search.R
 \name{calculate.simpson}
 \alias{calculate.simpson}
-\title{\code{calculate.simpson} is used to calculate dissimilarity index.}
+\title{\code{calculate.simpson} is used to calculate Simpson's index.}
 \usage{
 calculate.simpson(pattern)
 }
@@ -10,8 +10,8 @@ calculate.simpson(pattern)
 \item{pattern}{list of sequences}
 }
 \value{
-Will return fastaDNA.
+Will return the Simpson's index of the list of patterns.
 }
 \description{
-\code{calculate.simpson} is used to calculate dissimilarity index.
+\code{calculate.simpson} is used to calculate Simpson's index.
 }
