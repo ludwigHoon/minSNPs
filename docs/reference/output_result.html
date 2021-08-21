@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>get_metric_fun — get_metric_fun • minSNPs</title>
+<title>output_result — output_result • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,9 @@
 
 
 
-<meta property="og:title" content="get_metric_fun — get_metric_fun" />
-<meta property="og:description" content="get_metric_fun is used to get the metrics function
-and required parameters. Additional metric may set by
-assigning to `MinSNPs_metrics` variable." />
+<meta property="og:title" content="output_result — output_result" />
+<meta property="og:description" content="output_result is used to present the result
+and save the result as csv." />
 
 
 
@@ -108,33 +107,40 @@ assigning to `MinSNPs_metrics` variable." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><code>get_metric_fun</code></h1>
+    <h1><code>output_result</code></h1>
     
-    <div class="hidden name"><code>get_metric_fun.Rd</code></div>
+    <div class="hidden name"><code>output_result.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>get_metric_fun</code> is used to get the metrics function
-and required parameters. Additional metric may set by
-assigning to `MinSNPs_metrics` variable.</p>
+    <p><code>output_result</code> is used to present the result
+and save the result as csv.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_metric_fun</span><span class='op'>(</span><span class='va'>metric_name</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>output_result</span><span class='op'>(</span><span class='va'>result</span>, <span class='va'>view</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>metric_name</th>
-      <td><p>name of the metric, by default percent/simpson</p></td>
+      <th>result</th>
+      <td><p>is the result from <code>find_optimised_snps</code></p></td>
+    </tr>
+    <tr>
+      <th>view</th>
+      <td><p>how to present the output, "csv" will be saved as a file.
+Otherwise, printed to console.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>if view is "csv", file name can be passed, e.g.,
+file_name = "result.csv", otherwise, file is saved as &lt;timestamp&gt;.csv.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a list, including the function to calculate the
-metric based on a position (`calc`), and function to check for
-additional parameters the function need (`args`)</p>
+    <p>NULL, result either printed or saved as csv.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

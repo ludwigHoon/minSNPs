@@ -9,6 +9,7 @@
 #' @param ... if view is "csv", file name can be passed, e.g.,
 #' file_name = "result.csv", otherwise, file is saved as <timestamp>.csv.
 #' @return NULL, result either printed or saved as csv.
+#' @export
 output_result <- function(result, view, ...) {
     additional_args <- list(...)
     if (is.null(minSNPs::get_metric_fun(result$metric)[["view"]])) {
