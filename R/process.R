@@ -188,13 +188,26 @@ process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
     processed <- list()
     seqc <- remove_dup_allele(seqc)
     ignored <- flag_allele(seqc, bp)
-    processed$seqc <- seqc
+    processed$seqc <- as.list(seqc)
     processed$ignored_allele <- ignored
 
     cat("Ignored samples:", "\n")
     cat(paste(ignored, collapse = ", "), "\n")
 
     processed$seqc <- within(as.list(processed$seqc), rm(list = ignored))
+
+    processed$seqc <- lapply(processed$seqc, function(seqc) {
+        return(unlist(strsplit(as.character(seqc), split = "")))
+    })
+
+    names_seqs <-  names(processed$seqc)
+    processed$seqc <- lapply(seq_len(length(processed$seqc)),
+        function(i, seqs, names_seqs) {
+            attr(seqs[[i]], "name") <- names_seqs[[i]]
+            return(seqs[[i]])
+        },
+    names_seqs = names(processed$seqc), seqs = processed$seqc)
+    names(processed$seqc) <- names_seqs
 
     ignored_position <- flag_position(processed$seqc,
         dash_ignore = dash_ignore, accepted_char = accepted_char,
@@ -203,6 +216,6 @@ process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
     cat("Ignored ", length(ignored_position), " positions", "\n")
 
     processed$ignored_position <- ignored_position
-
+    class(processed) <- "processed_seqs"
     return(processed)
 }

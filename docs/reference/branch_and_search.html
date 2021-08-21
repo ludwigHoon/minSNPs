@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>write_fasta — write_fasta • minSNPs</title>
+<title>branch_and_search — branch_and_search • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,10 @@
 
 
 
-<meta property="og:title" content="write_fasta — write_fasta" />
-<meta property="og:description" content="write_fasta is used to write
-the named character vectors to fasta file." />
+<meta property="og:title" content="branch_and_search — branch_and_search" />
+<meta property="og:description" content="branch_and_search is the actual function used to
+find optimised SNPs set. This function is called by
+find_optimised_snps, after preprocessing." />
 
 
 
@@ -107,35 +108,71 @@ the named character vectors to fasta file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><code>write_fasta</code></h1>
+    <h1><code>branch_and_search</code></h1>
     
-    <div class="hidden name"><code>write_fasta.Rd</code></div>
+    <div class="hidden name"><code>branch_and_search.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>write_fasta</code> is used to write
-the named character vectors to fasta file.</p>
+    <p><code>branch_and_search</code> is the actual function used to
+find optimised SNPs set. This function is called by
+<code>find_optimised_snps</code>, after preprocessing.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>write_fasta</span><span class='op'>(</span><span class='va'>seqc</span>, <span class='va'>filename</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>branch_and_search</span><span class='op'>(</span>
+  starting_positions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
+  excluded_positions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>seqc</span>,
+  <span class='va'>metric</span>,
+  number_of_result <span class='op'>=</span> <span class='fl'>1</span>,
+  max_depth <span class='op'>=</span> <span class='fl'>1</span>,
+  bp <span class='op'>=</span> <span class='fu'>SerialParam</span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>seqc</th>
-      <td><p>a list containing list of nucleotides. To keep it simple,
-use provided read_fasta to import the fasta file.</p></td>
+      <th>starting_positions</th>
+      <td><p>the starting positions that is already in
+the SNP set.</p></td>
     </tr>
     <tr>
-      <th>filename</th>
-      <td><p>filename of the output file</p></td>
+      <th>excluded_positions</th>
+      <td><p>excluded positions</p></td>
+    </tr>
+    <tr>
+      <th>seqc</th>
+      <td><p>list of sequences, either passed directly from
+<code>process_allele</code> or <code>read_fasta</code> or equivalence</p></td>
+    </tr>
+    <tr>
+      <th>metric</th>
+      <td><p>either `simpson` or `percent`</p></td>
+    </tr>
+    <tr>
+      <th>number_of_result</th>
+      <td><p>number of results to return, 0 will be coerced to 1</p></td>
+    </tr>
+    <tr>
+      <th>max_depth</th>
+      <td><p>maximum depth to go before terminating,
+0 means it will only calculate the metric for included position</p></td>
+    </tr>
+    <tr>
+      <th>bp</th>
+      <td><p>BiocParallel backend. Rule of thumbs: use MulticoreParam()</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>other parameters as needed</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>will write the alignments to file</p>
+    <p>Will return the resolution-optimised SNPs set, based on the metric.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

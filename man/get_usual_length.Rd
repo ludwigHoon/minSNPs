@@ -2,8 +2,7 @@
 % Please edit documentation in R/process.R
 \name{get_usual_length}
 \alias{get_usual_length}
-\title{\code{get_usual_length} is used to find out
-the length of the sequences (W/O deletion).}
+\title{\code{get_usual_length}}
 \usage{
 get_usual_length(seqc, bp = SerialParam())
 }

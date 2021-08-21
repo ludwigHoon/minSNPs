@@ -2,8 +2,7 @@
 % Please edit documentation in R/process.R
 \name{write_fasta}
 \alias{write_fasta}
-\title{\code{write_fasta} is used to write
-the named character vectors to fasta file.}
+\title{\code{write_fasta}}
 \usage{
 write_fasta(seqc, filename)
 }

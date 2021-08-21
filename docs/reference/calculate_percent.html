@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>write_fasta — write_fasta • minSNPs</title>
+<title>calculate_percent — calculate_percent • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,10 @@
 
 
 
-<meta property="og:title" content="write_fasta — write_fasta" />
-<meta property="og:description" content="write_fasta is used to write
-the named character vectors to fasta file." />
+<meta property="og:title" content="calculate_percent — calculate_percent" />
+<meta property="og:description" content="calculate_percent is used to calculate dissimilarity index,
+proportion of isolates not in goi that have been discriminated against.
+1 being all and 0 being none." />
 
 
 
@@ -107,35 +108,35 @@ the named character vectors to fasta file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><code>write_fasta</code></h1>
+    <h1><code>calculate_percent</code></h1>
     
-    <div class="hidden name"><code>write_fasta.Rd</code></div>
+    <div class="hidden name"><code>calculate_percent.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>write_fasta</code> is used to write
-the named character vectors to fasta file.</p>
+    <p><code>calculate_percent</code> is used to calculate dissimilarity index,
+proportion of isolates not in goi that have been discriminated against.
+1 being all and 0 being none.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>write_fasta</span><span class='op'>(</span><span class='va'>seqc</span>, <span class='va'>filename</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>calculate_percent</span><span class='op'>(</span><span class='va'>pattern</span>, <span class='va'>goi</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>seqc</th>
-      <td><p>a list containing list of nucleotides. To keep it simple,
-use provided read_fasta to import the fasta file.</p></td>
+      <th>pattern</th>
+      <td><p>list of sequences</p></td>
     </tr>
     <tr>
-      <th>filename</th>
-      <td><p>filename of the output file</p></td>
+      <th>goi</th>
+      <td><p>group of interest</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>will write the alignments to file</p>
+    <p>Will return the dissimilarity index of the list of patterns.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

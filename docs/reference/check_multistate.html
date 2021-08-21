@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>write_fasta — write_fasta • minSNPs</title>
+<title>check_multistate — check_multistate • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="write_fasta — write_fasta" />
-<meta property="og:description" content="write_fasta is used to write
-the named character vectors to fasta file." />
+<meta property="og:title" content="check_multistate — check_multistate" />
+<meta property="og:description" content="check_multistate is used to remove positions where there are
+more than 1 state within the group of interest." />
 
 
 
@@ -107,35 +107,34 @@ the named character vectors to fasta file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><code>write_fasta</code></h1>
+    <h1><code>check_multistate</code></h1>
     
-    <div class="hidden name"><code>write_fasta.Rd</code></div>
+    <div class="hidden name"><code>check_multistate.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>write_fasta</code> is used to write
-the named character vectors to fasta file.</p>
+    <p><code>check_multistate</code> is used to remove positions where there are
+more than 1 state within the group of interest.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>write_fasta</span><span class='op'>(</span><span class='va'>seqc</span>, <span class='va'>filename</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>check_multistate</span><span class='op'>(</span><span class='va'>position</span>, <span class='va'>sequences</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>seqc</th>
-      <td><p>a list containing list of nucleotides. To keep it simple,
-use provided read_fasta to import the fasta file.</p></td>
+      <th>position</th>
+      <td><p>position to check</p></td>
     </tr>
     <tr>
-      <th>filename</th>
-      <td><p>filename of the output file</p></td>
+      <th>sequences</th>
+      <td><p>sequences from group of interest</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>will write the alignments to file</p>
+    <p>return `TRUE` if the position contains multistate otherwise `FALSE`</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -2,10 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_allele}
 \alias{process_allele}
-\title{\code{process_allele} is used to returned the processed allelic profiles, by
-removing the allele profile with duplicate name and length different
-from most. 1st allele profile with the duplicated name is returned,
-the longer length is taken as normal should there be 2 modes.}
+\title{\code{process_allele}}
 \usage{
 process_allele(
   seqc,

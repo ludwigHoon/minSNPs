@@ -2,7 +2,7 @@
 % Please edit documentation in R/search.R
 \name{generate_pattern}
 \alias{generate_pattern}
-\title{\code{generate_pattern} is used to generate pattern for calculation.}
+\title{\code{generate_pattern}}
 \usage{
 generate_pattern(seqc, ordered_index = c(), append_to = list())
 }
@@ -19,3 +19,4 @@ Will return concatenated list of string for searching.
 \description{
 \code{generate_pattern} is used to generate pattern for calculation.
 }
+\keyword{internal}

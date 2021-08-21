@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{remove_dup_allele}
 \alias{remove_dup_allele}
-\title{\code{remove_dup_allele} is used to remove allele with the same name.}
+\title{\code{remove_dup_allele}}
 \usage{
 remove_dup_allele(seqc)
 }

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>find_optimised_snps is used to find optimised SNPs set. — find_optimised_snps • minSNPs</title>
+<title>find_optimised_snps — find_optimised_snps • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="find_optimised_snps is used to find optimised SNPs set. — find_optimised_snps" />
+<meta property="og:title" content="find_optimised_snps — find_optimised_snps" />
 <meta property="og:description" content="find_optimised_snps is used to find optimised SNPs set." />
 
 
@@ -106,7 +106,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><code>find_optimised_snps</code> is used to find optimised SNPs set.</h1>
+    <h1><code>find_optimised_snps</code></h1>
     
     <div class="hidden name"><code>find_optimised_snps.Rd</code></div>
     </div>
@@ -117,15 +117,16 @@
 
     <pre class="usage"><span class='fu'>find_optimised_snps</span><span class='op'>(</span>
   <span class='va'>seqc</span>,
-  criteria <span class='op'>=</span> <span class='st'>"simpson"</span>,
+  metric <span class='op'>=</span> <span class='st'>"simpson"</span>,
   goi <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
-  accept_multiallelic <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  accept_multiallelic <span class='op'>=</span> <span class='cn'>TRUE</span>,
   number_of_result <span class='op'>=</span> <span class='fl'>1</span>,
   max_depth <span class='op'>=</span> <span class='fl'>1</span>,
   included_positions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
   excluded_positions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>)</span>,
   iterate_included <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  bp <span class='op'>=</span> <span class='fu'>SerialParam</span><span class='op'>(</span><span class='op'>)</span>
+  bp <span class='op'>=</span> <span class='fu'>SerialParam</span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -133,10 +134,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>seqc</th>
-      <td><p>list of sequences</p></td>
+      <td><p>list of sequences, either passed directly from
+<code>process_allele</code> or <code>read_fasta</code> or equivalence</p></td>
     </tr>
     <tr>
-      <th>criteria</th>
+      <th>metric</th>
       <td><p>either `simpson` or `percent`</p></td>
     </tr>
     <tr>
@@ -146,15 +148,16 @@ must be specified, ignored otherwise</p></td>
     </tr>
     <tr>
       <th>accept_multiallelic</th>
-      <td><p>whether include positions with &gt; 2 states</p></td>
+      <td><p>whether include positions with &gt; 1 state in goi</p></td>
     </tr>
     <tr>
       <th>number_of_result</th>
-      <td><p>number of results to return</p></td>
+      <td><p>number of results to return, 0 will be coerced to 1</p></td>
     </tr>
     <tr>
       <th>max_depth</th>
-      <td><p>maximum depth to go before terminating</p></td>
+      <td><p>maximum depth to go before terminating,
+0 means it will only calculate the metric for included position</p></td>
     </tr>
     <tr>
       <th>included_positions</th>
@@ -171,13 +174,17 @@ at each level of the included SNPs</p></td>
     </tr>
     <tr>
       <th>bp</th>
-      <td><p>BiocParallel backend</p></td>
+      <td><p>BiocParallel backend. Rule of thumbs: use MulticoreParam()</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>other parameters as needed</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Will return the resolution-optimised SNPs set, based on the criteria.</p>
+    <p>Will return the resolution-optimised SNPs set, based on the metric.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
