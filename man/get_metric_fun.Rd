@@ -7,7 +7,7 @@
 get_metric_fun(metric_name)
 }
 \arguments{
-\item{metric}{name of the metric, by default percent/simpson}
+\item{metric_name}{name of the metric, by default percent/simpson}
 }
 \value{
 a list, including the function to calculate the

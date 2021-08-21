@@ -13,5 +13,6 @@ RoxygenNote: 7.1.1
 Suggests: 
     knitr,
     testthat,
-    pkgdown
+    pkgdown,
+    Biostrings
 VignetteBuilder: knitr
