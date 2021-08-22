@@ -14,5 +14,7 @@ Suggests:
     knitr,
     testthat,
     pkgdown,
-    Biostrings
+    Biostrings,
+    rmarkdown
 VignetteBuilder: knitr
+URL: https://github.com/ludwigHoon/minSNPs

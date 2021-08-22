@@ -10,3 +10,4 @@ Rebuilding and cleaning old version of minSNPs.
 - `get_metric_fun` is used internally to translate the metric to the functions, additional metric can be added by defining the functions and overriding the global `MinSNPs_metrics` variable.
 - `calculate_simpson`, `calculate_percent`, and `check_percent`, `get_metric_fun` are only included as sample, there is no reason to call these functions directly.
 - `find_optimised_snps` is used to find optimised SNP set(s). It can also be used to recalculate index by giving it included positions and setting max_depth to 0.
+- `output_result` is used to output results from `find_optimised_snps`.

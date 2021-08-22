@@ -1,0 +1,31 @@
+---
+title: "MinSNPs_Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{MinSNPs_Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(minSNPs)
+library(Biostrings) # optional
+library(BiocParallel) # optional, but needed for parallel processing
+```
+### Reading & processing input for further analysis
+```{r}
+isolates_from_biostring <- readBStringSet(
+  system.file("extdata", "Chlamydia_mapped.fasta", package = "minSNPs"))
+isolates_from_default <- read_fasta(
+  system.file("extdata", "Chlamydia_mapped.fasta", package = "minSNPs"))
+processed_from_biostring <- process_allele(isolates_from_biostring)
+processed_from_default <- process_allele(isolates_from_default)
+```
+

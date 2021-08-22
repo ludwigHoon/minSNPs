@@ -10,7 +10,7 @@
 #' file_name = "result.csv", otherwise, file is saved as <timestamp>.csv.
 #' @return NULL, result either printed or saved as csv.
 #' @export
-output_result <- function(result, view, ...) {
+output_result <- function(result, view = "", ...) {
     additional_args <- list(...)
     if (is.null(get_metric_fun(result$metric)[["view"]])) {
         stop("The view function is not defined")
@@ -51,7 +51,8 @@ output_result <- function(result, view, ...) {
             write_output(paste(group_seq, isolates, sep = "\t"))
         }
         if ("residual" %in% parsed_view[[n]]) {
-            write_output(paste(group_seq, isolates, sep = "\t"))
+            write_output(paste("Residuals:",
+                parsed_view[[n]][["residual"]], sep = "\t"))
         }
         write_output("\n")
     }

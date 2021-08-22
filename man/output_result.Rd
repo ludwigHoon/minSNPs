@@ -4,7 +4,7 @@
 \alias{output_result}
 \title{\code{output_result}}
 \usage{
-output_result(result, view, ...)
+output_result(result, view = "", ...)
 }
 \arguments{
 \item{result}{is the result from \code{find_optimised_snps}}
