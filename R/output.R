@@ -12,11 +12,11 @@
 #' @export
 output_result <- function(result, view, ...) {
     additional_args <- list(...)
-    if (is.null(minSNPs::get_metric_fun(result$metric)[["view"]])) {
+    if (is.null(get_metric_fun(result$metric)[["view"]])) {
         stop("The view function is not defined")
     }
 
-    parsed_view <- minSNPs::get_metric_fun(result$metric)[["view"]](result,
+    parsed_view <- get_metric_fun(result$metric)[["view"]](result,
         additional_args)
     if (view == "csv") {
         if ("file_name" %in% names(additional_args)) {
