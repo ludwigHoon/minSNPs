@@ -1,5 +1,5 @@
 # minSNPs v0.0.1
-Rebuilding and cleaning old version of minSNPs.
+First release to CRAN.
 ## Changes
 - `read_fasta` will be used to read fasta file, the sequence name can contain spaces.
 - `write_fasta` will be used to write fasta file, the sequence name can contain spaces.

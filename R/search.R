@@ -89,7 +89,7 @@ check_percent <- function(list_of_parameters) {
 
 
 view_simpson <- function(result, ...) {
-    additional_args <- list(...)
+    additional_args <- list(...)[[1]]
     if (exists(result$seqc_name)) {
         seqc <- get(result$seqc_name)
     } else if (!is.null(additional_args[["seqc"]])) {
@@ -323,6 +323,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
             c(additional_exclude, original_excluded))),
         included_positions = included_positions,
         seqc_name = deparse(substitute(seqc)), goi = goi,
+        all_sequences = names(sequences),
         max_depth = max_depth, metric = metric))
 }
 

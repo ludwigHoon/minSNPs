@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>check_multistate — check_multistate • minSNPs</title>
+<title>output_parsed — output_parsed • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="check_multistate — check_multistate" />
-<meta property="og:description" content="check_multistate is used to remove positions where there are
-more than 1 state within the group of interest." />
+<meta property="og:title" content="output_parsed — output_parsed" />
+<meta property="og:description" content="output_parsed is subfunction used by output_result
+to present the result and save the result as csv." />
 
 
 
@@ -124,34 +124,43 @@ more than 1 state within the group of interest." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><code>check_multistate</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/ludwigHoon/minSNPs/blob/master/R/search.R'><code>R/search.R</code></a></small>
-    <div class="hidden name"><code>check_multistate.Rd</code></div>
+    <h1><code>output_parsed</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/ludwigHoon/minSNPs/blob/master/R/output.R'><code>R/output.R</code></a></small>
+    <div class="hidden name"><code>output_parsed.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>check_multistate</code> is used to remove positions where there are
-more than 1 state within the group of interest.</p>
+    <p><code>output_parsed</code> is subfunction used by <code>output_result</code>
+to present the result and save the result as csv.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>check_multistate</span><span class='op'>(</span><span class='va'>position</span>, <span class='va'>sequences</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>output_parsed</span><span class='op'>(</span><span class='va'>parsed_view</span>, <span class='va'>seqc_obj</span>, <span class='va'>result</span>, <span class='va'>file_name</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>position</th>
-      <td><p>position to check</p></td>
+      <th>parsed_view</th>
+      <td><p>the result from <code>get_metric_fun</code>, passed from
+<code>output_result</code></p></td>
     </tr>
     <tr>
-      <th>sequences</th>
-      <td><p>sequences from group of interest</p></td>
+      <th>seqc_obj</th>
+      <td><p>the sequences object.</p></td>
+    </tr>
+    <tr>
+      <th>result</th>
+      <td><p>is the result from <code>find_optimised_snps</code></p></td>
+    </tr>
+    <tr>
+      <th>file_name</th>
+      <td><p>file name, either csv or "" for terminal output</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>return `TRUE` if the position contains multistate otherwise `FALSE`</p>
+    <p>NULL, result either printed or saved as csv.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -5,3 +5,6 @@
 .*\.ipynb
 ^\.github
 ^docs
+^doc$
+^Meta$
+^MinSNPs_app
