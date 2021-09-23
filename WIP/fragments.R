@@ -10,7 +10,7 @@
 #' @return Will return a list consist of the genome and a dataframe of the meta
 read_ref_meta <- function(ref_meta, ref_genome, read_meta_from_file = TRUE,
     read_genome_from_file = TRUE) {
-    if (read_meta_from_file){
+    if (read_meta_from_file) {
         meta <- read.csv(ref_meta)
     } else{
         meta <- ref_meta

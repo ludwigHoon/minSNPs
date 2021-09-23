@@ -11,3 +11,8 @@ First release to CRAN.
 - `calculate_simpson`, `calculate_percent`, and `check_percent`, `get_metric_fun` are only included as sample, there is no reason to call these functions directly.
 - `find_optimised_snps` is used to find optimised SNP set(s). It can also be used to recalculate index by giving it included positions and setting max_depth to 0.
 - `output_result` is used to output results from `find_optimised_snps`.
+
+# minSNPs v0.0.2
+First release to CRAN.
+## Changes
+- `find_optimised_snps` can receive an additional argument `output_progress = TRUE`, such that progress can be shown in terminal when looking for multiple result.
