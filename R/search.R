@@ -83,11 +83,19 @@ calculate_simpson <- function(pattern) {
 #' \code{calculate_percent} are all present.
 #' @param list_of_parameters is a list of parameter passed
 #' to functions that will perform the calculation
+#' @return TRUE if goi exists, else FALSE
 check_percent <- function(list_of_parameters) {
     return(length(list_of_parameters[["goi"]]) > 0)
 }
 
-
+#' \code{view_simpson}
+#'
+#' @description
+#' \code{view_simpson} is used to present the result of selected
+#' SNPs set based on Simpson's Index.
+#' @param result is the result from \code{find_optimised_snps}
+#' @param ... other optional parameters
+#' @return formatted result list to be saved or presented.
 view_simpson <- function(result, ...) {
     additional_args <- list(...)[[1]]
     if (exists(result$seqc_name)) {
@@ -123,6 +131,14 @@ view_simpson <- function(result, ...) {
     return(isolates_in_groups)
 }
 
+#' \code{view_percent}
+#'
+#' @description
+#' \code{view_percent} is used to present the result of selected
+#' SNPs set based on Simpson's Index.
+#' @param result is the result from \code{find_optimised_snps}
+#' @param ... other optional parameters
+#' @return formatted result list to be saved or presented.
 view_percent <- function(result, ...) { # nolint
     additional_args <- list(...)[[1]]
     if (exists(result$seqc_name) && !is.null(result$goi)) {
@@ -315,7 +331,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
             bp, all_parameters)
         all_result <- bplapply(branch_result, function(branch_r, inc_r) {
             return(c(inc_r, branch_r))
-        }, inc_r = result)
+        }, inc_r = result, BPPARAM = SerialParam())
     }
 
     return(list(results = all_result,
@@ -349,7 +365,9 @@ branch_and_search <- function(starting_positions = c(),
     current_level <- length(starting_positions)
     traversed <- list()
     existing_pattern <- list()
-
+    output_progress <- ifelse(
+        is.null(additional_args[["output_progress"]]),
+    FALSE, additional_args[["output_progress"]])
     # Function to generate list of position to iterate through
     get_positions_to_search <- function(seqc_len, excluded_pos, traversed) {
         positions <- seq_len(seqc_len)
@@ -366,7 +384,7 @@ branch_and_search <- function(starting_positions = c(),
             BPPARAM = bp)
     depth_1 <- bplapply(scores, function(score) {
             return(score[["result"]])
-    }, BPPARAM = bp)
+    }, BPPARAM = SerialParam())
 
     # Sorting for selection at this depth
     names(depth_1) <- positions
@@ -398,6 +416,7 @@ branch_and_search <- function(starting_positions = c(),
             # if the index is not already 1
             if (max_depth - 1 > 0 &&
                 result_d1[[paste(traversed[[n]], collapse = ",")]] < 1) {
+                additional_args[["output_progress"]] <- FALSE
                 additional_args[["existing_pattern"]] <- existing_pattern[[n]]
                 multi_result[[paste("result", n)]] <- branch_and_search(
                     starting_positions = c(starting_positions,
@@ -412,6 +431,9 @@ branch_and_search <- function(starting_positions = c(),
             multi_result[[paste("result", n)]] <- c(
                 result_d1[n],
                 multi_result[[paste("result", n)]][["result"]])
+            if (output_progress) {
+                cat("Generated", n, "result\n")
+            }
         }
         return(multi_result)
     } else {
@@ -431,7 +453,7 @@ branch_and_search <- function(starting_positions = c(),
                     BPPARAM = bp)
             depth_1 <- bplapply(scores, function(score) {
                     return(score[["result"]])
-            }, BPPARAM = bp)
+            }, BPPARAM = SerialParam())
 
             names(depth_1) <- positions
             position_order <- order(unlist(depth_1), decreasing = TRUE)
