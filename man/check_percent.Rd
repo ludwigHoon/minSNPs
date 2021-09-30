@@ -10,6 +10,9 @@ check_percent(list_of_parameters)
 \item{list_of_parameters}{is a list of parameter passed
 to functions that will perform the calculation}
 }
+\value{
+TRUE if goi exists, else FALSE
+}
 \description{
 \code{check_percent} is used to check if parameters needed by
 \code{calculate_percent} are all present.

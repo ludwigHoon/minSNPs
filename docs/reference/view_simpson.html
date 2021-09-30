@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • minSNPs</title>
+<title>view_simpson — view_simpson • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="view_simpson — view_simpson" />
+<meta property="og:description" content="view_simpson is used to present the result of selected
+SNPs set based on Simpson's Index." />
 
 
 
@@ -58,7 +60,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -120,102 +122,38 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1><code>view_simpson</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/ludwigHoon/minSNPs/blob/master/R/search.R'><code>R/search.R</code></a></small>
+    <div class="hidden name"><code>view_simpson.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p><code>view_simpson</code> is used to present the result of selected
+SNPs set based on Simpson's Index.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>view_simpson</span><span class='op'>(</span><span class='va'>result</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="calculate_percent.html">calculate_percent()</a></code> </p>
-        </td>
-        <td><p><code>calculate_percent</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="calculate_simpson.html">calculate_simpson()</a></code> </p>
-        </td>
-        <td><p><code>calculate_simpson</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_percent.html">check_percent()</a></code> </p>
-        </td>
-        <td><p><code>check_percent</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="find_optimised_snps.html">find_optimised_snps()</a></code> </p>
-        </td>
-        <td><p><code>find_optimised_snps</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_metric_fun.html">get_metric_fun()</a></code> </p>
-        </td>
-        <td><p><code>get_metric_fun</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="output_result.html">output_result()</a></code> </p>
-        </td>
-        <td><p><code>output_result</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="process_allele.html">process_allele()</a></code> </p>
-        </td>
-        <td><p><code>process_allele</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="read_fasta.html">read_fasta()</a></code> </p>
-        </td>
-        <td><p><code>read_fasta</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="view_percent.html">view_percent()</a></code> </p>
-        </td>
-        <td><p><code>view_percent</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="view_simpson.html">view_simpson()</a></code> </p>
-        </td>
-        <td><p><code>view_simpson</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="write_fasta.html">write_fasta()</a></code> </p>
-        </td>
-        <td><p><code>write_fasta</code></p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>result</th>
+      <td><p>is the result from <code>find_optimised_snps</code></p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>other optional parameters</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>formatted result list to be saved or presented.</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
