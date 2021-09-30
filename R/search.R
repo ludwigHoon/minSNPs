@@ -173,8 +173,10 @@ view_percent <- function(result, ...) { # nolint
                 target_seqs <- c(target_seqs, patterns[[isolate]])
             }
         }
-        isolates_w_goi_pattern <- names(which(patterns %in% target_seqs))
-        failed_to_discriminate <- which(!isolates_w_goi_pattern %in% goi)
+        isolates_w_goi_pattern <- names(patterns)[
+            which(patterns %in% target_seqs)]
+        failed_to_discriminate <- isolates_w_goi_pattern[
+            which(!isolates_w_goi_pattern %in% goi)]
 
         for (seqs in unique_sequences) {
             if (seqs %in% target_seqs) {
