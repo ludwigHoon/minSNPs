@@ -13,6 +13,7 @@ First release to CRAN.
 - `output_result` is used to output results from `find_optimised_snps`.
 
 # minSNPs v0.0.2
-First release to CRAN.
+Minor changes & testing
 ## Changes
 - `find_optimised_snps` can receive an additional argument `output_progress = TRUE`, such that progress can be shown in terminal when looking for multiple result.
+- `write_fasta` bug where only the first letter is written to the file is fixed.

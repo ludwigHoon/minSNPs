@@ -70,7 +70,8 @@ write_fasta <- function(seqc, filename) {
         r <- l - (60 * q)
         if (q > 0) {
             sapply(seq_len(q), function(x) {
-                writeLines(this_seq[(60 * (x - 1) + 1):(60 * x)], outfile)
+                writeLines(paste(this_seq[(60 * (x - 1) + 1):(60 * x)],
+                    collapse = ""), outfile)
             })
         }
         if (r > 0) {
