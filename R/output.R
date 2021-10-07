@@ -49,7 +49,6 @@ output_result <- function(result, view = "", ...) {
         file_name <- ""
     }
 
-    print(additional_args)
     parsed_view <- get_metric_fun(result$metric)[["view"]](result,
         additional_args)
     seqc_obj <- get_seq_obj(result$seqc_name, additional_args)
@@ -88,10 +87,16 @@ output_parsed <- function(parsed_view, seqc_obj, result, file_name) {
             isolates <- parsed_view[[n]]$groups[[group]]
             write_output(paste(group_seq, isolates, sep = "\t"))
         }
-        print(parsed_view[[n]])
-        if ("residual" %in% parsed_view[[n]]) {
+        if ("residual" %in% names(parsed_view[[n]])) {
             write_output(paste("Residuals:",
                 parsed_view[[n]][["residual"]], sep = "\t"))
+        }
+        other_details <- names(parsed_view[[n]])[
+            startsWith(names(parsed_view[[n]]), "N.B.-")]
+        for (other_val in other_details) {
+            write_output(paste(paste(other_val, ":", sep = ""),
+                paste(parsed_view[[n]][[other_val]], collapse = ", "),
+                sep = "\t"))
         }
         write_output("\n")
     }

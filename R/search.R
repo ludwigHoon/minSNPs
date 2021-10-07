@@ -178,6 +178,15 @@ view_percent <- function(result, ...) { # nolint
         failed_to_discriminate <- isolates_w_goi_pattern[
             which(!isolates_w_goi_pattern %in% goi)]
 
+        pattern_failed <- patterns[failed_to_discriminate]
+
+        failed_to_discriminate <- sapply(failed_to_discriminate,
+        function(failed_name, pattern) {
+            return(paste(failed_name, " (", pattern[[failed_name]], ")",
+            sep = ""))
+            },
+        pattern = pattern_failed, USE.NAMES = FALSE)
+
         for (seqs in unique_sequences) {
             if (seqs %in% target_seqs) {
                 seqs_name <- paste("*target* -", seqs)
@@ -204,7 +213,7 @@ view_percent <- function(result, ...) { # nolint
 #' @return a list, including the function to calculate the
 #' metric based on a position (`calc`), and function to check for
 #' additional parameters the function need (`args`)
-get_metric_fun <- function(metric_name) {
+get_metric_fun <- function(metric_name = "") {
     if (! exists("MinSNPs_metrics")) {
         MinSNPs_metrics <- list( #nolint
             "percent" = list("calc" = calculate_percent,
@@ -212,6 +221,9 @@ get_metric_fun <- function(metric_name) {
             "simpson" = list("calc" = calculate_simpson,
                 "view" = view_simpson)
         )
+    }
+    if (metric_name == ""){
+        return(MinSNPs_metrics)
     }
     return(MinSNPs_metrics[[metric_name]])
 }

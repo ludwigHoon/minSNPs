@@ -1,7 +1,4 @@
----
-title: "MinSNPs & Plasmodium Vivax Analysis"
----
-```{r}
+setwd("/home/ludwig/MIN")
 devtools::load_all("./MinSNPs")
 hets_vivax <- read_fasta("n_vivax.fasta")
 homs_vivax <- read_fasta("Pv_Nature_communications_2018_VQSLOD3.min0.fasta")
@@ -62,13 +59,23 @@ w_5_k2_4 <- c(41422, 56428, 75728, 9946, 37301) # 0.971705137751303
 w_5_k2_5 <- c(46256, 53746, 289428, 111562, 28397) # 0.971705137751303
 resolved_5k2 <- ls(pattern = "w_5_k2_[0-9]")
 
+dir.create("./homs", showWarnings = TRUE)
 for (dataset in c(resolved_full, resolved_1k2, resolved_5k2)) {
     for (data in dataset) {
         result <- find_optimised_snps(homs_vivax, metric = "percent",
             goi = k2, max_depth = 0, included_positions = get(data),
             iterate_included = TRUE)
         output_result(result, view = "csv",
-            file_name = paste(data, ".tsv", sep = ""))
+            file_name = paste("./homs/", data, ".tsv", sep = ""))
     }
 }
-```
+dir.create("./hets", showWarnings = TRUE)
+for (dataset in c(resolved_full, resolved_1k2, resolved_5k2)) {
+    for (data in dataset) {
+        result <- find_optimised_snps(hets_vivax, metric = "percent",
+            goi = k2, max_depth = 0, included_positions = get(data),
+            iterate_included = TRUE)
+        output_result(result, view = "csv",
+            file_name = paste("./hets/", data, ".tsv", sep = ""))
+    }
+}
