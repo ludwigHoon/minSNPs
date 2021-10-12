@@ -1,6 +1,6 @@
 Package: minSNPs
 Title: Resolution-Optimised SNPs Searcher
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: c(person("Ludwig Kian Soon", "Hoon", email = "ldwgkshoon@gmail.com", role = c("aut", "cre"), comment = c(ORCID ="0000-0002-2310-3403")), person("Peter", "Shaw", email = "peter.shaw.cs@gmail.com", role = c("aut", "ctb"), comment = c(ORCID ="0000-0002-3187-8938")), person("Phil", "Giffard", email = "Phil.Giffard@menzies.edu.au", role = c("aut", "ctb"), comment = c(ORCID ="0000-0002-3030-9127")))
 Description: This is a R implementation of "Minimum SNPs" software as described in "Price E.P., Inman-Bamber, J., Thiruvenkataswamy, V., Huygens, F and Giffard, P.M." (2007) <doi:10.1186/1471-2105-8-278> "Computer-aided identification of polymorphism sets diagnostic for groups of bacterial and viral genetic variants."
 Depends: R (>= 3.4.0)

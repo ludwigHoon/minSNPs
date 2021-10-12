@@ -4,7 +4,7 @@
 \alias{get_metric_fun}
 \title{\code{get_metric_fun}}
 \usage{
-get_metric_fun(metric_name)
+get_metric_fun(metric_name = "")
 }
 \arguments{
 \item{metric_name}{name of the metric, by default percent/simpson}

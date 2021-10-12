@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>cal_met_snp — cal_met_snp • minSNPs</title>
+<title>merge_fasta — merge_fasta • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="cal_met_snp — cal_met_snp" />
-<meta property="og:description" content="cal_met_snp is used to calculate the metric at each position" />
+<meta property="og:title" content="merge_fasta — merge_fasta" />
+<meta property="og:description" content="merge_fasta is used to combine 2 ." />
 
 
 
@@ -123,43 +123,46 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><code>cal_met_snp</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/ludwigHoon/minSNPs/blob/master/R/search.R'><code>R/search.R</code></a></small>
-    <div class="hidden name"><code>cal_met_snp.Rd</code></div>
+    <h1><code>merge_fasta</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/ludwigHoon/minSNPs/blob/master/R/merge.R'><code>R/merge.R</code></a></small>
+    <div class="hidden name"><code>merge_fasta.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>cal_met_snp</code> is used to calculate the metric at each position</p>
+    <p><code>merge_fasta</code> is used to combine 2 .</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cal_met_snp</span><span class='op'>(</span><span class='va'>position</span>, <span class='va'>metric</span>, <span class='va'>seqc</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>merge_fasta</span><span class='op'>(</span><span class='va'>fasta_1</span>, <span class='va'>fasta_2</span>, <span class='va'>meta_1</span>, <span class='va'>meta_2</span>, method <span class='op'>=</span> <span class='st'>"inner"</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>position</th>
-      <td><p>position to check</p></td>
+      <th>fasta_1</th>
+      <td><p>fasta read into memory to join</p></td>
     </tr>
     <tr>
-      <th>metric</th>
-      <td><p>either `simpson` or `percent`</p></td>
+      <th>fasta_2</th>
+      <td><p>fasta read into memory to join</p></td>
     </tr>
     <tr>
-      <th>seqc</th>
-      <td><p>list of sequences, either passed directly from
-<code>process_allele</code> or <code>read_fasta</code> or equivalence</p></td>
+      <th>meta_1</th>
+      <td><p>meta file for `fasta_1`</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>other parameters as needed</p></td>
+      <th>meta_2</th>
+      <td><p>meta file for `fasta_2`</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>how to join the 2 fasta, currently supported methods are:
+inner, full</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>return the value at that position,
-as well as base pattern for next iteration.</p>
+    <p>Will return a list containing a merged FASTA and a meta.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

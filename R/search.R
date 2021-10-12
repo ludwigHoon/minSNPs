@@ -222,7 +222,7 @@ get_metric_fun <- function(metric_name = "") {
                 "view" = view_simpson)
         )
     }
-    if (metric_name == ""){
+    if (metric_name == "") {
         return(MinSNPs_metrics)
     }
     return(MinSNPs_metrics[[metric_name]])
@@ -234,7 +234,8 @@ get_metric_fun <- function(metric_name = "") {
 #' \code{find_optimised_snps} is used to find optimised SNPs set.
 #' @param seqc list of sequences, either passed directly from
 #' \code{process_allele} or \code{read_fasta} or equivalence
-#' @param bp BiocParallel backend. Rule of thumbs: use MulticoreParam()
+#' @param bp BiocParallel backend.
+#' Rule of thumbs: use MulticoreParam(workers = ncpus - 2)
 #' @param metric either `simpson` or `percent`
 #' @param goi group of interest, if creteria is percent,
 #' must be specified, ignored otherwise

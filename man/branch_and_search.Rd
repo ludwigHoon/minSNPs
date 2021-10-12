@@ -31,7 +31,8 @@ the SNP set.}
 \item{max_depth}{maximum depth to go before terminating,
 0 means it will only calculate the metric for included position}
 
-\item{bp}{BiocParallel backend. Rule of thumbs: use MulticoreParam()}
+\item{bp}{BiocParallel backend.
+Rule of thumbs: use MulticoreParam(workers = ncpus - 2)}
 
 \item{...}{other parameters as needed}
 }

@@ -41,7 +41,8 @@ must be specified, ignored otherwise}
 \item{iterate_included}{whether to calculate index
 at each level of the included SNPs}
 
-\item{bp}{BiocParallel backend. Rule of thumbs: use MulticoreParam()}
+\item{bp}{BiocParallel backend.
+Rule of thumbs: use MulticoreParam(workers = ncpus - 2)}
 
 \item{...}{other parameters as needed}
 }

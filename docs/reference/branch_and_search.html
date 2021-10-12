@@ -74,7 +74,7 @@ find_optimised_snps, after preprocessing." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
       </span>
     </div>
 
@@ -179,7 +179,8 @@ the SNP set.</p></td>
     </tr>
     <tr>
       <th>bp</th>
-      <td><p>BiocParallel backend. Rule of thumbs: use MulticoreParam()</p></td>
+      <td><p>BiocParallel backend.
+Rule of thumbs: use MulticoreParam(workers = ncpus - 2)</p></td>
     </tr>
     <tr>
       <th>...</th>
