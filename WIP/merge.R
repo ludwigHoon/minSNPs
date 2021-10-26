@@ -33,6 +33,11 @@ merge_fasta <- function(fasta_1, fasta_2, meta_1, meta_2, method = "inner") {
     return(merged_fasta)
 }
 
+
+### Same as the reference genome if not found.
+
+
+
 #' \code{check_fasta_meta_mapping}
 #'
 #' @description

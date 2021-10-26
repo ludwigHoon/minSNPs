@@ -213,6 +213,7 @@ view_percent <- function(result, ...) { # nolint
 #' @return a list, including the function to calculate the
 #' metric based on a position (`calc`), and function to check for
 #' additional parameters the function need (`args`)
+#' @export
 get_metric_fun <- function(metric_name = "") {
     if (! exists("MinSNPs_metrics")) {
         MinSNPs_metrics <- list( #nolint
