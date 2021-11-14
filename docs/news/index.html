@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
       </span>
     </div>
 
@@ -148,9 +148,9 @@
 <li>
 <code>check_percent</code> is used to check that the necessary parameter for <code>calculate_percent</code> is passed.</li>
 <li>
-<code>get_metric_fun</code> is used internally to translate the metric to the functions, additional metric can be added by defining the functions and overriding the global <code>MinSNPs_metrics</code> variable.</li>
+<code>get_metric_fun</code> is used to translate the metric to the functions, additional metric can be added by defining the functions and overriding the global <code>MinSNPs_metrics</code> variable.</li>
 <li>
-<code>calculate_simpson</code>, <code>calculate_percent</code>, and <code>check_percent</code>, <code>get_metric_fun</code> are only included as sample, there is no reason to call these functions directly.</li>
+<code>calculate_simpson</code>, <code>calculate_percent</code>, and <code>check_percent</code>, <code>get_metric_fun</code> are only as default, there is no reason to call these functions directly.</li>
 <li>
 <code>find_optimised_snps</code> is used to find optimised SNP set(s). It can also be used to recalculate index by giving it included positions and setting max_depth to 0.</li>
 <li>
@@ -173,6 +173,8 @@
 <code>write_fasta</code> bug where only the first letter is written to the file is fixed.</li>
 <li>
 <code>output_result</code> bug where residuals are not returned.</li>
+<li>
+<code>process_allele</code> will print names of duplicated isolate, and keep only the first instance of the found isolate.</li>
 </ul>
 </div>
 </div>
