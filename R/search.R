@@ -27,6 +27,7 @@ generate_pattern <- function(seqc, ordered_index=c(), append_to=list()) {
 #' @param pattern list of sequences
 #' @param goi group of interest
 #' @return Will return the dissimilarity index of the list of patterns.
+#' @export
 calculate_percent <- function(pattern, goi) {
     target_seqs <- character()
     for (isolate in goi) {
@@ -52,6 +53,7 @@ calculate_percent <- function(pattern, goi) {
 #' the more diverse the population.
 #' @inheritParams calculate_percent
 #' @return Will return the Simpson's index of the list of patterns.
+#' @export
 calculate_simpson <- function(pattern) {
     unique_sequences <- unlist(unique(pattern))
     no_isolate_in_group <- list()
@@ -84,6 +86,7 @@ calculate_simpson <- function(pattern) {
 #' @param list_of_parameters is a list of parameter passed
 #' to functions that will perform the calculation
 #' @return TRUE if goi exists, else FALSE
+#' @export
 check_percent <- function(list_of_parameters) {
     return(length(list_of_parameters[["goi"]]) > 0)
 }
@@ -96,6 +99,7 @@ check_percent <- function(list_of_parameters) {
 #' @param result is the result from \code{find_optimised_snps}
 #' @param ... other optional parameters
 #' @return formatted result list to be saved or presented.
+#' @export
 view_simpson <- function(result, ...) {
     additional_args <- list(...)[[1]]
     if (exists(result$seqc_name)) {
@@ -139,6 +143,7 @@ view_simpson <- function(result, ...) {
 #' @param result is the result from \code{find_optimised_snps}
 #' @param ... other optional parameters
 #' @return formatted result list to be saved or presented.
+#' @export
 view_percent <- function(result, ...) { # nolint
     additional_args <- list(...)[[1]]
     if (exists(result$seqc_name) && !is.null(result$goi)) {
@@ -515,6 +520,7 @@ check_multistate <- function(position, sequences) {
 #' @return return the value at that position,
 #' as well as base pattern for next iteration.
 #' @keywords internal
+#' @export
 cal_met_snp <- function(position, metric, seqc, ...) {
     additional_args <- list(...)[[1]]
     if ("existing_pattern" %in% names(additional_args)) {

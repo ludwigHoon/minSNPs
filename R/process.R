@@ -158,17 +158,23 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
     return(result)
 }
 
-#' \code{remove_dup_allele}
+#' \code{remove_dup_isolate}
 #'
 #' @description
-#' \code{remove_dup_allele} is used to remove allele with the same name.
+#' \code{remove_dup_isolate} is used to remove isolate with the same name.
 #' @inheritParams get_usual_length
 #' @keywords internal
 #' @return return the list of samples where only the first instance of
-#' the allele with the duplicate name is kept
-remove_dup_allele <- function(seqc) {
+#' the isolate with the duplicate name is kept
+remove_dup_isolate <- function(seqc) {
     all_sequences <- names(seqc)
-    unique_sequences <- which(unique(all_sequences) %in% all_sequences)
+    unique_sequences <- unique(all_sequences)
+
+    if (any(duplicated(all_sequences))) {
+        dups <- unique(all_sequences[duplicated(all_sequences)])
+        cat("Found multiple isolates with same names, only first is taken:\n",
+            paste(dups, collapse = ", "), "\n\n", sep = "")
+    }
     return(seqc[unique_sequences])
 }
 
@@ -187,7 +193,7 @@ process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
     dash_ignore=TRUE, accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE) {
 
     processed <- list()
-    seqc <- remove_dup_allele(seqc)
+    seqc <- remove_dup_isolate(seqc)
     ignored <- flag_allele(seqc, bp)
     processed$seqc <- as.list(seqc)
     processed$ignored_allele <- ignored
