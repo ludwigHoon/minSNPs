@@ -57,6 +57,7 @@ iterate_merge <- function(fastas, metas, ref, method = "full",
         stop("fastas and metas must have the same length")
     }
     for (round in seq_len(length(fastas) - 1)) {
+        cat("Running", round, "/", (length(fastas) - 1), "\n")
         if (round == 1) {
             result <- merge_fasta(fastas[[1]], fastas[[2]],
                 metas[[1]], metas[[2]], ref, method, bp)
