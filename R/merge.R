@@ -51,6 +51,7 @@ merge_fasta <- function(fasta_1, fasta_2, meta_1, meta_2,
     return(result)
 }
 
+
 iterate_merge <- function(fastas, metas, ref, method = "full",
                           bp = BiocParallel::MulticoreParam(), ...) {
     if (length(fastas) != length(metas)) {
@@ -69,6 +70,7 @@ iterate_merge <- function(fastas, metas, ref, method = "full",
     }
     return(result)
 }
+
 
 output_to_files <- function(merged_result, filename = "merged") {
     write_fasta(merged_result$merged_fasta, paste(filename, ".fasta", sep = ""))

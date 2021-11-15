@@ -19,3 +19,4 @@ Minor changes & testing
 - `write_fasta` bug where only the first letter is written to the file is fixed.
 - `output_result` bug where residuals are not returned.
 - `process_allele` will print names of duplicated isolate, and keep only the first instance of the found isolate.
+- `iterate_merge` can be used to merge alignment matrices
