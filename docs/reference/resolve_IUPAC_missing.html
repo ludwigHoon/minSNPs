@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • minSNPs</title>
+<title>resolve_IUPAC_missing — resolve_IUPAC_missing • minSNPs</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="resolve_IUPAC_missing — resolve_IUPAC_missing" />
+<meta property="og:description" content="resolve_IUPAC_missing is used to replace the
+ambiguity codes found in the sequences." />
 
 
 
@@ -58,7 +60,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -122,76 +124,72 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/ludwigHoon/minSNPs/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1><code>resolve_IUPAC_missing</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/ludwigHoon/minSNPs/blob/master/R/process.R'><code>R/process.R</code></a></small>
+    <div class="hidden name"><code>resolve_IUPAC_missing.Rd</code></div>
     </div>
 
-    <div id="minsnps-v001" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.1">
-<a href="#minsnps-v001" class="anchor"></a>minSNPs v0.0.1<small> 2021-09-08 </small>
-</h1>
-<p>First release to CRAN.</p>
-<div id="changes" class="section level2">
-<h2 class="hasAnchor">
-<a href="#changes" class="anchor"></a>Changes</h2>
-<ul>
-<li>
-<code>read_fasta</code> will be used to read fasta file, the sequence name can contain spaces.</li>
-<li>
-<code>write_fasta</code> will be used to write fasta file, the sequence name can contain spaces.</li>
-<li>
-<code>process_allele</code> can be used in place of the different functions to preprocess the FASTA file. It will perform all equivalent functions in one go; the others functions are no longer exported.</li>
-<li>
-<code>calculate_simpson</code> is used to calculate the Simpson’s index from list of pattern.</li>
-<li>
-<code>calculate_percent</code> is used to calculate the dissimilarity index from list of pattern.</li>
-<li>
-<code>check_percent</code> is used to check that the necessary parameter for <code>calculate_percent</code> is passed.</li>
-<li>
-<code>get_metric_fun</code> is used to translate the metric to the functions, additional metric can be added by defining the functions and overriding the global <code>MinSNPs_metrics</code> variable.</li>
-<li>
-<code>calculate_simpson</code>, <code>calculate_percent</code>, and <code>check_percent</code>, <code>get_metric_fun</code> are only as default, there is no reason to call these functions directly.</li>
-<li>
-<code>find_optimised_snps</code> is used to find optimised SNP set(s). It can also be used to recalculate index by giving it included positions and setting max_depth to 0.</li>
-<li>
-<code>output_result</code> is used to output results from <code>find_optimised_snps</code>.</li>
-</ul>
-</div>
-</div>
-    <div id="minsnps-v002" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.2">
-<a href="#minsnps-v002" class="anchor"></a>minSNPs v0.0.2<small> Unreleased </small>
-</h1>
-<p>Minor changes &amp; testing</p>
-<div id="changes-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#changes-1" class="anchor"></a>Changes</h2>
-<ul>
-<li>
-<code>find_optimised_snps</code> can receive an additional argument <code>output_progress = TRUE</code>, such that progress can be shown in terminal when looking for multiple result.</li>
-<li>
-<code>write_fasta</code> bug where only the first letter is written to the file is fixed.</li>
-<li>
-<code>output_result</code> bug where residuals are not returned.</li>
-<li>
-<code>process_allele</code> will print names of duplicated isolate, and keep only the first instance of the found isolate.</li>
-<li>
-<code>iterate_merge</code> can be used to merge alignment matrices.</li>
-<li>
-<code>find_optimised_snps</code> reduced memory usage.</li>
-<li>
-<code>resolve_IUPAC_missing</code> can be used to substitute the ambiguity codes found in the sequence.</li>
-</ul>
-</div>
-</div>
-  </div>
+    <div class="ref-description">
+    <p><code>resolve_IUPAC_missing</code> is used to replace the
+ambiguity codes found in the sequences.</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>resolve_IUPAC_missing</span><span class='op'>(</span>
+  <span class='va'>seqc</span>,
+  log_operation <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  log_file <span class='op'>=</span> <span class='st'>"replace.log"</span>,
+  max_ambiguity <span class='op'>=</span> <span class='op'>-</span><span class='fl'>1</span>,
+  replace_method <span class='op'>=</span> <span class='st'>"random"</span>,
+  N_is_any_base <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  output_progress <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>seqc</th>
+      <td><p>the sequences to be processed</p></td>
+    </tr>
+    <tr>
+      <th>log_operation</th>
+      <td><p>whether to log the operation</p></td>
+    </tr>
+    <tr>
+      <th>log_file</th>
+      <td><p>log file to write the operations</p></td>
+    </tr>
+    <tr>
+      <th>max_ambiguity</th>
+      <td><p>proportion of ambiguity codes to tolerate,
+-1 = ignore. Default to -1</p></td>
+    </tr>
+    <tr>
+      <th>replace_method</th>
+      <td><p>how to substitute the ambiguity codes,
+current supported methods:random and most_common, default to "random".</p></td>
+    </tr>
+    <tr>
+      <th>N_is_any_base</th>
+      <td><p>whether to treat N as any base or substitute it
+with one of the alleles found at the position.</p></td>
+    </tr>
+    <tr>
+      <th>output_progress</th>
+      <td><p>whether to output progress</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Will return the processed sequences.</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

@@ -226,3 +226,176 @@ process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
     class(processed) <- "processed_seqs"
     return(processed)
 }
+
+
+translation <- list(
+    M = c("A", "C"),
+    R = c("A", "G"),
+    W = c("A", "T"),
+    S = c("C", "G"),
+    Y = c("C", "T"),
+    K = c("G", "T"),
+    V = c("A", "C", "G"),
+    H = c("A", "C", "T"),
+    D = c("A", "G", "T"),
+    B = c("C", "G", "T")
+)
+
+#' \code{resolve_IUPAC_missing}
+#'
+#' @description
+#' \code{resolve_IUPAC_missing} is used to replace the
+#' ambiguity codes found in the sequences.
+#' @param seqc the sequences to be processed
+#' @param log_operation whether to log the operation
+#' @param log_file log file to write the operations
+#' @param max_ambiguity proportion of ambiguity codes to tolerate,
+#' -1 = ignore. Default to -1
+#' @param replace_method how to substitute the ambiguity codes,
+#' current supported methods:random and most_common, default to "random".
+#' @param N_is_any_base whether to treat N as any base or substitute it
+#' with one of the alleles found at the position.
+#' @param output_progress whether to output progress
+#' @return Will return the processed sequences.
+#' @export
+resolve_IUPAC_missing <- function(seqc, log_operation = TRUE, # nolint
+    log_file = "replace.log", max_ambiguity = -1,
+    replace_method = "random", N_is_any_base = FALSE, output_progress = TRUE) { #nolint
+
+    accepted_char <- c("A", "C", "T", "G")
+
+    # Whether N should be randomly resolved to any of the accepted bases
+    # or if it should be 1 of the bases present in any of the isolates
+    if (N_is_any_base) {
+        translation[["N"]] <- accepted_char
+    }
+
+    # Logging all operation
+    if (log_operation) {
+        cat("Position\tIsolate\tOriginal\tReplaced\n",
+            file = log_file, append = FALSE)
+    }
+
+    if (output_progress) {
+        pb <- txtProgressBar(min = 0, max = length(seqc[[1]]),
+            initial = 0, style = 3)
+    }
+
+    if ((max_ambiguity == -1 || max_ambiguity == 1) &&
+        replace_method == "most_common") {
+        stop("most_common must have max_ambiguity < 1")
+    }
+
+    if (replace_method == "most_common") {
+        for (p in seq_len(length(seqc[[1]]))) {
+            # All the nucleotides at this position
+            nucleotides <- lapply(seqc, `[[`, p)
+            # These need to be modified
+            to_modify <- which(!nucleotides %in% accepted_char)
+
+            # These are valid
+            valids <- which(nucleotides %in% accepted_char)
+            # Most common base
+            valid_bases <- as.vector(unlist(nucleotides[valids]))
+            most_common <- names(sort(table(valid_bases), decreasing = TRUE)[1])
+
+            ambiguity_ratio <- (length(to_modify) / length(seqc))
+            if (ambiguity_ratio >= max_ambiguity) {
+                if (log_operation) {
+                    for (t in to_modify) {
+                        cat(p, "\t", names(seqc)[t], "\t", seqc[[t]][p],
+                            "\t", "Skipped - >= max_ambiguity", "\n",
+                            file = log_file, append = TRUE)
+                    }
+                }
+                if (output_progress) {
+                    setTxtProgressBar(pb, p)
+                }
+                next
+            }
+            if (log_operation) {
+                for (t in to_modify) {
+                    cat(p, "\t", names(seqc)[t], "\t", seqc[[t]][p],
+                        "\t", most_common, "\n",
+                        file = log_file, append = TRUE)
+                }
+            }
+            for (t in to_modify) {
+                seqc[[t]][p] <- most_common
+            }
+            if (output_progress) {
+                setTxtProgressBar(pb, p)
+            }
+        }
+
+    } else if (replace_method == "random") {
+        for (p in seq_len(length(seqc[[1]]))) {
+            # All the nucleotides at this position
+            nucleotides <- lapply(seqc, `[[`, p)
+            # These need to be modified
+            to_modify <- which(!nucleotides %in% accepted_char)
+
+            if (max_ambiguity > 0 && max_ambiguity < 1) {
+                ambiguity_ratio <- (length(to_modify) / length(seqc))
+                if (ambiguity_ratio >= max_ambiguity) {
+                    if (log_operation) {
+                        for (t in to_modify) {
+                            cat(p, "\t", names(seqc)[t], "\t", seqc[[t]][p],
+                                "\t", "Skipped - >= max_ambiguity", "\n",
+                                file = log_file, append = TRUE)
+                        }
+                    }
+                    if (output_progress) {
+                        setTxtProgressBar(pb, p)
+                    }
+                    next
+                }
+            }
+
+            # All other valid uncleotides
+            valid_replacements <- unlist(
+                unique(
+                    nucleotides[which(nucleotides %in% accepted_char)]
+                )
+            )
+
+            # Iterate through isolate that needs to be modified at position p
+            for (t in to_modify) {
+
+                if (seqc[[t]][p] == "N") {
+                    # If N is any bases, it can be any of the accepted characters #nolint
+                    if (N_is_any_base) {
+                        candidates <- unique(
+                            c(translation[[seqc[[t]][p]]],
+                            valid_replacements)
+                        )
+                    } else {
+                        # Otherwise, it is one of the valid bases
+                        # shown in at least one of the isolates
+                        candidates <- valid_replacements
+                    }
+                } else {
+                    # If it's not N, just refer to the translation list
+                    candidates <- unique(translation[[seqc[[t]][p]]])
+                }
+                replacement <-
+                    sample(candidates, 1, replace = TRUE)
+                if (log_operation) {
+                    cat(p, "\t", names(seqc)[t], "\t", seqc[[t]][p],
+                        "\t", replacement, "\n",
+                        file = log_file, append = TRUE)
+                }
+                seqc[[t]][p] <- replacement
+            }
+            if (output_progress) {
+                setTxtProgressBar(pb, p)
+            }
+        }
+    } else {
+        stop("Unknown replace method")
+    }
+    if (output_progress) {
+        close(pb)
+    }
+    return(seqc)
+}
