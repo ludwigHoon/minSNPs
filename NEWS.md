@@ -20,3 +20,4 @@ Minor changes & testing
 - `output_result` bug where residuals are not returned.
 - `process_allele` will print names of duplicated isolate, and keep only the first instance of the found isolate.
 - `iterate_merge` can be used to merge alignment matrices
+- `find_optimised_snps` reduced memory usage

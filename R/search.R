@@ -309,7 +309,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
     }
 
     # Perform analysis on the included positions first
-    existing_pattern <- list()
+    # existing_pattern <- list()
     if (included) {
         if (iterate_included) {
             iterations <- list()
@@ -319,8 +319,8 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
             scores <- bplapply(iterations, cal_met_snp, metric = metric_fun,
                 seqc = sequences, all_parameters, BPPARAM = bp)
 
-            existing_pattern <- scores[[
-                length(included_positions)]][["patterns"]]
+            #existing_pattern <- scores[[
+            #    length(included_positions)]][["patterns"]]
             scores <- bplapply(scores, function(score) {
                 return(score[["result"]])
             }, BPPARAM = bp)
@@ -332,7 +332,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
                     sequences, all_parameters)
             result[[paste(included_positions, collapse = ",")]] <-
                 score[["result"]]
-            existing_pattern <- score[["patterns"]]
+            #existing_pattern <- score[["patterns"]]
         }
     excluded_positions <- c(excluded_positions, included_positions)
     if (result[[paste(included_positions, collapse = ",")]] >= 1) {
@@ -345,7 +345,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
         ) {
         all_result <- list(result = result)
     } else {
-        all_parameters[["existing_pattern"]] <- existing_pattern
+        #all_parameters[["existing_pattern"]] <- existing_pattern
         branch_result <- branch_and_search(included_positions,
             c(additional_exclude, excluded_positions),  sequences, metric_fun,
             number_of_result, max_depth,
@@ -385,14 +385,17 @@ branch_and_search <- function(starting_positions = c(),
     additional_args <- list(...)[[1]]
     current_level <- length(starting_positions)
     traversed <- list()
-    existing_pattern <- list()
+    #existing_pattern <- list()
     output_progress <- ifelse(
         is.null(additional_args[["output_progress"]]),
     FALSE, additional_args[["output_progress"]])
     # Function to generate list of position to iterate through
     get_positions_to_search <- function(seqc_len, excluded_pos, traversed) {
         positions <- seq_len(seqc_len)
-        positions <- positions[! positions %in% c(excluded_pos, traversed)]
+        positions <- as.list(positions[! positions %in% c(excluded_pos, traversed)])
+        positions <- bplapply(positions, function(pos){
+            return(c(traversed, pos))
+        }) # Updated
         return(positions)
     }
 
@@ -416,13 +419,13 @@ branch_and_search <- function(starting_positions = c(),
 
     # For each result, create the 1st selected SNP
     for (n in seq_len(number_of_result)) {
-        traversed[[n]] <- c(starting_positions,
+        traversed[[n]] <- c(#starting_positions,
             positions[position_order[n]][[1]])
         result_d1[[
                 paste(traversed[[n]], collapse = ",")]] <-
                     depth_1[position_order][[n]]
-        existing_pattern[[n]] <- scores[[position_order[n]
-            ]][["patterns"]]
+        #existing_pattern[[n]] <- scores[[position_order[n]
+        #    ]][["patterns"]]
         selected_positions <- c(selected_positions,
             positions[position_order[n]][[1]])
     }
@@ -438,7 +441,7 @@ branch_and_search <- function(starting_positions = c(),
             if (max_depth - 1 > 0 &&
                 result_d1[[paste(traversed[[n]], collapse = ",")]] < 1) {
                 additional_args[["output_progress"]] <- FALSE
-                additional_args[["existing_pattern"]] <- existing_pattern[[n]]
+                #additional_args[["existing_pattern"]] <- existing_pattern[[n]]
                 multi_result[[paste("result", n)]] <- branch_and_search(
                     starting_positions = c(starting_positions,
                         selected_positions[n]),
@@ -463,7 +466,7 @@ branch_and_search <- function(starting_positions = c(),
         while (((current_level - length(starting_positions)) < max_depth) &&
                (depth_1[position_order][[1]] < 1))  {
 
-            additional_args[["existing_pattern"]] <- existing_pattern[[1]]
+            #additional_args[["existing_pattern"]] <- existing_pattern[[1]]
             positions <- get_positions_to_search(length(seqc[[1]]),
                 c(excluded_positions, selected_positions[1]),
                 traversed[[1]])
@@ -480,13 +483,13 @@ branch_and_search <- function(starting_positions = c(),
             position_order <- order(unlist(depth_1), decreasing = TRUE)
 
 
-            traversed[[1]] <- c(traversed[[1]],
+            traversed[[1]] <- c(#traversed[[1]],
                 positions[position_order[1]][[1]])
             result_d1[[
                     paste(traversed[[1]], collapse = ",")]] <-
                         depth_1[position_order][[1]]
-            existing_pattern[[1]] <- scores[[position_order[1]
-                ]][["patterns"]]
+            #existing_pattern[[1]] <- scores[[position_order[1]
+            #    ]][["patterns"]]
 
             current_level <- current_level + 1
         }
@@ -536,5 +539,5 @@ cal_met_snp <- function(position, metric, seqc, ...) {
     sub_args <- additional_args[all_expected_args]
     sub_args[["pattern"]] <- pattern
     res <- do.call(metric_function, args = sub_args)
-    return(list(result = res, patterns = pattern))
+    return(list(result = res))#, patterns = pattern)) ## Updated this
 }
