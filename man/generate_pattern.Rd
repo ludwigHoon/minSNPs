@@ -19,4 +19,3 @@ Will return concatenated list of string for searching.
 \description{
 \code{generate_pattern} is used to generate pattern for calculation.
 }
-\keyword{internal}

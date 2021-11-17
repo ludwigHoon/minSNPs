@@ -8,6 +8,11 @@ check_fasta_meta_mapping(fasta, meta)
 }
 \arguments{
 \item{fasta}{the fasta read into memory to join}
+
+\item{meta}{the meta read into memory to join}
+}
+\value{
+TRUE/FALSE if the fasta and meta are compatible
 }
 \description{
 \code{check_fasta_meta_mapping} is used to check if

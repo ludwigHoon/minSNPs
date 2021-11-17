@@ -14,7 +14,7 @@
 #' @return Will return a list containing a merged FASTA and a meta.
 #' @export
 merge_fasta <- function(fasta_1, fasta_2, meta_1, meta_2,
-    ref, method = "full", bp = BiocParallel::MulticoreParam(), ...) {
+    ref, method = "full", bp = BiocParallel::SerialParam(), ...) {
     if (!ref %in% names(fasta_1)) {
         stop("fasta_1 must have the reference sequences")
     }
@@ -51,9 +51,19 @@ merge_fasta <- function(fasta_1, fasta_2, meta_1, meta_2,
     return(result)
 }
 
-
+#' \code{iterate_merge}
+#'
+#' @description
+#' \code{iterate_merge} is used to combine > 2 fastas iteratively.
+#' @param fastas list of fastas read into memory to join
+#' @param metas list of metas read into memory to join
+#' @param ref name of the reference genome (needs to be in both fasta files)
+#' @param method how to join the 2 fasta, currently supported methods are:
+#' inner, full
+#' @return Will return a list containing a merged FASTA and a meta.
+#' @export
 iterate_merge <- function(fastas, metas, ref, method = "full",
-                          bp = BiocParallel::MulticoreParam(), ...) {
+                          bp = BiocParallel::SerialParam(), ...) {
     if (length(fastas) != length(metas)) {
         stop("fastas and metas must have the same length")
     }
@@ -71,15 +81,33 @@ iterate_merge <- function(fastas, metas, ref, method = "full",
     return(result)
 }
 
-
+#' \code{output_to_files}
+#'
+#' @description
+#' \code{output_to_files} is write the result to files.
+#' @param merged_result a list containing the merged fasta and meta.
+#' @param filename filename to write to, will output
+#' <filename>.fasta and <filename>.csv.
+#' @return NULL, files written to filesystem
+#' @export
 output_to_files <- function(merged_result, filename = "merged") {
-    write_fasta(merged_result$merged_fasta, paste(filename, ".fasta", sep = ""))
+    write_fasta(merged_result$merged_fasta,
+        paste(filename, ".fasta", sep = ""))
     write.csv(merged_result$merged_meta, paste(filename, ".csv", sep = ""),
         row.names = FALSE)
 }
 
+#' \code{full_merge_1}
+#'
+#' @description
+#' \code{full_merge_1} is used to merge 2 fasta,
+#' where a position exist only in 1 of the fasta, the fasta without allele
+#' in that positions are given reference genome's allele at that position.
+#' @inheritParams merge_fasta
+#' @return merged fasta and meta
+#' @export
 full_merge_1 <- function(fasta_1, fasta_2, meta_1, meta_2, ref,
-                       bp = BiocParallel::MulticoreParam(), ...) {
+                       bp = BiocParallel::SerialParam(), ...) {
     args <- list(...)
     all_genome_positions <- sort(unique(c(meta_1$genome_position,
         meta_2$genome_position)))
@@ -114,7 +142,7 @@ full_merge_1 <- function(fasta_1, fasta_2, meta_1, meta_2, ref,
             return(
                 unname(unlist(lapply(new_fasta_1, `[`, i)))
                 )
-            }, BPPARAM = SerialParam()
+            }, BPPARAM = bp
         )
     if (! is.null(args[["v"]])) {
         cat("Finished Generating New Fasta_1\n")
@@ -140,7 +168,7 @@ full_merge_1 <- function(fasta_1, fasta_2, meta_1, meta_2, ref,
             return(
                 unname(unlist(lapply(new_fasta_2, `[`, i)))
                 )
-            }, BPPARAM = SerialParam()
+            }, BPPARAM = bp
         )
     if (! is.null(args[["v"]])) {
         cat("Finished Generating New Fasta_2\n")
@@ -151,7 +179,15 @@ full_merge_1 <- function(fasta_1, fasta_2, meta_1, meta_2, ref,
 }
 
 
-### Same as the reference genome if not found.
+#' \code{full_merge}
+#'
+#' @description
+#' \code{full_merge} is used to merge 2 fasta,
+#' where a position exist only in 1 of the fasta, the fasta without allele
+#' in that positions are given reference genome's allele at that position.
+#' **Doesn't work for large dataset, hence the need for \code{full_merge_1}**
+#' @inheritParams merge_fasta
+#' @return merged fasta and meta
 full_merge <- function(fasta_1, fasta_2, meta_1, meta_2, ref,
                        bp = BiocParallel::MulticoreParam(), ...) {
     args <- list(...)
@@ -220,6 +256,8 @@ full_merge <- function(fasta_1, fasta_2, meta_1, meta_2, ref,
 #' \code{check_fasta_meta_mapping} is used to check if
 #' fastas and metas are compatible.
 #' @param fasta the fasta read into memory to join
+#' @param meta the meta read into memory to join
+#' @return TRUE/FALSE if the fasta and meta are compatible
 check_fasta_meta_mapping <- function(fasta, meta) {
     is_valid <- FALSE
     if (length(unique(sapply(fasta, length))) > 1) {
