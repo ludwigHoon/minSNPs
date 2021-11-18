@@ -22,3 +22,4 @@ Minor changes & testing
 - `iterate_merge` can be used to merge alignment matrices.
 - `find_optimised_snps` reduced memory usage.
 - `resolve_IUPAC_missing` can be used to substitute the ambiguity codes found in the sequence. 
+- `output_result` updated such that it can be presented correctly in excel.

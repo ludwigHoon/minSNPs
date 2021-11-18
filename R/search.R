@@ -291,7 +291,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
     # Check if any of the included positions are in excluded positions
     if (any(included_positions %in% excluded_positions)) {
         errors <- included_positions[included_positions %in% excluded_positions]
-        stop(paste(errors, collapse = ","),
+        stop(paste(errors, collapse = ", "),
             " found in both included & excluded positions")
     }
 
@@ -323,18 +323,18 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
             scores <- bplapply(scores, function(score) {
                 return(score[["result"]])
             }, BPPARAM = bp)
-            names(scores) <- bplapply(iterations, paste, collapse = ",",
+            names(scores) <- bplapply(iterations, paste, collapse = ", ",
                 BPPARAM = bp)
             result <- scores
         } else {
             score <- cal_met_snp(included_positions, metric_fun,
                     sequences, all_parameters)
-            result[[paste(included_positions, collapse = ",")]] <-
+            result[[paste(included_positions, collapse = ", ")]] <-
                 score[["result"]]
             #existing_pattern <- score[["patterns"]]
         }
     excluded_positions <- c(excluded_positions, included_positions)
-    if (result[[paste(included_positions, collapse = ",")]] >= 1) {
+    if (result[[paste(included_positions, collapse = ", ")]] >= 1) {
             included_reached_1 <- TRUE
         }
     }
@@ -421,7 +421,7 @@ branch_and_search <- function(starting_positions = c(),
         traversed[[n]] <- c(#starting_positions,
             positions[position_order[n]][[1]])
         result_d1[[
-                paste(traversed[[n]], collapse = ",")]] <-
+                paste(traversed[[n]], collapse = ", ")]] <-
                     depth_1[position_order][[n]]
         #existing_pattern[[n]] <- scores[[position_order[n]
         #    ]][["patterns"]]
@@ -438,7 +438,7 @@ branch_and_search <- function(starting_positions = c(),
             # max_depth has not been reached AND
             # if the index is not already 1
             if (max_depth - 1 > 0 &&
-                result_d1[[paste(traversed[[n]], collapse = ",")]] < 1) {
+                result_d1[[paste(traversed[[n]], collapse = ", ")]] < 1) {
                 additional_args[["output_progress"]] <- FALSE
                 #additional_args[["existing_pattern"]] <- existing_pattern[[n]]
                 multi_result[[paste("result", n)]] <- branch_and_search(
@@ -485,7 +485,7 @@ branch_and_search <- function(starting_positions = c(),
             traversed[[1]] <- c(#traversed[[1]],
                 positions[position_order[1]][[1]])
             result_d1[[
-                    paste(traversed[[1]], collapse = ",")]] <-
+                    paste(traversed[[1]], collapse = ", ")]] <-
                         depth_1[position_order][[1]]
             #existing_pattern[[1]] <- scores[[position_order[1]
             #    ]][["patterns"]]

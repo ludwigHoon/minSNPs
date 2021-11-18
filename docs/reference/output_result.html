@@ -41,7 +41,7 @@
 
 <meta property="og:title" content="output_result — output_result" />
 <meta property="og:description" content="output_result is used to present the result
-and save the result as csv." />
+and save the result as tsv." />
 
 
 
@@ -131,7 +131,7 @@ and save the result as csv." />
 
     <div class="ref-description">
     <p><code>output_result</code> is used to present the result
-and save the result as csv.</p>
+and save the result as tsv.</p>
     </div>
 
     <pre class="usage"><span class='fu'>output_result</span><span class='op'>(</span><span class='va'>result</span>, view <span class='op'>=</span> <span class='st'>""</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -145,19 +145,20 @@ and save the result as csv.</p>
     </tr>
     <tr>
       <th>view</th>
-      <td><p>how to present the output, "csv" will be saved as a file.
+      <td><p>how to present the output,
+"csv" or "tsv" will be saved as a file.
 Otherwise, printed to console.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>if view is "csv", file name can be passed, e.g.,
-file_name = "result.csv", otherwise, file is saved as &lt;timestamp&gt;.csv.</p></td>
+      <td><p>if view is "tsv" or "csv", file name can be passed, e.g.,
+file_name = "result.tsv", otherwise, file is saved as &lt;timestamp&gt;.tsv.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>NULL, result either printed or saved as csv.</p>
+    <p>NULL, result either printed or saved as tsv.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

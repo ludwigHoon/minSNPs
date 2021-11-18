@@ -9,16 +9,17 @@ output_result(result, view = "", ...)
 \arguments{
 \item{result}{is the result from \code{find_optimised_snps}}
 
-\item{view}{how to present the output, "csv" will be saved as a file.
+\item{view}{how to present the output,
+"csv" or "tsv" will be saved as a file.
 Otherwise, printed to console.}
 
-\item{...}{if view is "csv", file name can be passed, e.g.,
-file_name = "result.csv", otherwise, file is saved as <timestamp>.csv.}
+\item{...}{if view is "tsv" or "csv", file name can be passed, e.g.,
+file_name = "result.tsv", otherwise, file is saved as <timestamp>.tsv.}
 }
 \value{
-NULL, result either printed or saved as csv.
+NULL, result either printed or saved as tsv.
 }
 \description{
 \code{output_result} is used to present the result
-and save the result as csv.
+and save the result as tsv.
 }

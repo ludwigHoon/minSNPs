@@ -14,13 +14,13 @@ output_parsed(parsed_view, seqc_obj, result, file_name)
 
 \item{result}{is the result from \code{find_optimised_snps}}
 
-\item{file_name}{file name, either csv or "" for terminal output}
+\item{file_name}{file name, either tsv or "" for terminal output}
 }
 \value{
-NULL, result either printed or saved as csv.
+NULL, result either printed or saved as tsv.
 }
 \description{
 \code{output_parsed} is subfunction used by \code{output_result}
-to present the result and save the result as csv.
+to present the result and save the result as tsv.
 }
 \keyword{internal}
