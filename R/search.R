@@ -120,7 +120,7 @@ view_simpson <- function(result, ...) {
         result_levels <- names(results[[n]])
         result_max_depth <- result_levels[length(result_levels)]
         ordered_index <- as.numeric(
-            strsplit(result_max_depth, split = ",")[[1]])
+            strsplit(result_max_depth, split = ", ")[[1]])
         patterns <- generate_pattern(seqc, ordered_index = c(ordered_index))
         unique_sequences <- unlist(unique(patterns))
 
@@ -167,7 +167,7 @@ view_percent <- function(result, ...) { # nolint
         result_levels <- names(results[[n]])
         result_max_depth <- result_levels[length(result_levels)]
         ordered_index <- as.numeric(
-            strsplit(result_max_depth, split = ",")[[1]])
+            strsplit(result_max_depth, split = ", ")[[1]])
         patterns <- generate_pattern(seqc, ordered_index = c(ordered_index))
         unique_sequences <- unlist(unique(patterns))
 
