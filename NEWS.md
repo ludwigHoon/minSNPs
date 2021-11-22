@@ -23,3 +23,4 @@ Minor changes & testing
 - `find_optimised_snps` reduced memory usage.
 - `resolve_IUPAC_missing` can be used to substitute the ambiguity codes found in the sequence. 
 - `output_result` updated such that it can be presented correctly in excel.
+- `cal_fn` and `cal_fp` can be used to calculate and identify false negatives and false postives respectively. To be called with `cal_met_snp`
