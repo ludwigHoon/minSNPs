@@ -41,7 +41,7 @@ calculate_percent <- function(pattern, goi) {
     isolate_w_goi_pattern <- length(which(pattern %in% target_seqs))
     failed_to_discriminate <- isolate_w_goi_pattern - length(goi)
     result <- 1 - (failed_to_discriminate / (length(pattern) - length(goi)))
-    return(result)
+    return(list(result = result))
 }
 
 #' \code{calculate_simpson}
@@ -74,7 +74,7 @@ calculate_simpson <- function(pattern) {
     }
 
     simpson_index <- 1 - (d_numerator / d_denominator)
-    return(simpson_index)
+    return(list(result = simpson_index))
 }
 
 #' \code{check_percent}
@@ -535,8 +535,23 @@ cal_met_snp <- function(position, metric, seqc, ...) {
     metric_expected_args <- formals(metric_function)
     all_expected_args <- names(additional_args)[
         names(additional_args) %in% names(metric_expected_args)]
+    if (!all(names(metric_expected_args)
+        [!names(metric_expected_args) == "pattern"] %in%
+            all_expected_args)) {
+
+            stop("Metric function requires additional arguments: ",
+              paste(names(metric_expected_args)[(!names(metric_expected_args)
+              %in% all_expected_args) &
+              (!names(metric_expected_args) == "pattern")], collapse = ", "))
+    }
     sub_args <- additional_args[all_expected_args]
     sub_args[["pattern"]] <- pattern
     res <- do.call(metric_function, args = sub_args)
-    return(list(result = res))#, patterns = pattern)) ## Updated this
+    if ("get_addn" %in% names(additional_args)) {
+        if (additional_args[["get_addn"]]) {
+            return(list(result = res$result,
+                additional_data = res$additional_data))
+        }
+    }
+    return(list(result = res$result))#, patterns = pattern)) ## Updated this
 }
