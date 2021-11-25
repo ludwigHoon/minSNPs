@@ -136,7 +136,7 @@ flag_allele <- function(seqc, bp=BiocParallel::SerialParam()) {
 #' @keywords internal
 #' @return Will return a list of positions that need to be ignored.
 flag_position <- function(pro_seqc, dash_ignore=TRUE,
-    accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE) {
+    accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE, bp = SerialParam()) {
 
     if (dash_ignore == FALSE) {
         accepted_char <- c(accepted_char, "-")
@@ -149,9 +149,9 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
         })
     }
 
-    ignored_position <- lapply(as.list(pro_seqc), function(iso, charset) {
+    ignored_position <- bplapply(as.list(pro_seqc), function(iso, charset) {
         return(which(! as.vector(iso) %in% charset))
-    }, charset = accepted_char)
+    }, charset = accepted_char, BPPARAM = bp)
 
     result <- sort(unique(unlist(ignored_position)))
 
@@ -218,7 +218,7 @@ process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
 
     ignored_position <- flag_position(processed$seqc,
         dash_ignore = dash_ignore, accepted_char = accepted_char,
-        ignore_case = ignore_case)
+        ignore_case = ignore_case, bp = bp)
 
     cat("Ignored ", length(ignored_position), " positions", "\n")
 
