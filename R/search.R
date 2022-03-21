@@ -69,15 +69,13 @@ calculate_simpson <- function(pattern) {
     d_denominator <- length(pattern) *
         (length(pattern) - 1)
 
-    if (length(no_isolate_in_group) == length(pattern)) {
-        return(list(result = 1))
-    }
-
     if (d_numerator == 0 || d_denominator == 0) {
-        return(list(result = 0))
+        ind <- 0
+    } else{
+        ind <- (d_numerator / d_denominator)
     }
 
-    simpson_index <- 1 - (d_numerator / d_denominator)
+    simpson_index <- 1 - ind
     return(list(result = simpson_index))
 }
 
