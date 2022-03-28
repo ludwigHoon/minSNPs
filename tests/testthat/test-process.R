@@ -116,10 +116,10 @@ test_that("flagging allele", {
 
 test_that("flagging duplicated allele name", {
   all_test <- function() {
-  expect_equal(remove_dup_allele(chlamydia), chlamydia)
-  expect_equal(remove_dup_allele(error_file_1), error_file_1)
-  expect_equal(length(remove_dup_allele(error_file_2)), 56)
-  expect_equal(remove_dup_allele(error_file_2)["A_D213"], error_file_2[1])
+  expect_equal(remove_dup_isolate(chlamydia), chlamydia)
+  expect_equal(remove_dup_isolate(error_file_1), error_file_1)
+  expect_equal(length(remove_dup_isolate(error_file_2)), 56)
+  expect_equal(remove_dup_isolate(error_file_2)["A_D213"], error_file_2[1])
   }
 
   set_test(all_test)
