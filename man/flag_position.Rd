@@ -8,7 +8,8 @@ flag_position(
   pro_seqc,
   dash_ignore = TRUE,
   accepted_char = c("A", "C", "T", "G"),
-  ignore_case = TRUE
+  ignore_case = TRUE,
+  bp = SerialParam()
 )
 }
 \arguments{
