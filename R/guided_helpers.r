@@ -1,3 +1,12 @@
+#' \code{cal_fn}
+#'
+#' @description
+#' \code{cal_fn} is used to check if the proportion of false negative
+#' fastas and metas are compatible.
+#' @param pattern the pattern from \code{generate_pattern}
+#' @param goi the group of interest (names of isolates)
+#' @param target the target sequence(s)
+#' @return proportion: no. false negative/number of isolates
 #' @export
 cal_fn <- function(pattern, goi, target) {
     target_seqs <- c(target)
@@ -28,6 +37,15 @@ cal_fn <- function(pattern, goi, target) {
     return(list(result = result, additional_data = false_negatives))
 }
 
+#' \code{cal_fp}
+#'
+#' @description
+#' \code{cal_fp} is used to check if the proportion of false positive
+#' fastas and metas are compatible.
+#' @param pattern the pattern from \code{generate_pattern}
+#' @param goi the group of interest (names of isolates)
+#' @param target the target sequence(s)
+#' @return proportion: no. false positive/number of isolates
 #' @export
 cal_fp <- function(pattern, goi, target) {
     target_seqs <- c(target)

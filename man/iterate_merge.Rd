@@ -22,6 +22,10 @@ iterate_merge(
 
 \item{method}{how to join the 2 fasta, currently supported methods are:
 inner, full}
+
+\item{bp}{the BiocParallel backend}
+
+\item{...}{all other arguments}
 }
 \value{
 Will return a list containing a merged FASTA and a meta.

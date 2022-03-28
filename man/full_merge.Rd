@@ -26,6 +26,10 @@ and position in reference genome}
 and position in reference genome}
 
 \item{ref}{name of the reference genome (needs to be in both fasta files)}
+
+\item{bp}{the BiocParallel backend}
+
+\item{...}{all other arguments}
 }
 \value{
 merged fasta and meta

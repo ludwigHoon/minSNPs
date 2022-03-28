@@ -110,7 +110,7 @@ view_simpson <- function(result, ...) {
     } else {
         stop("Unable to find the sequences used to generate result")
     }
-    if (class(seqc) == "processed_seqs") {
+    if (inherits(seqc, "processed_seqs")) {
         seqc <- seqc$seqc
     }
 
@@ -155,7 +155,7 @@ view_percent <- function(result, ...) { # nolint
         stop("Unable to find the sequences used to generate result OR GOI")
     }
 
-    if (class(seqc) == "processed_seqs") {
+    if (inherits(seqc, "processed_seqs")) {
         seqc <- seqc$seqc
     }
     results <- result$results
@@ -271,7 +271,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
     included_reached_1 <- FALSE
     additional_exclude <- numeric()
     # Automatically exclude ignored positions from processed sequences
-    if (class(seqc) == "processed_seqs") {
+    if (inherits(seqc, "processed_seqs")) {
         excluded_positions <- c(excluded_positions, seqc[["ignored_position"]])
         sequences <- seqc[["seqc"]]
     } else {

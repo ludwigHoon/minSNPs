@@ -256,6 +256,7 @@ translation <- list(
 #' @param N_is_any_base whether to treat N as any base or substitute it
 #' with one of the alleles found at the position.
 #' @param output_progress whether to output progress
+#' @importFrom utils txtProgressBar setTxtProgressBar
 #' @return Will return the processed sequences.
 #' @export
 resolve_IUPAC_missing <- function(seqc, log_operation = TRUE, # nolint

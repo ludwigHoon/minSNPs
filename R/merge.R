@@ -11,6 +11,8 @@
 #' @param ref name of the reference genome (needs to be in both fasta files)
 #' @param method how to join the 2 fasta, currently supported methods are:
 #' inner, full
+#' @param bp the BiocParallel backend
+#' @param ... all other arguments
 #' @return Will return a list containing a merged FASTA and a meta.
 #' @export
 merge_fasta <- function(fasta_1, fasta_2, meta_1, meta_2,
@@ -60,6 +62,8 @@ merge_fasta <- function(fasta_1, fasta_2, meta_1, meta_2,
 #' @param ref name of the reference genome (needs to be in both fasta files)
 #' @param method how to join the 2 fasta, currently supported methods are:
 #' inner, full
+#' @param bp the BiocParallel backend
+#' @param ... all other arguments
 #' @return Will return a list containing a merged FASTA and a meta.
 #' @export
 iterate_merge <- function(fastas, metas, ref, method = "full",
@@ -89,6 +93,7 @@ iterate_merge <- function(fastas, metas, ref, method = "full",
 #' @param filename filename to write to, will output
 #' <filename>.fasta and <filename>.csv.
 #' @return NULL, files written to filesystem
+#' @importFrom utils write.csv
 #' @export
 output_to_files <- function(merged_result, filename = "merged") {
     write_fasta(merged_result$merged_fasta,
