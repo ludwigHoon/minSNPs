@@ -27,11 +27,12 @@ process_result_file <- function(result_file) {
             }
             splitted <- strsplit(prev, split = "\t")[[1]]
             res <- as.numeric(splitted[2])
-            snps <- splitted[1]
+            snps <- gsub("\"", "", splitted[1])
             result <- rbind(result, data.frame(SNPs = snps, result = res))
             new_result <- F
         }
     }
     close(con)
+    result$SNPs <- as.character(result$SNPs)
     return(result)
 }
