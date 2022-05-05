@@ -1,5 +1,6 @@
 # minSNPs v0.0.1
 First release to CRAN.
+
 ## Changes
 - `read_fasta` will be used to read fasta file, the sequence name can contain spaces.
 - `write_fasta` will be used to write fasta file, the sequence name can contain spaces.
@@ -14,6 +15,7 @@ First release to CRAN.
 
 # minSNPs v0.0.2
 Minor changes & testing
+
 ## Changes
 - `find_optimised_snps` can receive an additional argument `output_progress = TRUE`, such that progress can be shown in terminal when looking for multiple result.
 - `write_fasta` bug where only the first letter is written to the file is fixed.

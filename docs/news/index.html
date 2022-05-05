@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3_a</span>
       </span>
     </div>
 
@@ -59,11 +59,56 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.1" id="minsnps-v001">minSNPs v0.0.1<small>2021-09-08</small><a class="anchor" aria-label="anchor" href="#minsnps-v001"></a></h2>
-<p>First release to CRAN. ## Changes - <code>read_fasta</code> will be used to read fasta file, the sequence name can contain spaces. - <code>write_fasta</code> will be used to write fasta file, the sequence name can contain spaces. - <code>process_allele</code> can be used in place of the different functions to preprocess the FASTA file. It will perform all equivalent functions in one go; the others functions are no longer exported. - <code>calculate_simpson</code> is used to calculate the Simpson’s index from list of pattern. - <code>calculate_percent</code> is used to calculate the dissimilarity index from list of pattern. - <code>check_percent</code> is used to check that the necessary parameter for <code>calculate_percent</code> is passed. - <code>get_metric_fun</code> is used to translate the metric to the functions, additional metric can be added by defining the functions and overriding the global <code>MinSNPs_metrics</code> variable. - <code>calculate_simpson</code>, <code>calculate_percent</code>, and <code>check_percent</code>, <code>get_metric_fun</code> are only as default, there is no reason to call these functions directly. - <code>find_optimised_snps</code> is used to find optimised SNP set(s). It can also be used to recalculate index by giving it included positions and setting max_depth to 0. - <code>output_result</code> is used to output results from <code>find_optimised_snps</code>.</p>
+<p>First release to CRAN.</p>
+<div class="section level3">
+<h3 id="changes-0-0-1">Changes<a class="anchor" aria-label="anchor" href="#changes-0-0-1"></a></h3>
+<ul><li>
+<code>read_fasta</code> will be used to read fasta file, the sequence name can contain spaces.</li>
+<li>
+<code>write_fasta</code> will be used to write fasta file, the sequence name can contain spaces.</li>
+<li>
+<code>process_allele</code> can be used in place of the different functions to preprocess the FASTA file. It will perform all equivalent functions in one go; the others functions are no longer exported.</li>
+<li>
+<code>calculate_simpson</code> is used to calculate the Simpson’s index from list of pattern.</li>
+<li>
+<code>calculate_percent</code> is used to calculate the dissimilarity index from list of pattern.</li>
+<li>
+<code>check_percent</code> is used to check that the necessary parameter for <code>calculate_percent</code> is passed.</li>
+<li>
+<code>get_metric_fun</code> is used to translate the metric to the functions, additional metric can be added by defining the functions and overriding the global <code>MinSNPs_metrics</code> variable.</li>
+<li>
+<code>calculate_simpson</code>, <code>calculate_percent</code>, and <code>check_percent</code>, <code>get_metric_fun</code> are only as default, there is no reason to call these functions directly.</li>
+<li>
+<code>find_optimised_snps</code> is used to find optimised SNP set(s). It can also be used to recalculate index by giving it included positions and setting max_depth to 0.</li>
+<li>
+<code>output_result</code> is used to output results from <code>find_optimised_snps</code>.</li>
+</ul></div>
 </div>
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.0.2" id="minsnps-v002">minSNPs v0.0.2<a class="anchor" aria-label="anchor" href="#minsnps-v002"></a></h2>
-<p>Minor changes &amp; testing ## Changes - <code>find_optimised_snps</code> can receive an additional argument <code>output_progress = TRUE</code>, such that progress can be shown in terminal when looking for multiple result. - <code>write_fasta</code> bug where only the first letter is written to the file is fixed. - <code>output_result</code> bug where residuals are not returned. - <code>process_allele</code> will print names of duplicated isolate, and keep only the first instance of the found isolate. - <code>iterate_merge</code> can be used to merge alignment matrices. - <code>find_optimised_snps</code> reduced memory usage. - <code>resolve_IUPAC_missing</code> can be used to substitute the ambiguity codes found in the sequence. - <code>output_result</code> updated such that it can be presented correctly in excel. - <code>cal_fn</code> and <code>cal_fp</code> can be used to calculate and identify false negatives and false postives respectively. To be called with <code>cal_met_snp</code></p>
+<h2 class="page-header" data-toc-text="0.0.2" id="minsnps-v002">minSNPs v0.0.2<small>2022-03-28</small><a class="anchor" aria-label="anchor" href="#minsnps-v002"></a></h2>
+<p>Minor changes &amp; testing</p>
+<div class="section level3">
+<h3 id="changes-0-0-2">Changes<a class="anchor" aria-label="anchor" href="#changes-0-0-2"></a></h3>
+<ul><li>
+<code>find_optimised_snps</code> can receive an additional argument <code>output_progress = TRUE</code>, such that progress can be shown in terminal when looking for multiple result.</li>
+<li>
+<code>write_fasta</code> bug where only the first letter is written to the file is fixed.</li>
+<li>
+<code>output_result</code> bug where residuals are not returned.</li>
+<li>
+<code>process_allele</code> will print names of duplicated isolate, and keep only the first instance of the found isolate.</li>
+<li>
+<code>iterate_merge</code> can be used to merge alignment matrices.</li>
+<li>
+<code>find_optimised_snps</code> reduced memory usage.</li>
+<li>
+<code>resolve_IUPAC_missing</code> can be used to substitute the ambiguity codes found in the sequence.</li>
+<li>
+<code>output_result</code> updated such that it can be presented correctly in excel.</li>
+<li>
+<code>cal_fn</code> and <code>cal_fp</code> can be used to calculate and identify false negatives and false postives respectively. To be called with <code>cal_met_snp</code>
+</li>
+</ul></div>
 </div>
   </div>
 

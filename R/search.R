@@ -365,6 +365,26 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
         max_depth = max_depth, metric = metric))
 }
 
+#' \code{get_positions_to_search}
+#'
+#' @description
+#' \code{get_positions_to_search} is used to identify all the positions
+#' to loop through, used by \code{branch_and_search} and \code{find_optimised_snps}
+#' @param seqc_len length of the matrix
+#' @param excluded_pos vector of excluded positions
+#' @param traversed vector of positions that is previously selected
+#' @keywords internal
+#' @importFrom BiocParallel bplapply
+#' @return Will return a list of positions to search through
+get_positions_to_search <- function(seqc_len, excluded_pos, traversed) {
+    positions <- seq_len(seqc_len)
+    positions <- as.list(positions[! positions %in% c(excluded_pos, traversed)])
+    positions <- bplapply(positions, function(pos){
+        return(c(traversed, pos))
+    }) # Updated
+    return(positions)
+}
+
 #' \code{branch_and_search}
 #'
 #' @description
@@ -390,15 +410,6 @@ branch_and_search <- function(starting_positions = c(),
     output_progress <- ifelse(
         is.null(additional_args[["output_progress"]]),
     FALSE, additional_args[["output_progress"]])
-    # Function to generate list of position to iterate through
-    get_positions_to_search <- function(seqc_len, excluded_pos, traversed) {
-        positions <- seq_len(seqc_len)
-        positions <- as.list(positions[! positions %in% c(excluded_pos, traversed)])
-        positions <- bplapply(positions, function(pos){
-            return(c(traversed, pos))
-        }) # Updated
-        return(positions)
-    }
 
     # Calculate metric
     positions <- get_positions_to_search(length(seqc[[1]]),
