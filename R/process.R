@@ -133,10 +133,12 @@ flag_allele <- function(seqc, bp=BiocParallel::SerialParam()) {
 #' @param dash_ignore whether to treat '-' as another type
 #' @param accepted_char character to accept, default to c("A", "C", "T", "G")
 #' @param ignore_case whether to be case insensitive, default to TRUE
+#' @param remove_invariant whether to remove invariant positions, default to FALSE
+#' @param biallelic_only whether to remove positions with more than 2 alleles, default to FALSE
 #' @keywords internal
 #' @return Will return a list of positions that need to be ignored.
 flag_position <- function(pro_seqc, dash_ignore=TRUE,
-    accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE, bp = SerialParam()) {
+    accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE, remove_invariant=FALSE, biallelic_only=FALSE, bp = SerialParam()) {
 
     if (dash_ignore == FALSE) {
         accepted_char <- c(accepted_char, "-")
@@ -149,10 +151,31 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
         })
     }
 
-    ignored_position <- bplapply(as.list(pro_seqc), function(iso, charset) {
+    seq <- as.list(pro_seqc)
+    ignored_position <- bplapply(seq, function(iso, charset) {
         return(which(! as.vector(iso) %in% charset))
     }, charset = accepted_char, BPPARAM = bp)
 
+    more_pos <- bplapply(
+        seq_len(length(seq[[1]])), function(pos, remove_invariant, biallelic_only) {
+            l_pat <- length(unique(minSNPs:::generate_pattern(seq, pos)))
+            print(l_pat)
+            if (remove_invariant & biallelic_only & (l_pat != 2)) {
+                return(pos)
+            }
+            if (remove_invariant & l_pat < 2) {
+                return(pos)
+            }
+            if (biallelic_only & l_pat > 2) {
+                return(pos)
+            }
+            else {
+                return(NULL)
+            }
+        }, remove_invariant = remove_invariant, biallelic_only = biallelic_only,
+    BPPARAM = bp)
+
+    ignored_position <- c(ignored_position, unlist(more_pos))
     result <- sort(unique(unlist(ignored_position)))
 
     return(result)
@@ -190,7 +213,7 @@ remove_dup_isolate <- function(seqc) {
 #' @return Will return the processed allelic profiles.
 #' @export
 process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
-    dash_ignore=TRUE, accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE) {
+    dash_ignore=TRUE, accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE, remove_invariant=FALSE, biallelic_only=FALSE) {
 
     processed <- list()
     seqc <- remove_dup_isolate(seqc)

@@ -1,0 +1,80 @@
+library(minSNPs) 
+library(BiocParallel) 
+
+processFile <- function(variant_sites){
+        result <- c()
+        read_cc <- c()
+        con <- file(variant_sites, "r")
+        while(TRUE){
+                data <- readLines(con, n = 3)
+                if (length(data) == 0){
+                        break
+                }
+                positions <- strsplit(strsplit(data, split = "\n")[[2]], split = ", ")
+                read_cc <- c(read_cc, strsplit(data, split = "\n")[[1]])
+                result <- c(result, unlist(positions))
+        }
+        close(con)
+        print(read_cc)
+        result <- sort(as.numeric(unique(result)))
+        return(result)
+}
+
+ref_genome <- read_fasta("./Mu50.fasta")
+ort_matrix <- read_fasta("./balanced_mat_without_SRR798725_single_final.fasta")
+ref_matrix <- read.csv("ref_OUTF1.csv")
+excluded <- processFile("variant_t10.csv")
+
+final_selected <- unique(c(19005, 146839, 139160, 56330, 161480, 3924, 154999, 16466, 81571, 18396, 7606, 1423, 123061, 146839, 16642, 62586, 6703, 121, 377, 34111, 81571, 19522, 1423, 17405, 2821, 28973, 42047, 81571, 8379, 28291, 1423, 71833, 42047, 16488, 63277, 13784, 712, 131033, 81571, 32405, 1423, 36872, 497, 19522, 26424, 88484, 6703, 133624, 121, 41373, 139160, 6703, 8379, 31757, 12521, 127418, 146839, 139160, 161480, 56330, 3924))
+
+length(final_selected)
+all(! final_selected %in% excluded)
+
+## After and before the "targets"
+prev <- 6
+after <- 6
+
+#target generation
+targets_set <- list()
+total <- length(final_selected)
+current <- 1
+ref <- paste(ref_genome[[1]], collapse = "")
+for (snp in sort(final_selected)){
+	genome_pos <- ref_matrix[ref_matrix$fasta_position == snp, "genome_position"]
+	overlaps <- ref_matrix[ref_matrix$genome_position >= (genome_pos - prev) & ref_matrix$genome_position <= (genome_pos + after),]
+	overlaps[["target_position"]] <- overlaps[["genome_position"]] - (genome_pos - prev) + 1
+	overlaps[["is_interest"]] <- rep(F, nrow(overlaps))
+	overlaps[overlaps$genome_position == genome_pos, "is_interest"] <- T
+	cat("Running:", (current/total), "\n")
+	cat("SNP:", snp, "(", genome_pos, ")", "\n")
+	print("Overlaps:")
+	print(overlaps)
+	targets_set[[as.character(snp)]][["fasta_position"]] <- snp
+	targets_set[[as.character(snp)]][["genome_position"]] <- genome_pos
+	targets_set[[as.character(snp)]][["overlaps"]] <- overlaps
+	variations <- unlist(unique(minSNPs:::generate_pattern(ort_matrix, overlaps$fasta_position)))
+	reference <- strsplit(minSNPs:::generate_pattern(Mu50, c((genome_pos - prev):(genome_pos + after)))[[1]], split = "")[[1]]
+	targets <- lapply(strsplit(variations, split = ""), function(x){
+		result <- reference
+		for (change in seq_len(nrow(overlaps))){
+			result[overlaps[change, "target_position"]] <- x[change]
+		}
+		return(paste(result, collapse = ""))
+	})
+	targets_set[[as.character(snp)]][["targets"]] <- targets
+	targets_set[[as.character(snp)]][["reference"]] <- paste(reference, collapse = "")
+	targets_set[[as.character(snp)]][["no_match_reference"]] <- lapply(targets, function(x){
+		matches <- gregexpr(paste(x, collapse=""), ref)
+		found <- 0
+		if (length(matches[[1]]) == 1){
+			if (matches[[1]][1] != -1){
+				found <- 1
+			}
+		} else{
+			found <- length(matches[[1]])
+		}
+		return(found)
+	})
+
+	current <- (current + 1)
+}
