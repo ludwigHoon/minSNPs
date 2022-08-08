@@ -1,0 +1,42 @@
+---
+title: MinSNPs User Manual
+---
+
+# Installation
+1. Download and install either [R base binary](https://cloud.r-project.org/) or [RStudio Desktop](https://www.rstudio.com/products/rstudio/).
+2. In either a R terminal or RStudio, run the command `setRepositories()` and make sure that both **CRAN** and **BioC software** are selected; can be confirmed with `getOption("repos")`.
+
+::: {layout-ncol=2 layout-nrow=2}
+![Prompt in CLI](./set_repositories.jpg)
+
+![Prompt in RStudio](./setrespository_rstudio.jpg)
+
+![Correct outcome](./repo_changed.jpg)
+:::
+3. Run the command `install.packages("minSNPs")` or user the provided UI in Rstudio to install `MinSNPs`, the package will be downloaded from CRAN and installed, ensure that it has been successfully installed.
+
+::: {layout-ncol=2}
+![Installing with GUI in RStudio](./install_rstudio.jpg)
+
+![Successful installation message](./install_success.jpg)
+:::
+
+# Using minSNPs
+These steps are always needed in any analysis:
+1. Import minSNPs package in R environment with command `library("minSNPs")`.
+
+![minSNPs output loaded version when imported successfully](./import_success.jpg)
+2. Setting the working directory to where the files are with `setwd(<directory>)`.
+
+![RStudio provide GUI to set working directory](./setdirectory.jpg)
+
+## Reading & Cleaning orthologous SNP matrix in FASTA format
+1. Use the function `read_fasta("<fasta_file>")` to read an orthologous SNP Matrix.
+2. 
+
+## minSNPs in %-mode
+
+## minSNPs in D-mode
+
+# Others
+1. Functions documentation can be found at: [https://ludwighoon.github.io/minSNPs/reference/index.html](https://ludwighoon.github.io/minSNPs/reference/index.html)
