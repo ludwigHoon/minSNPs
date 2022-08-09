@@ -15,6 +15,69 @@ span.underline{text-decoration: underline;}
 div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -116,26 +179,260 @@ ul.task-list{list-style: none;}
 </section>
 <section id="using-minsnps" class="level1">
 <h1>Using minSNPs</h1>
-<p>These steps are always needed in any analysis: 1. Import minSNPs package in R environment with command <code>library("minSNPs")</code>.</p>
-<p><img src="./import_success.jpg" class="img-fluid" alt="minSNPs output loaded version when imported successfully"> 2. Setting the working directory to where the files are with <code>setwd(&lt;directory&gt;)</code>.</p>
+<p>The following sections are demo making use of 3 sample FASTA files:</p>
+<ol type="1">
+<li><a href="https://github.com/ludwigHoon/minSNPs/raw/master/inst/extdata/Chlamydia_1.fasta">Chlamydia_1.fasta</a></li>
+<li><a href="https://github.com/ludwigHoon/minSNPs/raw/master/inst/extdata/Chlamydia_2.fasta">Chlamydia_2.fasta</a></li>
+<li><a href="https://github.com/ludwigHoon/minSNPs/raw/master/inst/extdata/Chlamydia_mapped.fasta">Chlamydia_mapped.fasta</a></li>
+</ol>
+<p>You can download the files and follow along.</p>
+<hr>
+<p>These steps are always needed in any analysis:</p>
+<ol type="1">
+<li><p>Import minSNPs package in R environment with command <code>library("minSNPs")</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./import_success.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">minSNPs output loaded version when imported successfully</figcaption><p></p>
+</figure>
+</div></li>
+<li><p>Setting the working directory to where the files are with <code>setwd("&lt;directory&gt;")</code>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./setdirectory.jpg" class="img-fluid figure-img"></p>
 <p></p><figcaption class="figure-caption">RStudio provide GUI to set working directory</figcaption><p></p>
 </figure>
-</div>
+</div></li>
+</ol>
 <section id="reading-cleaning-orthologous-snp-matrix-in-fasta-format" class="level2">
 <h2 class="anchored" data-anchor-id="reading-cleaning-orthologous-snp-matrix-in-fasta-format">Reading &amp; Cleaning orthologous SNP matrix in FASTA format</h2>
 <ol type="1">
 <li>Use the function <code>read_fasta("&lt;fasta_file&gt;")</code> to read an orthologous SNP Matrix.</li>
-<li></li>
+<li>Use the function <code>process_allele(&lt;read variable&gt;)</code> to preprocess the matrix, see <a href="https://ludwighoon.github.io/minSNPs/reference/process_allele.html">function reference</a> for options.</li>
 </ol>
+<section id="reading-and-processing-chlamydia_1" class="level3">
+<h3 class="anchored" data-anchor-id="reading-and-processing-chlamydia_1">Reading and processing Chlamydia_1</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>chlamydia_1 <span class="ot">&lt;-</span> <span class="fu">read_fasta</span>(<span class="st">"Chlamydia_1.fasta"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>processed_chlamydia_1 <span class="ot">&lt;-</span> <span class="fu">process_allele</span>(chlamydia_1)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>processed_chlamydia_1<span class="sc">$</span>ignored_position</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="chlamydia_1.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We read Chlamydia_1.fasta and assigned it to a variable called <code>chlamydia_1</code>.</li>
+<li>We processed the matrix, and:
+<ul>
+<li>removed 2 sequences, <code>A_D213</code> and <code>Ba_Aus25</code>, this is due to sequence with length different from others.</li>
+<li>ignored 2 positions, 22 and 24, this can be due to non-standard character or dash.</li>
+</ul></li>
+</ul>
+</section>
+<section id="reading-and-processing-chlamydia_2" class="level3">
+<h3 class="anchored" data-anchor-id="reading-and-processing-chlamydia_2">Reading and processing Chlamydia_2</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>chlamydia_2 <span class="ot">&lt;-</span> <span class="fu">read_fasta</span>(<span class="st">"Chlamydia_2.fasta"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>processed_chlamydia_2 <span class="ot">&lt;-</span> <span class="fu">process_allele</span>(chlamydia_2)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>processed_chlamydia_2<span class="sc">$</span>ignored_position</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="chlamydia_2.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We read Chlamydia_2.fasta and assigned it to a variable called <code>chlamydia_2</code>.</li>
+<li>We processed the matrix, and:
+<ul>
+<li>removed 1 or sequences <code>A_D213</code> because of the same sequence name.</li>
+<li>removed 3 sequences, <code>A_D213</code>, <code>Ia_SotoGIa3</code> and <code>D_SotoGD1</code>, this is due to sequence with length different from others.</li>
+<li>ignored 4 positions, 1, 2, 3, 4, this can be due to non-standard character or dash.</li>
+</ul></li>
+</ul>
+</section>
+<section id="reading-and-processing-chlamydia_mapped" class="level3">
+<h3 class="anchored" data-anchor-id="reading-and-processing-chlamydia_mapped">Reading and processing Chlamydia_mapped</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>chlamydia_mapped <span class="ot">&lt;-</span> <span class="fu">read_fasta</span>(<span class="st">"Chlamydia_mapped.fasta"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>processed_chlamydia_mapped <span class="ot">&lt;-</span> <span class="fu">process_allele</span>(chlamydia_mapped)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="chlamydia_mapped.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We read Chlamydia_mapped.fasta and assigned it to a variable called <code>chlamydia_mapped</code>.</li>
+<li>We processed the matrix, but did not find any anomaly.</li>
+</ul>
+</section>
 </section>
 <section id="minsnps-in--mode" class="level2">
 <h2 class="anchored" data-anchor-id="minsnps-in--mode">minSNPs in %-mode</h2>
+<section id="identify-snps-discriminating-a-single-sequence-a_d213" class="level3">
+<h3 class="anchored" data-anchor-id="identify-snps-discriminating-a-single-sequence-a_d213">Identify SNPs discriminating a single sequence (<code>A_D213</code>):</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">find_optimised_snps</span>(chlamydia_mapped, <span class="at">metric=</span><span class="st">"percent"</span>, <span class="at">number_of_result=</span><span class="dv">3</span>, <span class="at">goi=</span><span class="st">"A_D213"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">output_result</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="percent_1.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We identified 3 set of SNP that discriminate against <code>A_D213</code>.</li>
+<li>All the 3 SNPs on its own completely discriminate against <code>A_D213</code>, and the target allele is shown.</li>
+</ul>
+</section>
+<section id="identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1" class="level3">
+<h3 class="anchored" data-anchor-id="identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1">Identify SNPs discriminating multiple sequences (<code>A_D213</code>, <code>Ia_SotoGIa3</code>, <code>D_SotoGD1</code>):</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">find_optimised_snps</span>(chlamydia_mapped, <span class="at">metric=</span><span class="st">"percent"</span>, <span class="at">number_of_result=</span><span class="dv">3</span>, <span class="at">goi=</span><span class="fu">c</span>(<span class="st">"A_D213"</span>, <span class="st">"Ia_SotoGIa3"</span>, <span class="st">"D_SotoGD1"</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">output_result</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="percent_2.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We identified 3 sets of SNP that discriminate against <code>A_D213</code>, <code>Ia_SotoGIa3</code>, <code>D_SotoGD1</code>.</li>
+<li>None of the 3 sets completely discriminate against all the sequences, the selected SNPs and how it would group the sequences are shown.</li>
+</ul>
+</section>
+<section id="identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1-ii" class="level3">
+<h3 class="anchored" data-anchor-id="identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1-ii">Identify SNPs discriminating multiple sequences (<code>A_D213</code>, <code>Ia_SotoGIa3</code>, <code>D_SotoGD1</code>) II:</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">find_optimised_snps</span>(chlamydia_mapped, <span class="at">metric=</span><span class="st">"percent"</span>, <span class="at">number_of_result=</span><span class="dv">3</span>, <span class="at">max_depth =</span> <span class="dv">5</span>, <span class="at">goi=</span><span class="fu">c</span>(<span class="st">"A_D213"</span>, <span class="st">"Ia_SotoGIa3"</span>, <span class="st">"D_SotoGD1"</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">output_result</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="percent_3.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We identified 3 sets of SNP that discriminate against <code>A_D213</code>, <code>Ia_SotoGIa3</code>, <code>D_SotoGD1</code>, each set can have up to 5 SNPs.</li>
+<li>Set 1 and 3 completely discriminate against all the sequences with (5 and 4 SNPs respectively), while set 2 still fail to completely discriminate against all the 3 isolates; the selected SNPs and how it would group the sequences are shown.</li>
+</ul>
+</section>
 </section>
 <section id="minsnps-in-d-mode" class="level2">
 <h2 class="anchored" data-anchor-id="minsnps-in-d-mode">minSNPs in D-mode</h2>
+<section id="running-d-mode-analysis-as-is" class="level3">
+<h3 class="anchored" data-anchor-id="running-d-mode-analysis-as-is">Running D-mode analysis as-is:</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">find_optimised_snps</span>(chlamydia_mapped, <span class="at">metric=</span><span class="st">"simpson"</span>, <span class="at">number_of_result=</span><span class="dv">3</span>, <span class="at">max_depth =</span> <span class="dv">5</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">output_result</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="hd_1.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We identified 3 sets of SNP that have the highest Simpson score, each set can have up to 5 SNPs, only terminating if the Simpson is 1.</li>
+<li>The selected SNPs and how the SNPs would group the sequences are shown.</li>
+</ul>
+</section>
+<section id="exclude-specific-snps" class="level3">
+<h3 class="anchored" data-anchor-id="exclude-specific-snps">Exclude specific SNPs:</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">find_optimised_snps</span>(chlamydia_mapped, <span class="at">metric=</span><span class="st">"simpson"</span>, <span class="at">max_depth =</span> <span class="dv">5</span>, <span class="at">excluded_positions =</span> <span class="fu">c</span>(<span class="dv">1988</span>, <span class="dv">8241</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">output_result</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="hd_2.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We identified a set of maximum 5 SNPs that has the highest Simpson score, the set will not include SNPs at 1988, and 8241.</li>
+<li>The selected SNPs and how the SNPs would group the sequences are shown.</li>
+</ul>
+</section>
+<section id="include-specific-snps" class="level3">
+<h3 class="anchored" data-anchor-id="include-specific-snps">Include specific SNPs:</h3>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">find_optimised_snps</span>(chlamydia_mapped, <span class="at">metric=</span><span class="st">"simpson"</span>, <span class="at">max_depth =</span> <span class="dv">5</span>, <span class="at">included_positions =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">output_result</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="hd_3.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>We identified a set of SNPs that has the highest Simpson score, the set will include SNPs at 1, 2, 3, and up to additional 5 SNPs.</li>
+<li>The selected SNPs and how the SNPs would group the sequences are shown.</li>
+</ul>
+</section>
+</section>
+<section id="save-result-to-tsv" class="level2">
+<h2 class="anchored" data-anchor-id="save-result-to-tsv">Save result to TSV</h2>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">output_result</span>(result, <span class="at">view =</span> <span class="st">"tsv"</span>, <span class="at">file_name =</span> <span class="st">"result.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="saving.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>The result is saved at a file called <code>result.tsv</code>, which can be opened in excel, with tab as delimiter.</li>
+</ul>
+</section>
+<section id="parallelizing-runs" class="level2">
+<h2 class="anchored" data-anchor-id="parallelizing-runs">Parallelizing runs</h2>
+<p>Code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">find_optimised_snps</span>(chlamydia_mapped, <span class="at">metric=</span><span class="st">"simpson"</span>, <span class="at">max_depth =</span> <span class="dv">5</span>, <span class="at">number_of_result =</span> <span class="dv">3</span>, <span class="at">included_positions =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="at">bp =</span> BiocParallel<span class="sc">::</span><span class="fu">MulticoreParam</span>(<span class="at">workers =</span> <span class="dv">4</span>, ))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">output_result</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="parallel.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Output</figcaption><p></p>
+</figure>
+</div>
+<p>What happened?</p>
+<ul>
+<li>The is similar to analysis before, except that we parallelised with 4 cores, by adding the bp argument.</li>
+</ul>
 </section>
 </section>
 <section id="others" class="level1">

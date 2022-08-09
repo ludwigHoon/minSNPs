@@ -1,5 +1,7 @@
 ---
 title: MinSNPs User Manual
+execute: 
+  enabled: false
 ---
 
 # Installation
@@ -22,21 +24,186 @@ title: MinSNPs User Manual
 :::
 
 # Using minSNPs
+The following sections are demo making use of 3 sample FASTA files: 
+
+1. [Chlamydia_1.fasta](https://github.com/ludwigHoon/minSNPs/raw/master/inst/extdata/Chlamydia_1.fasta)
+2. [Chlamydia_2.fasta](https://github.com/ludwigHoon/minSNPs/raw/master/inst/extdata/Chlamydia_2.fasta)
+3. [Chlamydia_mapped.fasta](https://github.com/ludwigHoon/minSNPs/raw/master/inst/extdata/Chlamydia_mapped.fasta)
+
+You can download the files and follow along. 
+
+***
+
 These steps are always needed in any analysis:
+
 1. Import minSNPs package in R environment with command `library("minSNPs")`.
 
-![minSNPs output loaded version when imported successfully](./import_success.jpg)
-2. Setting the working directory to where the files are with `setwd(<directory>)`.
+    ![minSNPs output loaded version when imported successfully](./import_success.jpg)
 
-![RStudio provide GUI to set working directory](./setdirectory.jpg)
+2. Setting the working directory to where the files are with `setwd("<directory>")`.
+
+    ![RStudio provide GUI to set working directory](./setdirectory.jpg)
 
 ## Reading & Cleaning orthologous SNP matrix in FASTA format
 1. Use the function `read_fasta("<fasta_file>")` to read an orthologous SNP Matrix.
-2. 
+2. Use the function `process_allele(<read variable>)` to preprocess the matrix, see [function reference](https://ludwighoon.github.io/minSNPs/reference/process_allele.html) for options.
+
+### Reading and processing Chlamydia_1
+Code:
+```{r}
+chlamydia_1 <- read_fasta("Chlamydia_1.fasta")
+processed_chlamydia_1 <- process_allele(chlamydia_1)
+processed_chlamydia_1$ignored_position
+```
+![Output](chlamydia_1.jpg)
+
+What happened?
+
+- We read Chlamydia_1.fasta and assigned it to a variable called `chlamydia_1`.
+- We processed the matrix, and:
+    - removed 2 sequences, `A_D213` and `Ba_Aus25`, this is due to sequence with length different from others.
+    - ignored 2 positions, 22 and 24, this can be due to non-standard character or dash.
+
+### Reading and processing Chlamydia_2
+Code:
+```{r}
+chlamydia_2 <- read_fasta("Chlamydia_2.fasta")
+processed_chlamydia_2 <- process_allele(chlamydia_2)
+processed_chlamydia_2$ignored_position
+```
+![Output](chlamydia_2.jpg)
+
+What happened?
+
+- We read Chlamydia_2.fasta and assigned it to a variable called `chlamydia_2`.
+- We processed the matrix, and:
+    - removed 1 or sequences `A_D213` because of the same sequence name.
+    - removed 3 sequences, `A_D213`, `Ia_SotoGIa3` and `D_SotoGD1`, this is due to sequence with length different from others.
+    - ignored 4 positions, 1, 2, 3, 4, this can be due to non-standard character or dash.
+
+### Reading and processing Chlamydia_mapped
+Code:
+```{r}
+chlamydia_mapped <- read_fasta("Chlamydia_mapped.fasta")
+processed_chlamydia_mapped <- process_allele(chlamydia_mapped)
+```
+![Output](chlamydia_mapped.jpg)
+
+What happened?
+
+- We read Chlamydia_mapped.fasta and assigned it to a variable called `chlamydia_mapped`.
+- We processed the matrix, but did not find any anomaly.
 
 ## minSNPs in %-mode
+### Identify SNPs discriminating a single sequence (`A_D213`):
+Code:
+```{r}
+result <- find_optimised_snps(chlamydia_mapped, metric="percent", number_of_result=3, goi="A_D213")
+output_result(result)
+```
+
+![Output](percent_1.jpg)
+
+What happened?
+
+- We identified 3 set of SNP that discriminate against `A_D213`.
+- All the 3 SNPs on its own completely discriminate against `A_D213`, and the target allele is shown.
+
+### Identify SNPs discriminating multiple sequences (`A_D213`, `Ia_SotoGIa3`, `D_SotoGD1`):
+Code:
+```{r}
+result <- find_optimised_snps(chlamydia_mapped, metric="percent", number_of_result=3, goi=c("A_D213", "Ia_SotoGIa3", "D_SotoGD1"))
+output_result(result)
+```
+
+![Output](percent_2.jpg)
+
+What happened? 
+
+- We identified 3 sets of SNP that discriminate against `A_D213`, `Ia_SotoGIa3`, `D_SotoGD1`.
+- None of the 3 sets completely discriminate against all the sequences, the selected SNPs and how it would group the sequences are shown.
+
+### Identify SNPs discriminating multiple sequences (`A_D213`, `Ia_SotoGIa3`, `D_SotoGD1`) II:
+Code:
+```{r}
+result <- find_optimised_snps(chlamydia_mapped, metric="percent", number_of_result=3, max_depth = 5, goi=c("A_D213", "Ia_SotoGIa3", "D_SotoGD1"))
+output_result(result)
+```
+
+![Output](percent_3.jpg)
+
+What happened? 
+
+- We identified 3 sets of SNP that discriminate against `A_D213`, `Ia_SotoGIa3`, `D_SotoGD1`, each set can have up to 5 SNPs.
+- Set 1 and 3 completely discriminate against all the sequences with (5 and 4 SNPs respectively), while set 2 still fail to completely discriminate against all the 3 isolates; the selected SNPs and how it would group the sequences are shown.
 
 ## minSNPs in D-mode
+### Running D-mode analysis as-is:
+Code:
+```{r}
+result <- find_optimised_snps(chlamydia_mapped, metric="simpson", number_of_result=3, max_depth = 5)
+output_result(result)
+```
+
+![Output](hd_1.jpg)
+
+What happened? 
+
+- We identified 3 sets of SNP that have the highest Simpson score, each set can have up to 5 SNPs, only terminating if the Simpson is 1.
+- The selected SNPs and how the SNPs would group the sequences are shown.
+
+### Exclude specific SNPs:
+Code:
+```{r}
+result <- find_optimised_snps(chlamydia_mapped, metric="simpson", max_depth = 5, excluded_positions = c(1988, 8241))
+output_result(result)
+```
+
+![Output](hd_2.jpg)
+
+What happened? 
+
+- We identified a set of maximum 5 SNPs that has the highest Simpson score, the set will not include SNPs at 1988, and 8241.
+- The selected SNPs and how the SNPs would group the sequences are shown.
+
+### Include specific SNPs: 
+Code:
+```{r}
+result <- find_optimised_snps(chlamydia_mapped, metric="simpson", max_depth = 5, included_positions = c(1, 2, 3))
+output_result(result)
+```
+
+![Output](hd_3.jpg)
+
+What happened? 
+
+- We identified a set of SNPs that has the highest Simpson score, the set will include SNPs at 1, 2, 3, and up to additional 5 SNPs.
+- The selected SNPs and how the SNPs would group the sequences are shown.
+
+## Save result to TSV
+Code:
+```{r}
+output_result(result, view = "tsv", file_name = "result.tsv")
+```
+
+![Output](saving.jpg)
+
+What happened? 
+
+- The result is saved at a file called `result.tsv`, which can be opened in excel, with tab as delimiter.
+
+## Parallelizing runs
+Code:
+```{r}
+result <- find_optimised_snps(chlamydia_mapped, metric="simpson", max_depth = 5, number_of_result = 3, included_positions = c(1, 2, 3), bp = BiocParallel::MulticoreParam(workers = 4, ))
+output_result(result)
+```
+
+![Output](parallel.jpg)
+
+What happened? 
+
+- The is similar to analysis before, except that we parallelised with 4 cores, by adding the bp argument.
 
 # Others
 1. Functions documentation can be found at: [https://ludwighoon.github.io/minSNPs/reference/index.html](https://ludwighoon.github.io/minSNPs/reference/index.html)
