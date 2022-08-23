@@ -374,14 +374,14 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
 #' @param excluded_pos vector of excluded positions
 #' @param traversed vector of positions that is previously selected
 #' @keywords internal
-#' @importFrom BiocParallel bplapply
+#' @importFrom BiocParallel bplapply SerialParam
 #' @return Will return a list of positions to search through
 get_positions_to_search <- function(seqc_len, excluded_pos, traversed) {
     positions <- seq_len(seqc_len)
     positions <- as.list(positions[! positions %in% c(excluded_pos, traversed)])
     positions <- bplapply(positions, function(pos){
         return(c(traversed, pos))
-    }) # Updated
+    }, BPPARAM = SerialParam()) # Updated
     return(positions)
 }
 

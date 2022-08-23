@@ -4,9 +4,20 @@ execute:
   enabled: false
 ---
 
-# Installation
-1. Download and install either [R base binary](https://cloud.r-project.org/) or [RStudio Desktop](https://www.rstudio.com/products/rstudio/).
-2. In either a R terminal or RStudio, run the command `setRepositories()` and make sure that both **CRAN** and **BioC software** are selected; can be confirmed with `getOption("repos")`.
+# Introduction
+MinSNPs is written in R. The convention is that programs written in this language are termed "packages".
+
+We suggest two different user interfaces:
+
+1. For users who are unfamiliar with the UNIX operating system and/or do not have access to a computer cluster, we suggest running MinSNPs in RStudio. RStudio is designed to facilitate the development and operation of R packages by providing a workspace that is quicker and easier to use than a purely command line interface. Although this will limit the scale and speed of analyses, a typical office PC is powerful enough for many useful applications of MinSNPs. RStusdio  Desktop can be accessed at [https://www.rstudio.com/products/rstudio/](https://www.rstudio.com/products/rstudio/)
+2. For users who are familiar with the UNIX environment, or who can access appropriate support, we suggest operating MinSNPs using a standard command line interface, with a UNIX-based high performance computer cluster. [R base Binary](https://cloud.r-project.org/) will need to be installed. Running R in this environment creates an "R  Terminal".
+
+The operations for either interface are very similar. In general, all operations & commands for 2nd UI can be copied and run within the terminal in RStudio, and where RStudio provide additional UI to simplify the user experience, the following sections provide additional screenshots.
+
+# Accessing & Installing MinSNPs
+MinSNPs is available in the CRAN repository of R packages. The R environment makes it straightforward to load packages directly from CRAN i.e. it is unnecessary to download the code onto a local machine prior to installation.
+
+1. In either a R terminal or RStudio, run the command `setRepositories()` and make sure that both **CRAN** and **BioC software** are selected; can be confirmed with `getOption("repos")`.
 
 ::: {layout-ncol=2 layout-nrow=2}
 ![Prompt in CLI](./set_repositories.jpg)
@@ -15,7 +26,7 @@ execute:
 
 ![Correct outcome](./repo_changed.jpg)
 :::
-3. Run the command `install.packages("minSNPs")` or user the provided UI in Rstudio to install `MinSNPs`, the package will be downloaded from CRAN and installed, ensure that it has been successfully installed.
+2. Run the command `install.packages("minSNPs")` or user the provided UI in Rstudio to install `MinSNPs`, the package will be downloaded from CRAN and installed, ensure that it has been successfully installed.
 
 ::: {layout-ncol=2}
 ![Installing with GUI in RStudio](./install_rstudio.jpg)
@@ -207,3 +218,4 @@ What happened?
 
 # Others
 1. Functions documentation can be found at: [https://ludwighoon.github.io/minSNPs/reference/index.html](https://ludwighoon.github.io/minSNPs/reference/index.html)
+2. [Cheat sheet for R](https://iqss.github.io/dss-workshops/R/Rintro/base-r-cheat-sheet.pdf)

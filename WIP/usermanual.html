@@ -95,10 +95,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#accessing-installing-minsnps" id="toc-accessing-installing-minsnps" class="nav-link" data-scroll-target="#accessing-installing-minsnps">Accessing &amp; Installing MinSNPs</a></li>
+  <li><a href="#using-minsnps" id="toc-using-minsnps" class="nav-link" data-scroll-target="#using-minsnps">Using minSNPs</a>
+  <ul class="collapse">
+  <li><a href="#reading-cleaning-orthologous-snp-matrix-in-fasta-format" id="toc-reading-cleaning-orthologous-snp-matrix-in-fasta-format" class="nav-link" data-scroll-target="#reading-cleaning-orthologous-snp-matrix-in-fasta-format">Reading &amp; Cleaning orthologous SNP matrix in FASTA format</a>
+  <ul class="collapse">
+  <li><a href="#reading-and-processing-chlamydia_1" id="toc-reading-and-processing-chlamydia_1" class="nav-link" data-scroll-target="#reading-and-processing-chlamydia_1">Reading and processing Chlamydia_1</a></li>
+  <li><a href="#reading-and-processing-chlamydia_2" id="toc-reading-and-processing-chlamydia_2" class="nav-link" data-scroll-target="#reading-and-processing-chlamydia_2">Reading and processing Chlamydia_2</a></li>
+  <li><a href="#reading-and-processing-chlamydia_mapped" id="toc-reading-and-processing-chlamydia_mapped" class="nav-link" data-scroll-target="#reading-and-processing-chlamydia_mapped">Reading and processing Chlamydia_mapped</a></li>
+  </ul></li>
+  <li><a href="#minsnps-in--mode" id="toc-minsnps-in--mode" class="nav-link" data-scroll-target="#minsnps-in--mode">minSNPs in %-mode</a>
+  <ul class="collapse">
+  <li><a href="#identify-snps-discriminating-a-single-sequence-a_d213" id="toc-identify-snps-discriminating-a-single-sequence-a_d213" class="nav-link" data-scroll-target="#identify-snps-discriminating-a-single-sequence-a_d213">Identify SNPs discriminating a single sequence (<code>A_D213</code>):</a></li>
+  <li><a href="#identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1" id="toc-identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1" class="nav-link" data-scroll-target="#identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1">Identify SNPs discriminating multiple sequences (<code>A_D213</code>, <code>Ia_SotoGIa3</code>, <code>D_SotoGD1</code>):</a></li>
+  <li><a href="#identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1-ii" id="toc-identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1-ii" class="nav-link" data-scroll-target="#identify-snps-discriminating-multiple-sequences-a_d213-ia_sotogia3-d_sotogd1-ii">Identify SNPs discriminating multiple sequences (<code>A_D213</code>, <code>Ia_SotoGIa3</code>, <code>D_SotoGD1</code>) II:</a></li>
+  </ul></li>
+  <li><a href="#minsnps-in-d-mode" id="toc-minsnps-in-d-mode" class="nav-link" data-scroll-target="#minsnps-in-d-mode">minSNPs in D-mode</a>
+  <ul class="collapse">
+  <li><a href="#running-d-mode-analysis-as-is" id="toc-running-d-mode-analysis-as-is" class="nav-link" data-scroll-target="#running-d-mode-analysis-as-is">Running D-mode analysis as-is:</a></li>
+  <li><a href="#exclude-specific-snps" id="toc-exclude-specific-snps" class="nav-link" data-scroll-target="#exclude-specific-snps">Exclude specific SNPs:</a></li>
+  <li><a href="#include-specific-snps" id="toc-include-specific-snps" class="nav-link" data-scroll-target="#include-specific-snps">Include specific SNPs:</a></li>
+  </ul></li>
+  <li><a href="#save-result-to-tsv" id="toc-save-result-to-tsv" class="nav-link" data-scroll-target="#save-result-to-tsv">Save result to TSV</a></li>
+  <li><a href="#parallelizing-runs" id="toc-parallelizing-runs" class="nav-link" data-scroll-target="#parallelizing-runs">Parallelizing runs</a></li>
+  </ul></li>
+  <li><a href="#others" id="toc-others" class="nav-link" data-scroll-target="#others">Others</a></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -117,10 +150,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<section id="installation" class="level1">
-<h1>Installation</h1>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>MinSNPs is written in R. The convention is that programs written in this language are termed “packages”.</p>
+<p>We suggest two different user interfaces:</p>
 <ol type="1">
-<li>Download and install either <a href="https://cloud.r-project.org/">R base binary</a> or <a href="https://www.rstudio.com/products/rstudio/">RStudio Desktop</a>.</li>
+<li>For users who are unfamiliar with the UNIX operating system and/or do not have access to a computer cluster, we suggest running MinSNPs in RStudio. RStudio is designed to facilitate the development and operation of R packages by providing a workspace that is quicker and easier to use than a purely command line interface. Although this will limit the scale and speed of analyses, a typical office PC is powerful enough for many useful applications of MinSNPs. RStusdio Desktop can be accessed at <a href="https://www.rstudio.com/products/rstudio/">https://www.rstudio.com/products/rstudio/</a></li>
+<li>For users who are familiar with the UNIX environment, or who can access appropriate support, we suggest operating MinSNPs using a standard command line interface, with a UNIX-based high performance computer cluster. “R base Binary” will need to be installed. Running R in this environment creates an “R Terminal”.</li>
+</ol>
+<p>The operations for either interface are very similar. In general, all operations &amp; commands for 2nd UI can be copied and run within the terminal in RStudio, and where RStudio provide additional UI to simplify the user experience, the following sections provide additional screenshots.</p>
+</section>
+<section id="accessing-installing-minsnps" class="level1">
+<h1>Accessing &amp; Installing MinSNPs</h1>
+<p>MinSNPs is available in the CRAN repository of R packages. The R environment makes it straightforward to load packages directly from CRAN i.e.&nbsp;it is unnecessary to download the code onto a local machine prior to installation.</p>
+<ol type="1">
 <li>In either a R terminal or RStudio, run the command <code>setRepositories()</code> and make sure that both <strong>CRAN</strong> and <strong>BioC software</strong> are selected; can be confirmed with <code>getOption("repos")</code>.</li>
 </ol>
 <div class="quarto-layout-panel">
@@ -153,7 +196,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-<ol start="3" type="1">
+<ol start="2" type="1">
 <li>Run the command <code>install.packages("minSNPs")</code> or user the provided UI in Rstudio to install <code>MinSNPs</code>, the package will be downloaded from CRAN and installed, ensure that it has been successfully installed.</li>
 </ol>
 <div class="quarto-layout-panel">
@@ -439,6 +482,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Others</h1>
 <ol type="1">
 <li>Functions documentation can be found at: <a href="https://ludwighoon.github.io/minSNPs/reference/index.html">https://ludwighoon.github.io/minSNPs/reference/index.html</a></li>
+<li><a href="https://iqss.github.io/dss-workshops/R/Rintro/base-r-cheat-sheet.pdf">Cheat sheet for R</a></li>
 </ol>
 </section>
 

@@ -157,7 +157,8 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
     }, charset = accepted_char, BPPARAM = bp)
 
     more_pos <- bplapply(
-        seq_len(length(seq[[1]])), function(pos, remove_invariant, biallelic_only) {
+        seq_len(length(seq[[1]])),
+            function(pos, remove_invariant, biallelic_only) {
             l_pat <- length(unique(minSNPs:::generate_pattern(seq, pos)))
             print(l_pat)
             if (remove_invariant & biallelic_only & (l_pat != 2)) {
@@ -168,8 +169,7 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
             }
             if (biallelic_only & l_pat > 2) {
                 return(pos)
-            }
-            else {
+            } else {
                 return(NULL)
             }
         }, remove_invariant = remove_invariant, biallelic_only = biallelic_only,
