@@ -159,8 +159,7 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
     more_pos <- bplapply(
         seq_len(length(seq[[1]])),
             function(pos, remove_invariant, biallelic_only) {
-            l_pat <- length(unique(minSNPs:::generate_pattern(seq, pos)))
-            print(l_pat)
+            l_pat <- length(unique(generate_pattern(seq, pos)))
             if (remove_invariant & biallelic_only & (l_pat != 2)) {
                 return(pos)
             }

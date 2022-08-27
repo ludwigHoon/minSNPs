@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3_a</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
       </span>
     </div>
 
@@ -83,34 +83,57 @@
     <dl><dt>seqc</dt>
 <dd><p>list of sequences, either passed directly from
 <code>process_allele</code> or <code>read_fasta</code> or equivalence</p></dd>
+
+
 <dt>metric</dt>
 <dd><p>either `simpson` or `percent`</p></dd>
+
+
 <dt>goi</dt>
 <dd><p>group of interest, if creteria is percent,
 must be specified, ignored otherwise</p></dd>
+
+
 <dt>accept_multiallelic</dt>
 <dd><p>whether include positions with &gt; 1 state in goi</p></dd>
+
+
 <dt>number_of_result</dt>
 <dd><p>number of results to return, 0 will be coerced to 1</p></dd>
+
+
 <dt>max_depth</dt>
 <dd><p>maximum depth to go before terminating,
 0 means it will only calculate the metric for included position</p></dd>
+
+
 <dt>included_positions</dt>
 <dd><p>included positions</p></dd>
+
+
 <dt>excluded_positions</dt>
 <dd><p>excluded positions</p></dd>
+
+
 <dt>iterate_included</dt>
 <dd><p>whether to calculate index
 at each level of the included SNPs</p></dd>
+
+
 <dt>bp</dt>
 <dd><p>BiocParallel backend.
 Rule of thumbs: use MulticoreParam(workers = ncpus - 2)</p></dd>
+
+
 <dt>...</dt>
 <dd><p>other parameters as needed</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Will return the resolution-optimised SNPs set, based on the metric.</p>
+    
+
+<p>Will return the resolution-optimised SNPs set, based on the metric.</p>
     </div>
 
   </div>
@@ -125,7 +148,7 @@ Rule of thumbs: use MulticoreParam(workers = ncpus - 2)</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

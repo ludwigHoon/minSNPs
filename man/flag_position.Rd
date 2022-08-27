@@ -9,6 +9,8 @@ flag_position(
   dash_ignore = TRUE,
   accepted_char = c("A", "C", "T", "G"),
   ignore_case = TRUE,
+  remove_invariant = FALSE,
+  biallelic_only = FALSE,
   bp = SerialParam()
 )
 }
@@ -20,6 +22,10 @@ flag_position(
 \item{accepted_char}{character to accept, default to c("A", "C", "T", "G")}
 
 \item{ignore_case}{whether to be case insensitive, default to TRUE}
+
+\item{remove_invariant}{whether to remove invariant positions, default to FALSE}
+
+\item{biallelic_only}{whether to remove positions with more than 2 alleles, default to FALSE}
 }
 \value{
 Will return a list of positions that need to be ignored.

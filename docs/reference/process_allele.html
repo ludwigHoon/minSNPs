@@ -20,7 +20,7 @@ the longer length is taken as normal should there be 2 modes."><!-- mathjax --><
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3_a</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
       </span>
     </div>
 
@@ -74,7 +74,9 @@ the longer length is taken as normal should there be 2 modes.</p>
   bp <span class="op">=</span> <span class="fu">BiocParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/SerialParam-class.html" class="external-link">SerialParam</a></span><span class="op">(</span><span class="op">)</span>,
   dash_ignore <span class="op">=</span> <span class="cn">TRUE</span>,
   accepted_char <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"C"</span>, <span class="st">"T"</span>, <span class="st">"G"</span><span class="op">)</span>,
-  ignore_case <span class="op">=</span> <span class="cn">TRUE</span>
+  ignore_case <span class="op">=</span> <span class="cn">TRUE</span>,
+  remove_invariant <span class="op">=</span> <span class="cn">FALSE</span>,
+  biallelic_only <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -83,19 +85,38 @@ the longer length is taken as normal should there be 2 modes.</p>
     <dl><dt>seqc</dt>
 <dd><p>a list containing list of nucleotides. To keep it simple,
 use provided read_fasta to import the fasta file.</p></dd>
+
+
 <dt>bp</dt>
 <dd><p>is the biocparallel backend, default to serialParam,
 most likely sufficient in most scenario</p></dd>
+
+
 <dt>dash_ignore</dt>
 <dd><p>whether to treat '-' as another type</p></dd>
+
+
 <dt>accepted_char</dt>
 <dd><p>character to accept, default to c("A", "C", "T", "G")</p></dd>
+
+
 <dt>ignore_case</dt>
 <dd><p>whether to be case insensitive, default to TRUE</p></dd>
+
+
+<dt>remove_invariant</dt>
+<dd><p>whether to remove invariant positions, default to FALSE</p></dd>
+
+
+<dt>biallelic_only</dt>
+<dd><p>whether to remove positions with more than 2 alleles, default to FALSE</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Will return the processed allelic profiles.</p>
+    
+
+<p>Will return the processed allelic profiles.</p>
     </div>
 
   </div>
@@ -110,7 +131,7 @@ most likely sufficient in most scenario</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -44,6 +44,7 @@ set_test <- function(tests) {
 }
 
 test_that("read fasta file", {
+  skip_on_cran()
   all_test <- function() {
     expect_equal(length(names(chlamydia)), 56)
     expect_equal(length(names(error_file_1)), 56)
@@ -55,6 +56,7 @@ test_that("read fasta file", {
 
 
 test_that("usual length", {
+  skip_on_cran()
   all_test <- function() {
   # Normal File
   expect_equal(get_usual_length(chlamydia), 19570)
@@ -94,6 +96,7 @@ test_that("usual length", {
 })
 
 test_that("flagging allele", {
+  skip_on_cran()
   all_test <- function() {
 
   expect_vector(flag_allele(chlamydia), ptype = character(), size = 0)
@@ -115,6 +118,7 @@ test_that("flagging allele", {
 })
 
 test_that("flagging duplicated allele name", {
+  skip_on_cran()
   all_test <- function() {
   expect_equal(remove_dup_isolate(chlamydia), chlamydia)
   expect_equal(remove_dup_isolate(error_file_1), error_file_1)
@@ -126,7 +130,7 @@ test_that("flagging duplicated allele name", {
 })
 
 test_that("flagging position", {
-
+  skip_on_cran()
   all_test <- function() {
   expect_vector(flag_position(chlamydia), ptype = integer(), size = 0)
   # By default read_fasta force to upper case
@@ -148,6 +152,7 @@ test_that("flagging position", {
 })
 
 test_that("Overall", {
+  skip_on_cran()
   all_test <- function() {
   expect_equal(length(process_allele(chlamydia)[["seqc"]]), 56)
   expect_vector(process_allele(chlamydia)[["ignored_allele"]],
