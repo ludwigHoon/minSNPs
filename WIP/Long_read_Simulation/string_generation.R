@@ -1,7 +1,6 @@
 ### HELPERS
 STEP_1 <- T
 
-
 process_result_file <- function(result_filepath){
     f <- file(result_filepath, "r")
     preparse <- readLines(f)
@@ -21,9 +20,10 @@ process_result_file <- function(result_filepath){
         }
     }
     close(f)
-    final_selected <- unique(unlist(result))
+    final_selected <- (result)
     return(final_selected)
 }
+
 
 process_variant_file <- function(variant_sites){
     result <- c()
@@ -218,7 +218,7 @@ ref_matrix <- read.csv("ref_OUTF1.csv")
 ort_matrix <- read_fasta("./balanced_mat_without_SRR798725_single_final.fasta")
 excluded <- process_variant_file("variant_t10.csv")
 result_filepath <- "evenhd_with_exc200x8_400.csv"
-final_selected <- process_result_file(result_filepath)
+final_selected <- unique(unlist(process_result_file(result_filepath)))
 ref_genome <- read_fasta("./Mu50.fasta")
 
 ###

@@ -6,6 +6,7 @@
 #' @param ordered_index list of indexes for the pattern in the order
 #' @param append_to existing patterns to append to
 #' @return Will return concatenated list of string for searching.
+#' @export
 generate_pattern <- function(seqc, ordered_index=c(), append_to=list()) {
     pattern <- append_to
     for (isolate in names(seqc)) {
