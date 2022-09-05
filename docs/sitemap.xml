@@ -1,132 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/articles/MinSNPs_Workflow.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/articles/MinSNPs_Workflow.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/articles/index.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/articles/user_manual.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/authors.html</loc>
   </url>
   <url>
-    <loc>/news/index.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/index.html</loc>
   </url>
   <url>
-    <loc>/reference/branch_and_search.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/cal_fn.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/branch_and_search.html</loc>
   </url>
   <url>
-    <loc>/reference/cal_fp.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/cal_fn.html</loc>
   </url>
   <url>
-    <loc>/reference/cal_met_snp.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/cal_fp.html</loc>
   </url>
   <url>
-    <loc>/reference/calculate.percent.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/cal_met_snp.html</loc>
   </url>
   <url>
-    <loc>/reference/calculate.simpson.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/calculate.percent.html</loc>
   </url>
   <url>
-    <loc>/reference/calculate_percent.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/calculate.simpson.html</loc>
   </url>
   <url>
-    <loc>/reference/calculate_simpson.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_percent.html</loc>
   </url>
   <url>
-    <loc>/reference/check_fasta_meta_mapping.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_simpson.html</loc>
   </url>
   <url>
-    <loc>/reference/check_multistate.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/check_fasta_meta_mapping.html</loc>
   </url>
   <url>
-    <loc>/reference/check_percent.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/check_multistate.html</loc>
   </url>
   <url>
-    <loc>/reference/find_optimised_snps.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/check_percent.html</loc>
   </url>
   <url>
-    <loc>/reference/flag_allele.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/find_optimised_snps.html</loc>
   </url>
   <url>
-    <loc>/reference/flag_position.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/flag_allele.html</loc>
   </url>
   <url>
-    <loc>/reference/full_merge.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/flag_position.html</loc>
   </url>
   <url>
-    <loc>/reference/full_merge_1.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/full_merge.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_pattern.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/full_merge_1.html</loc>
   </url>
   <url>
-    <loc>/reference/get_metric_fun.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/generate_pattern.html</loc>
   </url>
   <url>
-    <loc>/reference/get_positions_to_search.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/get_metric_fun.html</loc>
   </url>
   <url>
-    <loc>/reference/get_usual_length.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/get_positions_to_search.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/get_usual_length.html</loc>
   </url>
   <url>
-    <loc>/reference/iterate_merge.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/merge_fasta.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/iterate_merge.html</loc>
   </url>
   <url>
-    <loc>/reference/output_parsed.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/merge_fasta.html</loc>
   </url>
   <url>
-    <loc>/reference/output_result.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/output_parsed.html</loc>
   </url>
   <url>
-    <loc>/reference/output_to_files.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/output_result.html</loc>
   </url>
   <url>
-    <loc>/reference/process_allele.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/output_to_files.html</loc>
   </url>
   <url>
-    <loc>/reference/read.fasta.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/process_allele.html</loc>
   </url>
   <url>
-    <loc>/reference/read_fasta.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/read.fasta.html</loc>
   </url>
   <url>
-    <loc>/reference/remove_dup_allele.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/read_fasta.html</loc>
   </url>
   <url>
-    <loc>/reference/remove_dup_isolate.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/remove_dup_allele.html</loc>
   </url>
   <url>
-    <loc>/reference/resolve_IUPAC_missing.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/remove_dup_isolate.html</loc>
   </url>
   <url>
-    <loc>/reference/usual_length.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/resolve_IUPAC_missing.html</loc>
   </url>
   <url>
-    <loc>/reference/view_percent.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/usual_length.html</loc>
   </url>
   <url>
-    <loc>/reference/view_simpson.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/view_percent.html</loc>
   </url>
   <url>
-    <loc>/reference/write_fasta.html</loc>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/view_simpson.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/write_fasta.html</loc>
   </url>
 </urlset>

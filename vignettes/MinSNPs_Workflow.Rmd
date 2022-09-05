@@ -1,8 +1,8 @@
 ---
-title: "MinSNPs_Workflow"
+title: "MinSNPs Workflow"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{MinSNPs_Workflow}
+  %\VignetteIndexEntry{MinSNPs Workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
