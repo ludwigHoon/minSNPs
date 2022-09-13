@@ -265,7 +265,18 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
     iterate_included = FALSE, bp = SerialParam(), ...) {
 
     # Define parameters
-    positions <- seq_len(length(seqc[[1]]))
+    if (inherits(seqc, "processed_seqs")) {
+        all_length <- sapply(seqc[["seqc"]], length)
+    } else {
+        all_length <- sapply(seqc, length)
+    }
+
+    if (length(unique(all_length)) > 1) {
+        warning("Sequences are not of the same length; ",
+        "Only the first ", min(all_length), " positions will be used")
+    }
+
+    positions <- seq_len(min(all_length))
     result <- list()
     original_excluded <- excluded_positions
     included <- ifelse(length(included_positions) > 0, TRUE, FALSE)
