@@ -24,6 +24,16 @@ process_result_file <- function(result_filepath){
     return(final_selected)
 }
 
+generate_kmers <- function(final_string, k){
+    if (is.character(final_string) && length(final_string) == 1){
+        final_string <- strsplit(final_string, split = "")[[1]]
+    }
+    kmer <- list()
+    for (i in seq_len(length(final_string) - k + 1)){
+        kmer[[i]] <- paste(final_string[i:(i+k-1)], collapse = "")
+    }
+    return(unlist(kmer))
+}
 
 process_variant_file <- function(variant_sites){
     result <- c()
@@ -134,6 +144,81 @@ match_count <- function(target, search_from){
     }
     return(found)
 }
+
+### search string for gene
+generate_search_string_gene <- function(genes, ref_seq, k, id_prefix="s"){
+    
+    string_table <- data.frame(search_string = c(), string_id = c(), stringsAsFactors = F)
+
+    mapping_table <- data.frame(gene = c(), f_string_id = c(), r_string_id = c(), 
+        n_match_genome = c(), n_match_genome_rev = c(), stringsAsFactors = F)
+
+    if (class(ref_seq) == "list") {
+        ref_seq <- ref_seq[[1]]
+    }
+    
+    search_strings <- BiocParallel::bplapply(genes, function(gene, generate_kmers, k){
+        kmers <- generate_kmers(final_string = gene, k = k)
+        return(kmers)
+    }, k=k, generate_kmers=generate_kmers)
+
+    names(search_strings) <- names(genes)
+
+    u_string <- unique(unlist(search_strings))
+    rc_u_string <- unname(sapply(u_string, reverse_complement))
+
+    string_table <- data.frame(search_string = c(u_string, rc_u_string),
+        string_id = c(paste(id_prefix, seq_along(u_string), sep = "_"),
+            paste(id_prefix, (seq_along(rc_u_string) + length(u_string)), sep = "_")),
+        stringsAsFactors = F)
+
+####HERE
+    string_table$ 
+
+    temp_mapping_list <- BiocParallel::bplapply(names(search_strings),
+        function(i, search_strings, string_table, id_prefix){
+            search_string <- search_strings[[i]]
+        temp_mapping_table <- data.frame(gene = c(), f_string_id = c(), r_string_id = c(), 
+            stringsAsFactors = F)
+        
+        string_id <- match(search_string, string_table$search_string)
+        f_string_id <- paste(id_prefix, string_id, sep = "_")
+        r_string_id <- paste(id_prefix, (string_id + nrow(string_table)/2), sep = "_")
+        return(data.frame(gene = rep(i, length(string_id)),
+            f_string_id = f_string_id, r_string_id = r_string_id, stringsAsFactors = F))
+    }, string_table=string_table, search_strings=search_strings, id_prefix=id_prefix)
+
+    mapping_table <- do.call(rbind, temp_mapping_list)
+    
+    data.frame(gene = names(genes), f_string_id = c(), r_string_id = c(), 
+        n_match_genome = c(), n_match_genome_rev = c(), stringsAsFactors = F)
+
+
+    temp_string_table$n_match_genome <- unlist(lapply(temp_string_table$search_string, match_count,
+        search_from = paste(ref_seq, collapse = "")))
+    temp_string_table$n_match_genome_rev <- unlist(lapply(temp_string_table$search_string, match_count,
+        search_from = reverse_complement(paste(ref_seq, collapse = ""))))
+
+
+
+    search_string <- c()
+    for (gene in genes){
+        gene_seq <- ref_seq[gene]
+        gene_seq <- strsplit(gene_seq, split = "")[[1]]
+        gene_seq <- paste(gene_seq, collapse = "")
+        gene_seq <- paste(gene_seq, reverse_complement(gene_seq), sep = "|")
+        search_string <- c(search_string, gene_seq)
+    }
+    search_string <- paste(search_string, collapse = "|")
+    search_string <- paste0("(?<=.{", k, "})", search_string, "(?=.{", k, "})")
+    
+    return(search_string)
+}
+
+#data.frame(search_string = c(), snp_id = c(), genes = c(), snp_string = c(),
+#    n_match_genome = c(), n_match_genome_rev = c(), stringsAsFactor = F)
+
+
 
 ### STEP 2
 generate_search_string <- function(snp_table, overlap_table, orth_matrix, ref_seq, include_neighbour = F,
