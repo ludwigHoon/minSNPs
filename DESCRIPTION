@@ -6,7 +6,8 @@ Description: This is a R implementation of "Minimum SNPs" software as described 
 Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Imports: 
-    BiocParallel
+    BiocParallel,
+    optparse
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 Suggests: 

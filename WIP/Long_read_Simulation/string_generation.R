@@ -173,7 +173,7 @@ generate_search_string_gene <- function(genes, ref_seq, k, id_prefix="s"){
         stringsAsFactors = F)
 
 ####HERE
-    string_table$ 
+    string_table$
 
     temp_mapping_list <- BiocParallel::bplapply(names(search_strings),
         function(i, search_strings, string_table, id_prefix){
