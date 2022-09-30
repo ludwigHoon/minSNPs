@@ -145,81 +145,6 @@ match_count <- function(target, search_from){
     return(found)
 }
 
-### search string for gene
-generate_search_string_gene <- function(genes, ref_seq, k, id_prefix="s"){
-    
-    string_table <- data.frame(search_string = c(), string_id = c(), stringsAsFactors = F)
-
-    mapping_table <- data.frame(gene = c(), f_string_id = c(), r_string_id = c(), 
-        n_match_genome = c(), n_match_genome_rev = c(), stringsAsFactors = F)
-
-    if (class(ref_seq) == "list") {
-        ref_seq <- ref_seq[[1]]
-    }
-    
-    search_strings <- BiocParallel::bplapply(genes, function(gene, generate_kmers, k){
-        kmers <- generate_kmers(final_string = gene, k = k)
-        return(kmers)
-    }, k=k, generate_kmers=generate_kmers)
-
-    names(search_strings) <- names(genes)
-
-    u_string <- unique(unlist(search_strings))
-    rc_u_string <- unname(sapply(u_string, reverse_complement))
-
-    string_table <- data.frame(search_string = c(u_string, rc_u_string),
-        string_id = c(paste(id_prefix, seq_along(u_string), sep = "_"),
-            paste(id_prefix, (seq_along(rc_u_string) + length(u_string)), sep = "_")),
-        stringsAsFactors = F)
-
-####HERE
-    string_table$
-
-    temp_mapping_list <- BiocParallel::bplapply(names(search_strings),
-        function(i, search_strings, string_table, id_prefix){
-            search_string <- search_strings[[i]]
-        temp_mapping_table <- data.frame(gene = c(), f_string_id = c(), r_string_id = c(), 
-            stringsAsFactors = F)
-        
-        string_id <- match(search_string, string_table$search_string)
-        f_string_id <- paste(id_prefix, string_id, sep = "_")
-        r_string_id <- paste(id_prefix, (string_id + nrow(string_table)/2), sep = "_")
-        return(data.frame(gene = rep(i, length(string_id)),
-            f_string_id = f_string_id, r_string_id = r_string_id, stringsAsFactors = F))
-    }, string_table=string_table, search_strings=search_strings, id_prefix=id_prefix)
-
-    mapping_table <- do.call(rbind, temp_mapping_list)
-    
-    data.frame(gene = names(genes), f_string_id = c(), r_string_id = c(), 
-        n_match_genome = c(), n_match_genome_rev = c(), stringsAsFactors = F)
-
-
-    temp_string_table$n_match_genome <- unlist(lapply(temp_string_table$search_string, match_count,
-        search_from = paste(ref_seq, collapse = "")))
-    temp_string_table$n_match_genome_rev <- unlist(lapply(temp_string_table$search_string, match_count,
-        search_from = reverse_complement(paste(ref_seq, collapse = ""))))
-
-
-
-    search_string <- c()
-    for (gene in genes){
-        gene_seq <- ref_seq[gene]
-        gene_seq <- strsplit(gene_seq, split = "")[[1]]
-        gene_seq <- paste(gene_seq, collapse = "")
-        gene_seq <- paste(gene_seq, reverse_complement(gene_seq), sep = "|")
-        search_string <- c(search_string, gene_seq)
-    }
-    search_string <- paste(search_string, collapse = "|")
-    search_string <- paste0("(?<=.{", k, "})", search_string, "(?=.{", k, "})")
-    
-    return(search_string)
-}
-
-#data.frame(search_string = c(), snp_id = c(), genes = c(), snp_string = c(),
-#    n_match_genome = c(), n_match_genome_rev = c(), stringsAsFactor = F)
-
-
-
 ### STEP 2
 generate_search_string <- function(snp_table, overlap_table, orth_matrix, ref_seq, include_neighbour = F,
     bpparam = BiocParallel::MulticoreParam()){
@@ -293,6 +218,35 @@ summarise_result <- function(snp_table, overlap_table, search_string_table, excl
     return(new_snp_table)
 }
 
+### For gene
+generate_search_string_gene <- function(gene_seq, ref_seq, k, id_prefix = "gene"){
+    string_table <- data.frame(search_string = c(), string_id = c(), stringsAsFactors = FALSE)
+
+    if (class(ref_seq) == "list") {
+        ref_seq <- ref_seq[[1]]
+    }
+
+    search_strings <- BiocParallel::bplapply(gene_seq, function(gene, generate_kmers, k){
+        kmers <- generate_kmers(final_string = gene, k = k)
+        return(kmers)
+    }, k=k, generate_kmers=generate_kmers)
+
+    u_string <- unique(unlist(search_strings))
+    rc_u_string <- unname(sapply(u_string, reverse_complement))
+
+    string_table <- data.frame(search_string = c(u_string, rc_u_string),
+        string_id = c(paste(id_prefix, seq_along(u_string), "1", sep = "_"),
+            paste(id_prefix, seq_along(rc_u_string), "2", sep = "_")),
+        stringsAsFactors = F)
+
+    string_table$n_match_genome <- unlist(bplapply(string_table$search_string, match_count,
+        search_from = paste(ref_seq, collapse = "")))
+    string_table$n_match_genome_rev <- unlist(bplapply(string_table$search_string, match_count,
+        search_from = reverse_complement(paste(ref_seq, collapse = ""))))
+
+    return(string_table)
+}
+
 
 
 #### RUNS
@@ -305,6 +259,8 @@ excluded <- process_variant_file("variant_t10.csv")
 result_filepath <- "evenhd_with_exc200x8_400.csv"
 final_selected <- unique(unlist(process_result_file(result_filepath)))
 ref_genome <- read_fasta("./Mu50.fasta")
+meca <- read_fasta("mecA.fasta")
+pvl <- read_fasta("pvl.fasta")
 
 ###
 # final_selected <- seq_len(length(ref_matrix[[1]]))
@@ -312,6 +268,7 @@ ref_genome <- read_fasta("./Mu50.fasta")
 ##
 prev <- 7
 after <- 7
+k <- 15
 
 if (STEP_1) {
 RES_STEP_1 <- bplapply(final_selected, identify_overlaps,
@@ -337,4 +294,11 @@ summary <- summarise_result(RES_STEP_1[["snp_table"]], RES_STEP_1[["overlap_tabl
                         search_string_table)
 write.csv(summary, "summary.csv", row.names = F)
 
-#search_string_table <- generate_search_string(test_snp_table, test_overlap_table, ort_matrix, ref_genome, bpparam = SerialParam(progressbar = T))
+# For gene
+meca_search_string_table <- generate_search_string_gene(meca, ref_genome, k, id_prefix = "mecA")
+pvl_search_string_table <- generate_search_string_gene(pvl, ref_genome, k, id_prefix = "pvl")
+
+gene_search_table <- rbind(meca_search_string_table, pvl_search_string_table)
+write.csv(gene_search_table, "gene_search_table.csv", row.names = F)
+#search_string_table <- generate_search_string(test_snp_table, test_overlap_table, ort_matrix, ref_genome, bpparam = Serial
+
