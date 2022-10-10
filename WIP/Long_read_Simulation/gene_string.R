@@ -54,7 +54,11 @@ collapse_strings_table <- function(string_table_1, string_table_2,
 ### Rewrite match string function to include both snp and gene k-mers
 
 
-matched_string <- function(datum, searches){
+matched_string <- function(datum, searches, i){
+    result <- data.frame(matched_string = c(),
+            match_count = c(), string_id = c(), read = c(),
+            stringsAsFactors = FALSE)
+
     s_strings <- unique(searches$search_string)
     c_count <- lapply(s_strings, function(string) {
             match <- unlist(gregexpr(string, datum))
@@ -63,17 +67,23 @@ matched_string <- function(datum, searches){
     s_m <- lapply(c_count, length)
     matched_string <- s_strings[which(s_m > 0)]
     match_count <- unlist(s_m[which(s_m > 0)])
-    return(
-        data.frame(matched_string = matched_string,
+    
+    t_result <- data.frame(matched_string = matched_string,
             match_count = match_count,
             string_id = searches[match(matched_string, searches$search_string), "string_id"],
+            read = rep(i, length(matched_string)),
             stringsAsFactors = FALSE)
-    )
+    result <- rbind(result, t_result)
+    return(result)
 }
 
 combine_match_gene <- function(match_table){
-    if (ncol(match_table) == 0){
-        return(NULL)
+    gene_presence_indicators <- data.frame(gene = c(),
+        matched_string_id = c(),
+        matched_string_count = c(), stringsAsFactors = FALSE)
+
+    if (ncol(match_table) == 0 || nrow(match_table) == 0){
+        return(gene_presence_indicators)
     }
     combined_match_count <- aggregate(match_table$match_count,
         by=list(matched_string=match_table$matched_string), FUN=sum)
@@ -87,9 +97,7 @@ combine_match_gene <- function(match_table){
     names(strings_gene) <- match_table$matched_string
     genes <- unique(unlist(strings_gene))
 
-    gene_presence_indicators <- data.frame(gene = c(),
-        matched_string_id = c(),
-        matched_string_count = c(), stringsAsFactors = FALSE)
+    
 
     for (gene in genes){
         string_has_gene <- lapply(strings_gene, function(x){
@@ -112,25 +120,41 @@ combine_match_gene <- function(match_table){
 }
 
 
-
+source("inference_common.R")
 library(minSNPs)
 library(BiocParallel)
 
-register(MulticoreParam(workers = 64, progressbar = TRUE))
+register(MulticoreParam(workers = 32, progressbar = TRUE))
 genes <- read.csv("../gene_search_table.csv", stringsAsFactors=FALSE)
-
+final_search <- genes
 test_files <- list.files(pattern = "*.fastq")
 test_data <- lapply(test_files, get_data)
 
 final_res <- list()
 i <- 1
+temp_tables <- list()
+
 for (dat in test_data){
-    temp_res <- bplapply(dat, function(x){
-        return(matched_string(paste0(x), searches = final_search))
-        })
+    temp_res <- bplapply(seq_len(length(dat)), function(x){
+        return(matched_string(paste0(dat[x]), searches = final_search, i = x))
+    })
+
     temp_table <- do.call(rbind, temp_res)
-    final_res[[i]] <- combine_match_gene(temp_table)
+    write.csv(temp_table, paste0("temp_table", i, ".csv"))
+    temp_tables[[paste0("res", i)]] <- temp_table
+    filtered_table <- temp_table[
+        temp_table$read %in% names(
+            which(table(temp_table[, "read"]) > 70)),
+        ]
+    final_res[[as.character(i)]] <- combine_match_gene(filtered_table)
+    write.csv(final_res[[as.character(i)]], paste0("final_res", i, ".csv"))
     i <- i + 1
 }
 
 final_search
+
+
+dat <- test_data[[1]]
+temp_res <- bplapply(seq_len(length(dat)), function(x){
+    return(matched_string(paste0(dat[x]), searches = final_search, i = x))
+    })

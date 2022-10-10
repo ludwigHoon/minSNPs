@@ -1,21 +1,25 @@
 ### HELPERS
 STEP_1 <- T
 
-process_result_file <- function(result_filepath){
+process_result_file <- function(result_filepath) {
     f <- file(result_filepath, "r")
     preparse <- readLines(f)
     result <- list()
     cur <- 1
-    is_result <- F
+    is_result <- FALSE
     for (i in seq_len(length(preparse))){
         if (length(grep("^Result", preparse[[i]])) >= 1){
-            is_result <- T
+            is_result <- TRUE
         }
         if (is_result){
-            if (preparse[[i+1]] == ""){
-                result[[cur]] <- as.numeric(strsplit(gsub("\"", "", strsplit(preparse[[i]], "\t")[[1]][1]), ", ")[[1]])
+            if (preparse[[i + 1]] == "") {
+                result[[cur]] <- as.numeric(
+                    strsplit(
+                        gsub("\"", "",
+                            strsplit(preparse[[i]], split = "\t")[[1]][1]),
+                    split = ", ")[[1]])
                 cur <- cur + 1
-                is_result <- F
+                is_result <- FALSE
             }
         }
     }
@@ -55,7 +59,7 @@ process_variant_file <- function(variant_sites){
 }
 
 reverse_complement <- function(seq){
-    seq <- strsplit(seq, split = "")[[1]]
+    seq <- rev(strsplit(seq, split = "")[[1]])
     result <- lapply(seq, function(x){
         if (toupper(x) == "A") {return("T")}
         if (toupper(x) == "C") {return("G")}
@@ -63,7 +67,7 @@ reverse_complement <- function(seq){
         if (toupper(x) == "G") {return("C")}
         return(x)
         })
-    return(rev(paste(result, collapse="")))
+    return(paste(result, collapse = ""))
 }
 
 
