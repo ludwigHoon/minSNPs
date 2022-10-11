@@ -9,7 +9,7 @@ process_result_file <- function(result_filepath) {
             is_result <- TRUE
         }
         if (is_result) {
-            if (preparse[[i + 1]] == "") {
+            if (gsub("\\s+", "", preparse[[i + 1]]) == "") {
                 result[[cur]] <- as.numeric(
                     strsplit(
                         gsub(
@@ -133,28 +133,37 @@ generate_kmers <- function(final_string, k) {
 #' @param extend_length whether to extend the search string
 #' before and after the SNP and ignore overlapping SNPs
 #' @return a list containing 2 dataframes,
-#' (1) SNP tables - 
-#' (2) overlap tables
+#' (1) SNP table - snp_id, fasta_position, genome_position,
+#' string_start, string_end, snp_string_pos
+#' (2) overlap table - snp_id, overlaps_genome_pos,
+#' overlaps_fasta_pos, overlaps_string_pos
 #' @export
 identify_overlaps <- function(selected_snps, position_reference, prev, after,
     position_type = "fasta", extend_length = TRUE) {
     snp_table <- data.frame(
         snp_id = c(), fasta_position = c(), genome_position = c(),
-        string_start = c(), string_end = c(),
+        string_start = c(), string_end = c(), snp_string_pos = c(),
         stringsAsFactors = FALSE
     )
     overlap_table <- data.frame(
         snp_id = c(), overlaps_genome_pos = c(), overlaps_fasta_pos = c(),
         overlaps_string_pos = c(), stringsAsFactors = FALSE
     )
+    
+    selected_snps <- unique(selected_snps)
+    if (position_type == "fasta") {
+        snp_genome_pos <- position_reference[
+            match(selected_snps, position_reference$fasta_position),
+                c("fasta_position", "genome_position")]
+    } else{
+        snp_genome_pos <- position_reference[
+            match(selected_snps, position_reference$genome_position),
+                c("fasta_position", "genome_position")]
+    }
 
-    #<TODO>
-    selected_fasta <- c(selected_snps)
-    #<TODO>
-
-    for (snp in selected_fasta) {
-        genome_pos <- position_reference[
-            position_reference$fasta_position == snp, "genome_position"]
+    for (pos in seq_len(nrow(snp_genome_pos))) {
+        genome_pos <- snp_genome_pos[pos, "genome_position"]
+        snp <- snp_genome_pos[pos, "fasta_position"]
         string_start <- genome_pos - prev
         string_end <- genome_pos + after
 
@@ -217,7 +226,7 @@ identify_overlaps <- function(selected_snps, position_reference, prev, after,
         temp_overlap_table$snp_id <- rep(snp, nrow(temp_overlap_table))
 
         snp_table <- rbind(snp_table, data.frame(
-            snp_id = snp,
+            snp_id = as.character(snp),
             fasta_position = as.character(paste(snp, collapse = ", ")),
             genome_position = genome_pos,
             string_start = string_start,
@@ -229,4 +238,77 @@ identify_overlaps <- function(selected_snps, position_reference, prev, after,
         overlap_table <- rbind(overlap_table, temp_overlap_table)
     }
     return(list(snp_table = snp_table, overlap_table = overlap_table))
+}
+
+#' \code{generate_search_string}
+#'
+#' @description
+#' \code{generate_search_string} generate the search string based on the 2 tables
+#' generated from \code{identify_overlaps}
+#' @param snp_table SNP table generated from \code{identify_overlaps}
+#' @param overlap_table overlap table generated from \code{identify_overlaps}
+#' @param orth_matrix the relevant orthologous SNP matrix containing the SNPs
+#' @param ref_seq the sequence of reference genome
+#' @param include_neighbour whether to include the neighbouring SNPs in the search string
+#' @param bp BiocParallel backend to use for parallelization
+#' @return a list containing 2 dataframes,
+#' (1) string table - string_id (snp_id), search_string, strand, type (snp or gene);
+#' (2) SNP table - snp_id, snp_string, n_match_genome, n_match_genome_rev_com
+#' @importFrom BiocParallel bplapply MulticoreParam
+#' @export
+generate_search_string <- function(snp_table, overlap_table, orth_matrix, ref_seq, include_neighbour = FALSE,
+    bp = MulticoreParam()){
+
+    string_table <- data.frame(search_string = c(), string_id = c(), strand = c(),
+        type = c(), stringsAsFactors = FALSE)
+
+    snp_table <- data.frame(
+        snp_id = c(), snp_string = c(), n_match_genome = c(),
+        n_match_genome_rev_com = c(), stringsAsFactors = FALSE
+    )
+
+    if (class(ref_seq) == "list") {
+        ref_seq <- ref_seq[[1]]
+    }
+
+    l_string_table <- BiocParallel::bplapply(seq_len(nrow(snp_table)), function(i){
+        snp_id <- snp_table[i, "snp_id"]
+
+        ref_string <- ref_seq[
+            c(snp_table[i, "string_start"]:snp_table[i, "string_end"])]
+
+        fasta_positions <- as.numeric(
+            strsplit(snp_table[i, "fasta_position"], split = ", ")[[1]])
+        overlaps <- overlap_table[overlap_table$snp_id == snp_id,]
+
+        if (include_neighbour){
+            ##### TO-DO
+            next
+        } else {
+            variants <- unlist(unique(minSNPs:::generate_pattern(orth_matrix, fasta_positions)))
+            f_string <- lapply(variants, function(var){
+                ref_string[as.numeric(strsplit(snp_table[i, "snp_string_pos"], split = ", ")[[1]])] <- var
+                return(paste(ref_string, collapse = ""))
+            })
+            f_string <- lapply(f_string, function(string){
+                string <- strsplit(string, split = "")[[1]]
+                string[overlaps$overlaps_string_pos] <- "."
+                return(paste(string, collapse = ""))
+            })
+        }
+        
+        rc_string <- lapply(f_string, reverse_complement)
+        temp_string_table <- data.frame(search_string = c(unlist(f_string), unlist(rc_string)),
+            snp_id = rep(snp_id, length(f_string)*2), snp_string = c(variants, variants), stringsAsFactors = F)
+        temp_string_table$n_match_genome <- unlist(lapply(temp_string_table$search_string, match_count,
+            search_from = paste(ref_seq, collapse = "")))
+        temp_string_table$n_match_genome_rev <- unlist(lapply(temp_string_table$search_string, match_count,
+            search_from = reverse_complement(paste(ref_seq, collapse = ""))))
+        temp_string_table$fasta_position <- rep(snp_table[i, "fasta_position"], nrow(temp_string_table))
+        #toc()
+        return(temp_string_table)
+    }, BPPARAM = bp)
+    string_table <- do.call(rbind, l_string_table)
+
+    return(string_table)
 }
