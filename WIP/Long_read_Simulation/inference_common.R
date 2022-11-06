@@ -77,7 +77,9 @@ combine_snps <- function(result_list, matrix){
         result_to_use <- rbind(result_to_use, base_result)
     }
     return(result_to_use)
-}
+}kmer_table[grepl("pvl", kmer_table$match_gene), "match_gene"] <- "pvl_p"
+kmer_table[grepl("mecA", kmer_table$match_gene), "match_gene"] <- "mecA"
+kmer_table[grepl("lukS", kmer_table$string_id), "match_gene"] <- "lukS"
 
 #### STEP 3.
 infer_most_likely <- function(processed_result){

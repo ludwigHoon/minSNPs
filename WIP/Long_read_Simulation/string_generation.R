@@ -12,7 +12,7 @@ process_result_file <- function(result_filepath) {
             is_result <- TRUE
         }
         if (is_result){
-            if (preparse[[i + 1]] == "") {
+            if (gsub("\\s+", "", preparse[[i + 1]]) == "") {
                 result[[cur]] <- as.numeric(
                     strsplit(
                         gsub("\"", "",
