@@ -201,13 +201,13 @@ all_reads <- do.call(rbind, all_reads)
 write.csv(all_reads, "for_cut_off_search_string.csv", row.names = FALSE)
 
 mecA_train <- all_reads[, c("mecA", "read_length", "mecA_count")]
-mecA_train$target_count <- 2477
+mecA_train$target_count <- 4936
 colnames(mecA_train) <- c("is_positive", "read_length", "kmer_found", "target_count")
 lukS_train <- all_reads[, c("pvl", "read_length", "lukS_count")]
-lukS_train$target_count <- 970
+lukS_train$target_count <- 1938
 colnames(lukS_train) <- c("is_positive", "read_length", "kmer_found", "target_count")
 lukF_train <- all_reads[, c("pvl", "read_length", "lukF_count")]
-lukF_train$target_count <- 858
+lukF_train$target_count <- 1714
 colnames(lukF_train) <- c("is_positive", "read_length", "kmer_found", "target_count")
 do.call(rbind, list(mecA_train, lukS_train, lukF_train)) -> train_data
 
@@ -215,7 +215,7 @@ model <- glm(is_positive ~ read_length + kmer_found + target_count, data = train
 
 
   (Intercept)   read_length    kmer_found  target_count
--2.718459e+00 -1.288518e-06  1.743036e-02  9.617835e-04
+-2.721989e+00 -1.288464e-06  1.742866e-02  4.833567e-04
 
 
 #############################
