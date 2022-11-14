@@ -1,0 +1,130 @@
+
+#t_result <- gather_temp_result("sd_0001.*.csv")
+t_res <- list()
+for (s in c(20221029, 20221030, 20221031, 20221101, 20221102)){
+    t_res_s <- bplapply(all_sim_out, function(sim_iso, s){
+        return(sim(sim_iso = sim_iso, seed = s))
+    }, s = s, BPPARAM = MulticoreParam(workers = 2, progress = TRUE))
+    t_res[[as.character(s)]] <- do.call(rbind, t_res_s)
+}
+head(t_res[[20221029]])
+do.call(rbind, t_res)
+do.call(rbind, tt)
+
+
+
+a <- read.csv("for_cut_off.csv", stringsAsFactors = FALSE)
+iso <- sapply(strsplit(a$read_id, split = "_"), `[`, 1)
+a$iso <- iso
+############
+Analysing cut-off for:- 
+
+1. mecA ----- Min: 2007 kmers
+- Positive
+summary(a[
+    a$iso %in% c("S1", "S3", "S5", "S10", "S11", "S12", "S21", "S22", "S24")
+    & a$match_gene == "mecA", "count"])
+---
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+1.0    10.0    10.0   117.7    20.0 11832.0
+---
+
+- Negative
+summary(a[
+    a$iso %in% c("S4", "S6", "S7", "S8", "S9", "S13", "S14", "S15", "S16", "S17",
+    "S18", "S19", "S20")
+    & a$match_gene == "mecA", "count"])
+---
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+1.00   10.00   10.00   15.25   20.00  152.00
+---
+
+2. pvl_p (defunct) ----- Min: 252 kmers
+summary(a[
+    a$iso %in% c("S10", "S11", "S22")
+    & a$match_gene == "pvl_p", "count"])
+Positive
+---
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+1.0     1.0     2.0    61.5     9.0  2483.0
+---
+
+Negative
+summary(a[
+    a$iso %in% c("S1", "S3", "S4", "S5", "S6", "S7", "S8", "S9",
+    "S12", "S13", "S14", "S15", "S16", "S17", "S18", "S19", "S20",
+    "S21", "S24")
+    & a$match_gene == "pvl_p", "count"])
+---
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+1.00    1.00    2.00   10.26    6.00  310.00
+---
+
+3. lukS ---- Min: 943
+summary(a[
+    a$iso %in% c("S10", "S11", "S22")
+    & a$match_gene == "lukS", "count"])
+Positive
+---
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+1.00    1.00    1.00   14.27    2.00  460.00
+---
+
+Negative
+summary(a[
+    a$iso %in% c("S1", "S3", "S4", "S5", "S6", "S7", "S8", "S9",
+    "S12", "S13", "S14", "S15", "S16", "S17", "S18", "S19", "S20",
+    "S21", "S24")
+    & a$match_gene == "lukS", "count"])
+---
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+1.000   1.000   1.000   2.031   2.000  28.000
+---
+
+4. lukF ---- Min: 970
+summary(a[
+    a$iso %in% c("S10", "S11", "S22")
+    & a$match_gene == "lukF", "count"])
+Positive
+---
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+1.00    1.00    1.00   12.88    2.00  524.00
+---
+
+Negative
+summary(a[
+    a$iso %in% c("S1", "S3", "S4", "S5", "S6", "S7", "S8", "S9",
+    "S12", "S13", "S14", "S15", "S16", "S17", "S18", "S19", "S20",
+    "S21", "S24")
+    & a$match_gene == "lukF", "count"])
+---
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+1.000   1.000   1.000   2.606   2.000  66.000
+---
+
+- Positive
+    S10
+    S11
+    S22
+
+
+- Negative
+    S1
+    S3
+    S4
+    S5
+    S6
+    S7
+    S8
+    S9
+    S12
+    S13
+    S14
+    S15
+    S16
+    S17
+    S18
+    S19
+    S20
+    S21
+    S24

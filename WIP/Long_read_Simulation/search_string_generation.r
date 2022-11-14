@@ -178,7 +178,9 @@ identify_overlaps <- function(selected_snps, position_reference, ref_seq,
         snp <- snp_genome_pos[pos, "fasta_position"]
         string_start <- genome_pos - prev
         string_end <- genome_pos + after
+        snp_string_pos <- prev + 1
         if (string_start < 1) {
+            snp_string_pos <- snp_string_pos + string_start - 1
             string_start <- 1
         }
         if (string_end > genome_max) {
@@ -186,7 +188,6 @@ identify_overlaps <- function(selected_snps, position_reference, ref_seq,
         }
 
         n_test <- 0
-        snp_string_pos <- prev + 1
         # Check overlaps before
         overlaps_before <- position_reference[
             position_reference$genome_position
@@ -207,11 +208,11 @@ identify_overlaps <- function(selected_snps, position_reference, ref_seq,
                         < genome_pos, c("fasta_position", "genome_position")
                 ]
             }
-            string_start <- string_start - n_test
-            snp_string_pos <- snp_string_pos + n_test
-            overlaps_before$s_pos <-
-                (overlaps_before$genome_position - string_start)
         }
+        string_start <- string_start - n_test
+        snp_string_pos <- snp_string_pos + n_test
+        overlaps_before$s_pos <-
+            (overlaps_before$genome_position - string_start) + 1
 
         n_test <- 0
         # Check overlaps after
@@ -235,10 +236,10 @@ identify_overlaps <- function(selected_snps, position_reference, ref_seq,
                     c("fasta_position", "genome_position")
                 ]
             }
-            string_end <- string_end + n_test
-            overlaps_after$s_pos <-
-                (snp_string_pos + (overlaps_after$genome_position - genome_pos))
         }
+        string_end <- string_end + n_test
+        overlaps_after$s_pos <-
+            (snp_string_pos + (overlaps_after$genome_position - genome_pos))
 
         temp_overlap_table <- rbind(overlaps_before, overlaps_after)
         if (ncol(temp_overlap_table) >= 3) {
@@ -354,15 +355,15 @@ generate_snp_search_string <- function(snp_overlap_tables = NULL,
         if (include_neighbour) {
             fasta_positions <- sort(c(fasta_positions,
                 as.numeric(
-                    overlaps[, "overlaps_fasta_pos"])),
+                    overlaps[overlaps$snp_id == snp_id, "overlaps_fasta_pos"])),
                 decreasing = FALSE)
             genome_positions <- sort(c(genome_positions,
                 as.numeric(
-                    overlaps[, "overlaps_genome_pos"])),
+                    overlaps[overlaps$snp_id == snp_id, "overlaps_genome_pos"])),
                 decreasing = FALSE)
             strings_pos <- sort(c(strings_pos,
                 as.numeric(
-                    overlaps[, "overlaps_string_pos"])),
+                    overlaps[overlaps$snp_id == snp_id, "overlaps_string_pos"])),
                 decreasing = FALSE)
         }
 
@@ -380,9 +381,9 @@ generate_snp_search_string <- function(snp_overlap_tables = NULL,
         variants <- unlist(variants)
         if (unique_only) {
             variants <- unique(variants)
-            snp_ids <- paste0("snp_", i, "_", seq_along(variants))
+            snp_ids <- paste0("snp_", snp_id, "_", seq_along(variants))
         } else {
-            snp_ids <- paste0("snp_", i, "_", snp_ids)
+            snp_ids <- paste0("snp_", snp_id, "_", snp_ids)
         }
 
         f_string <- lapply(variants, function(var, ref_string) {
@@ -481,18 +482,16 @@ generate_kmer_search_string <- function(gene_seq, ref_seq, k,
         return(kmers)
     }, k = k, generate_kmers = generate_kmers, BPPARAM = bp)
 
-    gene_names <- names(gene_seq)
+    search_strings <- unique(unlist(search_strings))
 
     string_ids <- bplapply(seq_along(search_strings),
-        function(id, search_strings, id_prefix, gene_names) {
-            strings <- search_strings[[id]]
-            g_name <- gene_names[id]
-            return(paste0(id_prefix, "_", g_name, "_", seq_along(strings)))
+        function(id, search_strings, id_prefix) {
+            return(paste0(id_prefix, "_", id))
         },
     search_strings = search_strings, id_prefix = id_prefix,
-    gene_names = gene_names, BPPARAM = bp)
+    BPPARAM = bp)
 
-    genes_matches <- rep(gene_names, lapply(search_strings, length))
+    genes_matches <- rep(id_prefix, length(search_strings))
 
     f_string <- unlist(search_strings)
     rc_string <- unlist(bplapply(f_string, reverse_complement, BPPARAM = bp))
@@ -666,7 +665,7 @@ search_from_fastq_reads <- function(fastq_file, search_tables,
 fastq_reads_length <- function(fastq_file, bp = SerialParam()) {
     reads <- read_sequences_from_fastq(fastq_file, bp = bp)
     result <- bplapply(names(reads), function(read_id, reads) {
-        read <- reads[[read_id]]
+        read <- strsplit(reads[[read_id]], split = "")[[1]]
         read_length <- length(read)
         return(data.frame(
             read_id = read_id,
@@ -763,7 +762,7 @@ collapse_result <- function(results, matched_type_functions =
                     arguments = arguments[[type]],
                     bp = bp_per_type))
             } else {
-                return(NULL)
+                return(NA)
             }
         }, results = results, matched_type_functions = matched_type_functions,
     arguments = arguments, bp_per_type = bp_per_type, BPPARAM = bp_overall)
@@ -803,7 +802,7 @@ analyse_kmer_matches <- function(kmer_matches, arguments,
     read_kmer_count <- kmer_matches_with_ID %>%
         dplyr::group_by(read_id, match_gene) %>% #nolint
         dplyr::summarise(
-            count = dplyr::n_distinct(string_id), .groups = "rowwise") #nolint
+            count = dplyr::n_distinct(search_string), .groups = "rowwise") #nolint
 
     checked_genes <- unique(kmer_table$match_gene)
 
@@ -813,19 +812,18 @@ analyse_kmer_matches <- function(kmer_matches, arguments,
 
         relevant_reads <- read_kmer_count[
             read_kmer_count$match_gene == gene &
-            read_kmer_count$count >= min_match_per_read[[gene]], "read_id"]
+            read_kmer_count$count >= min_match_per_read[[gene]], ] %>%
+            pull(read_id)
 
         kmer_id_count <- kmer_matches %>%
             dplyr::filter(match_gene == gene) %>% #nolint
             dplyr::filter(read_id %in% relevant_reads) %>% #nolint
-            dplyr::group_by(string_id) %>% #nolint
+            dplyr::group_by(search_string) %>% #nolint
             dplyr::summarise(
                 count = sum(found_string_count), .groups = "keep" #nolint
             )
 
-        table <- merge(kmer_id_count, kmer_table)
-
-        if (nrow(table[table$match_gene == gene, ]) < 1) {
+        if (nrow(kmer_id_count) < 1) {
             return(
                 data.frame(gene = gene, total_count = 0,
                     unique_kmer_count = 0,
@@ -834,24 +832,121 @@ analyse_kmer_matches <- function(kmer_matches, arguments,
             )
         }
 
-        total_count <- sum(table[table$match_gene == gene,
-            "count"])
+        total_count <- sum(kmer_id_count[, "count"])
 
-        unique_kmer <- unique(table[table$match_gene == gene,
-            "string_id"])
+        unique_kmer <- kmer_id_count[sort(kmer_id_count$count,
+                decreasing = TRUE),
+            "search_string"]
 
-        kmer_count <- unlist(
-            lapply(unique_kmer, function(kmer) {
-                return(
-                    sum(table[table$string_id == kmer,
-                        "count"]))
-            })
-        )
-        unique_kmer_count <- length(unique_kmer)
+        kmer_count <- kmer_id_count[sort(kmer_id_count$count,
+                decreasing = TRUE),
+            "count"]
+
+        unique_kmer_count <- length(unlist(unique_kmer))
         return(data.frame(gene = gene, total_count = total_count,
             unique_kmer_count = unique_kmer_count,
-            unique_kmer = paste0(unique_kmer, collapse = "_"),
-            kmer_count = paste0(kmer_count, collapse = "_")))
+            unique_kmer = paste0(unlist(unique_kmer), collapse = "_"),
+            kmer_count = paste0(unlist(kmer_count), collapse = "_")))
+    }, read_kmer_count = read_kmer_count,
+        kmer_matches = kmer_matches_with_ID,
+        min_match_per_read = min_match_per_read, BPPARAM = bp)
+
+    result <- do.call(rbind, gene_results)
+    return(result)
+}
+
+#' \code{analyse_kmer_matches_2}
+#'
+#' @description
+#' \code{analyse_kmer_matches_2} will analyse the matched kmers
+#' @param kmer_matches result from \code{gather_temp_result}
+#' restricted to type "kmer"
+#' @param arguments a list containing (1) Kmer table
+#' @param bp BiocParallel backend to use for parallelization
+#' @importFrom BiocParallel bplapply MulticoreParam
+#' @importFrom dplyr %>% group_by summarise filter
+#' @return Will return the resulting ST
+analyse_kmer_matches_2 <- function(kmer_matches, arguments,
+    bp = MulticoreParam()) {
+    kmer_table <- arguments[["kmer_table"]]
+    min_match_per_read <- arguments[["coeffs"]]
+
+    kmer_matches_with_ID <- merge( #nolint
+        kmer_matches,
+        kmer_table[, c("string_id", "match_gene")],
+    by.x = "string_id", by.y = "string_id")
+
+    read_kmer_count <- kmer_matches_with_ID %>%
+        dplyr::group_by(read_id, match_gene) %>% #nolint
+        dplyr::summarise(
+            count = dplyr::n_distinct(search_string), .groups = "rowwise") #nolint
+
+    read_kmer_count <- merge(read_kmer_count,
+        unique(kmer_matches[, c("read_id", "read_length")])
+    )
+    checked_genes <- unique(kmer_table$match_gene)
+
+    gene_results <- bplapply(checked_genes,
+        function(gene, kmer_matches, min_match_per_read,
+            read_kmer_count) {
+
+        relevant_reads_check <- read_kmer_count[
+            read_kmer_count$match_gene == gene, ]
+
+        n_searched_kmer <- 0
+        if (gene == "mecA") {
+            n_searched_kmer <- 2477
+        }
+        if (gene == "pvl_p") {
+            n_searched_kmer <- 1259
+        }
+        if (gene == "lukS") {
+            n_searched_kmer <- 943
+        }
+        if (gene == "lukF") {
+            n_searched_kmer <- 970
+        }
+        p_acceptance <- -2.911843e+00 +
+            relevant_reads_check$count * 2.283203e-02 +
+            relevant_reads_check$read_length * 5.455275e-07 +
+            n_searched_kmer * 1.016444e-03
+        p_acceptance <- exp(p_acceptance) / (1 + exp(p_acceptance))
+
+        relevant_reads <- relevant_reads_check[
+            which(p_acceptance >= .5), "read_id"]
+
+        kmer_id_count <- kmer_matches %>%
+            dplyr::filter(match_gene == gene) %>% #nolint
+            dplyr::filter(read_id %in% relevant_reads) %>% #nolint
+            dplyr::group_by(search_string) %>% #nolint
+            dplyr::summarise(
+                count = sum(found_string_count), .groups = "keep" #nolint
+            )
+
+        if (nrow(kmer_id_count) < 1) {
+            return(
+                data.frame(gene = gene, total_count = 0,
+                    unique_kmer_count = 0,
+                    unique_kmer = "",
+                    kmer_count = "")
+            )
+        }
+
+        total_count <- sum(kmer_id_count[, "count"])
+
+        unique_kmer <- kmer_id_count[sort(kmer_id_count$count,
+                decreasing = TRUE),
+            "search_string"]
+
+        kmer_count <- kmer_id_count[sort(kmer_id_count$count,
+                decreasing = TRUE),
+            "count"]
+
+        unique_kmer_count <- length(unlist(unique_kmer))
+        return(data.frame(gene = gene, total_count = total_count,
+            unique_kmer_count = unique_kmer_count,
+            unique_kmer = paste0(unlist(unique_kmer), collapse = "_"),
+            kmer_count = paste0(unlist(kmer_count), collapse = "_")))
     }, read_kmer_count = read_kmer_count,
         kmer_matches = kmer_matches_with_ID,
         min_match_per_read = min_match_per_read, BPPARAM = bp)

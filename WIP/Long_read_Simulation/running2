@@ -1,0 +1,516 @@
+all_sim_out <- paste0(
+    gsub(".fastq", "", list.files(pattern = "*fastq$")),
+    ".*.csv")
+library(dplyr)
+library(minSNPs)
+library(BiocParallel)
+kmer_table <- read.csv("kmer_table.csv")
+snp_table <- read.csv("snp_table.csv")
+
+kmer_table[grepl("pvl", kmer_table$match_gene), "match_gene"] <- "pvl_p"
+kmer_table[grepl("mecA", kmer_table$match_gene), "match_gene"] <- "mecA"
+kmer_table[grepl("lukS", kmer_table$string_id), "match_gene"] <- "lukS"
+res <- list()
+res <- bplapply(all_sim_out, function(a){
+    sim <- list.files(path = "./temp_results", pattern = a)
+    t_results <- lapply(sim, function(f){
+            read.csv(paste0("./temp_results", "/", f))
+        })
+    t_results <- do.call(rbind, t_results)
+    kmer_matches <- t_results[t_results$type == "kmer", ]
+    kmer_matches_with_ID <- merge( #nolint
+        kmer_matches,
+        kmer_table[, c("string_id", "match_gene")],
+    by.x = "string_id", by.y = "string_id")
+    read_kmer_count <- kmer_matches_with_ID %>%
+        dplyr::group_by(read_id, match_gene) %>% #nolint
+        dplyr::summarise(
+            count = dplyr::n_distinct(search_string), .groups = "rowwise") #nolint
+    return(read_kmer_count)
+}, BPPARAM = MulticoreParam(workers = 124, progress = TRUE))
+names(res) <- all_sim_out
+fin_res <- do.call(rbind, res)
+head(fin_res)
+write.csv(fin_res, "for_cut_off_search_string.csv", row.names = FALSE)
+
+
+
+
+
+a <- read.csv("sim_res_1_10.csv", stringsAsFactors = FALSE)
+b <- read.csv("sim_truth.csv", stringsAsFactors = FALSE)
+Fin <- a[a$file %in% b$ID, ]
+Fin <- merge(Fin, b, by.x = "file", by.y = "ID")
+
+Fin$CC_correct_assignment <- Fin$CC == Fin$T1_CC & ((Fin$T1_CC_match_count - Fin$T2_CC_match_count) > 10)
+Fin$mecA_correctly_detected <- Fin$mecA == 1 & Fin$mecA_total >= 602.1
+Fin$pvl_p_correctly_detected <- Fin$pvl == 2 & Fin$pvl_p_n_unique_kmer >= 75.6
+Fin$pvl_correctly_detected <- Fin$pvl == 2 & Fin$lukS_n_unique_kmer >= 282.9 & Fin$lukF_n_unique_kmer >= 291
+
+mecA_TRUE_only <- Fin[Fin$mecA == 1, c("n_bases", "mecA_correctly_detected")]
+pvl_TRUE_only <- Fin[Fin$pvl == 2, c("n_bases", "pvl_correctly_detected")]
+CC_not_NA_only <- Fin[!is.na(Fin$CC), c("n_bases", "CC_correct_assignment")]
+
+write.csv(mecA_TRUE_only, "mecA_only.csv", row.names = FALSE)
+write.csv(pvl_TRUE_only, "pvl_only.csv", row.names = FALSE)
+write.csv(CC_not_NA_only, "cc_only.csv", row.names = FALSE)
+
+
+
+
+
+
+
+
+for (i in c(1:10)){
+    sim_res <- list()
+    b <- txtProgressBar(min = 0, max = length(all_sim_out), style = 3)
+    for (a in all_sim_out){
+        print(a)
+        sim_res[[gsub("\\.\\*\\.csv", "", a)]] <- sim(a, seed = i)
+        setTxtProgressBar(b, value = b$getVal() + 1)
+    }
+    close(b)
+
+    fin <- do.call(rbind, sim_res[which(!is.na(sim_res))])
+    write.csv(fin, paste0("sim_res_seed_", i, ".csv"), row.names = FALSE)
+}
+
+res_step_1 <- identify_overlaps(c(13, 557, 738, 758, 2142), position_reference = starrs_ref,
+ref_seq = Mu50, prev = 500, after = 500, extend_length = FALSE)
+
+res <- generate_snp_search_string(snp_overlap_tables = res_step_1, orth_matrix = starrs, ref_seq = Mu50,
+include_neighbour = TRUE, unique_only = FALSE, bp = MulticoreParam(workers = 2, progress = TRUE))
+
+snp_overlap_tables = res_step_1; orth_matrix = starrs; ref_seq = Mu50;
+include_neighbour = TRUE; unique_only = FALSE
+
+fasta <- string_table_to_fasta(res$string_table)
+
+
+
+
+for (i in c(1:10)){
+    sim_res <- list()
+    b <- txtProgressBar(min = 0, max = length(all_sim_out)*10, style = 3)
+    for (a in all_sim_out){
+        sim_res[[gsub("\\.\\*\\.csv", "", a)]] <-
+            sim(
+                a, seed = i)
+        setTxtProgressBar(b, value = b$getVal() + 1)
+        }
+    close(b)
+
+    fin <- do.call(rbind, sim_res[which(!is.na(sim_res))])
+    write.csv(fin, paste0("sim_res_seed_",
+        i, ".csv"), row.names = FALSE)
+}
+
+
+for (i in c(1:10)){
+    sim_res <- list()
+    b <- txtProgressBar(min = 0, max = length(all_sim_out), style = 3)
+    for (a in all_sim_out){
+        print(paste("DOING", a, "SEED", i))
+        sim_res[[gsub("\\.\\*\\.csv", "", a)]] <-
+            sim_2(
+                a, seed = i)
+        setTxtProgressBar(b, value = b$getVal() + 1)
+        print(paste("Completed", a, "SEED", i))
+        }
+    close(b)
+
+    fin <- do.call(rbind, sim_res[which(!is.na(sim_res))])
+    write.csv(fin, paste0("sim_res_k2_seed_",
+        i, ".csv"), row.names = FALSE)
+}
+
+
+
+
+# Cut-off-check
+library(BiocParallel)
+source_truth <- read.csv("sim_truth.csv", stringsAsFactors = FALSE)
+read_base <- read.csv("number_bases_reads.csv", stringsAsFactors=FALSE)
+ukmer_2 <- read.csv("for_cut_off.csv", stringsAsFactors=FALSE)
+ukmer <- read.csv("for_cut_off_search_string.csv", stringsAsFactors=FALSE)
+
+read_base$ID <- gsub(".fastq", "", read_base$file)
+read_base$file <- NULL
+
+nrow(ukmer) == nrow(ukmer_2)
+all(ukmer$read_id == ukmer_2$read_id)
+
+colnames(ukmer)[3] <- "n_unique_kmer"
+colnames(ukmer_2)[3] <- "n_unique_string_id"
+
+ukmer <- cbind(ukmer, n_unique_string_id = ukmer_2[,3])
+
+ID_read <- strsplit(ukmer$read_id, split = "_")
+
+ukmer$read_id <- sapply(ID_read, function(x) x[2])
+
+ukmer$ID <- paste0("sd_", sprintf("%04d",
+    as.numeric(
+        gsub("S", "", sapply(ID_read, function(x) x[1]))
+    )
+))
+
+read_base <- read_base[read_base$ID %in% source_truth$ID,]
+
+read_base_with_truth <- merge(read_base, source_truth, by.x = "ID", by.y = "ID")
+
+nrow(read_base) == nrow(read_base_with_truth)
+
+read_base_with_truth$mecA_n_unique_kmer <- unlist(
+    bplapply(seq_len(nrow(read_base_with_truth)), function(x){
+        res <- ukmer[ukmer$ID == read_base_with_truth$ID[x] &
+        ukmer$match_gene == "mecA" &
+        ukmer$read_id == read_base_with_truth$reads[x], "n_unique_kmer"]
+        if (identical(res, integer(0))) return(0)
+        else return(res)
+    }, BPPARAM = MulticoreParam(progress = TRUE))
+)
+
+read_base_with_truth$lukS_n_unique_kmer <- unlist(
+    bplapply(seq_len(nrow(read_base_with_truth)), function(x){
+        res <- ukmer[ukmer$ID == read_base_with_truth$ID[x] &
+        ukmer$match_gene == "lukS" &
+        ukmer$read_id == read_base_with_truth$reads[x], "n_unique_kmer"]
+        if (identical(res, integer(0))) return(0)
+        else return(res)
+    }, BPPARAM = MulticoreParam(progress = TRUE))
+)
+
+read_base_with_truth$lukF_n_unique_kmer <- unlist(
+    bplapply(seq_len(nrow(read_base_with_truth)), function(x){
+        res <- ukmer[ukmer$ID == read_base_with_truth$ID[x] &
+        ukmer$match_gene == "lukF" &
+        ukmer$read_id == read_base_with_truth$reads[x], "n_unique_kmer"]
+        if (identical(res, integer(0))) return(0)
+        else return(res)
+    }, BPPARAM = MulticoreParam(progress = TRUE))
+)
+
+read_base_with_truth$mecA_n_string_id <- unlist(
+    bplapply(seq_len(nrow(read_base_with_truth)), function(x){
+        res <- ukmer[ukmer$ID == read_base_with_truth$ID[x] &
+        ukmer$match_gene == "mecA" &
+        ukmer$read_id == read_base_with_truth$reads[x], "n_unique_string_id"]
+        if (identical(res, integer(0))) return(0)
+        else return(res)
+    }, BPPARAM = MulticoreParam(progress = TRUE))
+)
+
+read_base_with_truth$lukS_n_string_id <- unlist(
+    bplapply(seq_len(nrow(read_base_with_truth)), function(x){
+        res <- ukmer[ukmer$ID == read_base_with_truth$ID[x] &
+        ukmer$match_gene == "lukS" &
+        ukmer$read_id == read_base_with_truth$reads[x], "n_unique_string_id"]
+        if (identical(res, integer(0))) return(0)
+        else return(res)
+    }, BPPARAM = MulticoreParam(progress = TRUE))
+)
+
+read_base_with_truth$lukF_n_string_id <- unlist(
+    bplapply(seq_len(nrow(read_base_with_truth)), function(x){
+        res <- ukmer[ukmer$ID == read_base_with_truth$ID[x] &
+        ukmer$match_gene == "lukF" &
+        ukmer$read_id == read_base_with_truth$reads[x], "n_unique_string_id"]
+        if (identical(res, integer(0))) return(0)
+        else return(res)
+    }, BPPARAM = MulticoreParam(progress = TRUE))
+)
+
+write.csv(read_base_with_truth, "read_base_with_truth.csv", row.names = FALSE)
+#https://rcompanion.org/rcompanion/e_07.html
+library(dplyr)
+library(ggplot2)
+library(plotly)
+read_base_with_truth <- read.csv(
+    "read_base_with_truth.csv", stringsAsFactors = FALSE)
+
+all.data <- read_base_with_truth
+mecA.data <- read_base_with_truth %>% filter(mecA_n_unique_kmer > 0)
+
+model.all.null = glm(mecA ~ 1,
+                 data=all.data,
+                 family = binomial(link="logit")
+                 )
+
+model.all.a = glm(mecA ~ mecA_n_unique_kmer + read_lengths,
+                 data=all.data,
+                 family = binomial(link="logit")
+                 )
+
+model.mecA.null = glm(mecA ~ 1,
+                 data=mecA.data,
+                 family = binomial(link="logit")
+                 )
+
+model.mecA.a = glm(mecA ~ mecA_n_unique_kmer + read_lengths ,
+                 data=mecA.data,
+                 family = binomial(link="logit")
+                 )
+test_data <- all.data %>% select(mecA_n_unique_kmer, read_lengths)
+predicted <- predict(model.mecA.a, newdata = test_data, type = "response")
+
+all.data$predicted <- predicted
+plot(mecA ~ predicted,
+     data = all.data,
+     pch = 16,
+     xlab="Predicted probability of 1 response",
+     ylab="Actual response")
+
+test_data <- all.data %>% select(n_kmer = mecA_n_unique_kmer,
+        n_bases = read_lengths, is_positive = mecA)
+test_data <- rbind(test_data, all.data %>%
+    mutate(is_positive = ifelse(pvl > 0, 1, 0)) %>%
+    select(n_kmer = lukS_n_unique_kmer,
+        n_bases = read_lengths,
+        is_positive = is_positive))
+test_data <- rbind(test_data, all.data %>%
+    mutate(is_positive = ifelse(pvl > 0, 1, 0)) %>%
+    select(n_kmer = lukF_n_unique_kmer,
+        n_bases = read_lengths,
+        is_positive = is_positive))
+
+mecA_reads_with_kmer <- all.data %>%
+    filter(mecA_n_unique_kmer > 0) %>%
+    select(n_kmer = mecA_n_unique_kmer,
+        n_bases = read_lengths, is_positive = mecA)
+
+pvl_reads_with_lukS_kmer <- all.data %>%
+    filter(lukS_n_unique_kmer > 0) %>%
+    mutate(is_positive = ifelse(pvl > 0, 1, 0)) %>%
+    select(n_kmer = lukS_n_unique_kmer,
+        n_bases = read_lengths,
+        is_positive = is_positive)
+
+pvl_reads_with_lukF_kmer <- all.data %>%
+    filter(lukF_n_unique_kmer > 0) %>%
+    mutate(is_positive = ifelse(pvl > 0, 1, 0)) %>%
+    select(n_kmer = lukF_n_unique_kmer,
+        n_bases = read_lengths,
+        is_positive = is_positive)
+
+training_data <- rbind(mecA_reads_with_kmer,
+    pvl_reads_with_lukS_kmer,
+    pvl_reads_with_lukF_kmer)
+
+model <- glm(is_positive ~ n_kmer + n_bases ,
+                 data=training_data,
+                 family = binomial(link="logit")
+                 )
+
+predicted <- ifelse(predict(model, newdata = test_data, type = "response")
+    < 0.5, 0, 1)
+
+test_data$predicted <- predicted
+plot(is_positive ~ predicted,
+     data = test_data,
+     pch = 16,
+     xlab="Predicted probability of 1 response",
+     ylab="Actual response")
+
+##### mecA positive - unique kmers/bases (per reads)
+read_base_with_truth %>% filter(mecA == 1) %>%
+mutate(mecA_kmer_ratio = mecA_n_unique_kmer/read_lengths) %>%
+group_by(ID) %>%
+summarise(mean_mecA_kmer_ratio = mean(mecA_kmer_ratio)/mean(read_lengths),
+mean_mecA_kmer_ratio_if_present = mean(mecA_kmer_ratio[mecA_kmer_ratio > 0]))
+
+  ID      mean_mecA_kmer_ratio mean_mecA_kmer_ratio_if_present
+  <chr>                  <dbl>                           <dbl>
+1 sd_0001         0.0000000416                         0.00160
+2 sd_0003         0.0000000425                         0.00163
+3 sd_0005         0.0000000437                         0.00172
+4 sd_0010         0.0000000446                         0.00159
+5 sd_0011         0.0000000323                         0.00121
+6 sd_0012         0.0000000320                         0.00128
+7 sd_0021         0.0000000305                         0.00121
+8 sd_0022         0.0000000367                         0.00138
+9 sd_0024         0.0000000372                         0.00147
+
+all_mecA <- read_base_with_truth %>% 
+mutate(mecA_kmer_ratio = mecA_n_unique_kmer/read_lengths) %>%
+
+mutate(prob = 2477*((1/4)^(15))*(read_lengths - 14)) %>%
+mutate(t = mecA_kmer_ratio/(2477*(1/4)^(15))*read_lengths) %>%
+select("mecA", "mecA_kmer_ratio", "prob", "read_lengths", "mecA_n_unique_kmer", "t")
+
+
+ggplot(all_mecA, aes(x=t, y=mecA)) + geom_point() + stat_smooth(method="glm", color = "green", se= FALSE,method.args=list(family=binomial))
+
+
+read_base_with_truth %>% filter(mecA == 0) %>%
+mutate(mecA_kmer_ratio = mecA_n_unique_kmer/read_lengths) %>%
+group_by(ID) %>%
+summarise(mean_mecA_kmer_ratio = mean(mecA_kmer_ratio)/mean(read_lengths),
+mean_mecA_kmer_ratio_if_present = mean(mecA_kmer_ratio[mecA_kmer_ratio > 0]))
+
+   ID      mean_mecA_kmer_ratio mean_mecA_kmer_ratio_if_present
+   <chr>                  <dbl>                           <dbl>
+ 1 sd_0004        0.00000000513                        0.000198
+ 2 sd_0006        0.00000000515                        0.000205
+ 3 sd_0007        0.00000000458                        0.000188
+ 4 sd_0008        0.00000000534                        0.000203
+ 5 sd_0009        0.00000000523                        0.000199
+ 6 sd_0013        0.00000000483                        0.000192
+ 7 sd_0014        0.00000000508                        0.000203
+ 8 sd_0015        0.00000000523                        0.000193
+ 9 sd_0016        0.00000000528                        0.000200
+10 sd_0017        0.00000000501                        0.000191
+11 sd_0018        0.00000000566                        0.000212
+12 sd_0019        0.00000000550                        0.000205
+13 sd_0020        0.00000000510                        0.000197
+
+all_detected_negative <- read_base_with_truth %>% filter(mecA == 0) %>%
+mutate(mecA_kmer_ratio = mecA_n_unique_kmer/read_lengths) %>%
+filter(mecA_n_unique_kmer > 0) %>%
+mutate(prob = 2477* 4^(15*(read_lengths - 14)), obs = mecA_n_unique_kmer/(read_lengths - 14))
+
+all(all_detected_negative$obs < all_detected_negative$prob)
+[1] TRUE
+
+###### pvl
+read_base_with_truth %>% filter(pvl == 2) %>%
+mutate(lukS_kmer_ratio = lukS_n_unique_kmer/read_lengths,
+    lukF_kmer_ratio = lukF_n_unique_kmer/read_lengths) %>%
+group_by(ID) %>%
+summarise(mean_lukS_kmer_ratio = mean(lukS_kmer_ratio)/mean(read_lengths),
+mean_lukF_kmer_ratio = mean(lukF_kmer_ratio)/mean(read_lengths),
+mean_lukS_kmer_ratio_if_present = mean(lukS_kmer_ratio[lukS_kmer_ratio > 0]),
+mean_lukF_kmer_ratio_if_present = mean(lukF_kmer_ratio[lukF_kmer_ratio > 0]))
+
+  ID      mean_lukS_kmer_rat… mean_lukF_kmer_… mean_lukS_kmer_… mean_lukF_kmer_…
+  <chr>                 <dbl>            <dbl>            <dbl>            <dbl>
+1 sd_0010        0.0000000189     0.0000000136          0.00211          0.00120
+2 sd_0011        0.0000000200     0.0000000185          0.00219          0.00158
+3 sd_0022        0.0000000129     0.0000000157          0.00128          0.00130
+
+all_detected_positive <- read_base_with_truth %>% filter(pvl == 2) %>%
+mutate(lukS_kmer_ratio = lukS_n_unique_kmer/read_lengths,
+    lukF_kmer_ratio = lukF_n_unique_kmer/read_lengths) %>%
+filter(lukS_n_unique_kmer > 0) %>%
+mutate(prob_lukS = 943 * 4^(15*(read_lengths - 14)), obs_lukS = lukS_n_unique_kmer/(read_lengths - 14))
+
+all_detected_positive$obs_lukS > all_detected_positive$prob_lukS
+
+
+read_base_with_truth %>% filter(pvl == 0) %>%
+mutate(lukS_kmer_ratio = lukS_n_unique_kmer/read_lengths,
+    lukF_kmer_ratio = lukF_n_unique_kmer/read_lengths) %>%
+group_by(ID) %>%
+summarise(mean_lukS_kmer_ratio = mean(lukS_kmer_ratio)/mean(read_lengths),
+mean_lukF_kmer_ratio = mean(lukF_kmer_ratio)/mean(read_lengths),
+mean_lukS_kmer_ratio_if_present = mean(lukS_kmer_ratio[lukS_kmer_ratio > 0]),
+mean_lukF_kmer_ratio_if_present = mean(lukF_kmer_ratio[lukF_kmer_ratio > 0]))
+
+   ID      mean_lukS_kmer_ra… mean_lukF_kmer_… mean_lukS_kmer_… mean_lukF_kmer_…
+   <chr>                <dbl>            <dbl>            <dbl>            <dbl>
+ 1 sd_0001      0.00000000218    0.00000000384         0.000219         0.000339
+ 2 sd_0003      0.00000000244    0.00000000410         0.000251         0.000354
+ 3 sd_0004      0.00000000198    0.00000000315         0.000207         0.000268
+ 4 sd_0005      0.00000000239    0.00000000377         0.000268         0.000321
+ 5 sd_0006      0.00000000231    0.00000000365         0.000269         0.000291
+ 6 sd_0007      0.00000000152    0.00000000257         0.000174         0.000232
+ 7 sd_0008      0.00000000241    0.00000000360         0.000263         0.000294
+ 8 sd_0009      0.00000000212    0.00000000412         0.000236         0.000356
+ 9 sd_0012      0.00000000180    0.00000000307         0.000227         0.000268
+10 sd_0013      0.00000000170    0.00000000288         0.000199         0.000239
+11 sd_0014      0.00000000203    0.00000000296         0.000238         0.000260
+12 sd_0015      0.00000000231    0.00000000311         0.000251         0.000273
+13 sd_0016      0.00000000190    0.00000000398         0.000218         0.000338
+14 sd_0017      0.00000000215    0.00000000442         0.000236         0.000355
+15 sd_0018      0.00000000206    0.00000000387         0.000229         0.000295
+16 sd_0019      0.00000000182    0.00000000404         0.000208         0.000313
+17 sd_0020      0.00000000179    0.00000000325         0.000201         0.000269
+18 sd_0021      0.00000000206    0.00000000344         0.000218         0.000300
+19 sd_0024      0.00000000177    0.00000000239         0.000199         0.000218
+##### Question 1: How many reads have mecA, lukS, lukF?
+##### For mecA positive
+read_base_with_truth %>% filter(mecA == 1) %>%
+mutate(has_mecA = ifelse(mecA_n_unique_kmer > 0, 1, 0)) %>%
+group_by(ID) %>% summarise(has_mecA = sum(has_mecA), no_mecA = n() - sum(has_mecA))
+
+  ID      has_mecA no_mecA
+  <chr>      <dbl>    <dbl>
+1 sd_0001     1437     4645
+2 sd_0003     1581     5210
+3 sd_0005     1568     5374
+4 sd_0010     1587     4624
+5 sd_0011     1503     4929
+6 sd_0012     1448     4904
+7 sd_0021     1450     4873
+8 sd_0022     1493     4790
+9 sd_0024     1480     4961
+
+##### For mecA negative
+read_base_with_truth %>% filter(mecA == 0) %>%
+mutate(has_mecA = ifelse(mecA_n_unique_kmer > 0, 1, 0)) %>%
+group_by(ID) %>% summarise(has_mecA = sum(has_mecA), no_mecA = n() - sum(has_mecA))
+
+   ID      has_mecA no_mecA
+   <chr>      <dbl>    <dbl>
+ 1 sd_0004     1424     4715
+ 2 sd_0006     1382     4722
+ 3 sd_0007     1328     4709
+ 4 sd_0008     1514     4877
+ 5 sd_0009     1515     4938
+ 6 sd_0013     1431     4843
+ 7 sd_0014     1397     4892
+ 8 sd_0015     1528     4755
+ 9 sd_0016     1482     4712
+10 sd_0017     1447     4724
+11 sd_0018     1501     4845
+12 sd_0019     1458     4656
+13 sd_0020     1425     4640
+
+##### For pvl positive
+read_base_with_truth %>% filter(pvl == 2) %>%
+mutate(has_lukS = ifelse(lukS_n_unique_kmer > 0, 1, 0),
+    has_lukF = ifelse(lukF_n_unique_kmer > 0, 1, 0),
+    has_both = ifelse((lukS_n_unique_kmer > 0 & lukF_n_unique_kmer > 0), 1, 0)) %>%
+group_by(ID) %>% summarise(has_lukS = sum(has_lukS),
+    has_lukF = sum(has_lukF),
+    has_both = sum(has_both),
+    no_pvl = n() - sum(has_both))
+
+  ID      has_lukS has_lukF has_both no_pvl
+  <chr>      <dbl>    <dbl>    <dbl>  <dbl>
+1 sd_0010      505      640      112   6099
+2 sd_0011      514      661      129   6303
+3 sd_0022      564      677      128   6155
+
+##### For pvl negative
+read_base_with_truth %>% filter(pvl == 0) %>%
+mutate(has_lukS = ifelse(lukS_n_unique_kmer > 0, 1, 0),
+    has_lukF = ifelse(lukF_n_unique_kmer > 0, 1, 0),
+    has_both = ifelse((lukS_n_unique_kmer > 0 & lukF_n_unique_kmer > 0), 1, 0)) %>%
+group_by(ID) %>% summarise(has_lukS = sum(has_lukS),
+    has_lukF = sum(has_lukF),
+    has_both = sum(has_both),
+    no_pvl = n() - sum(has_both))
+
+   ID      has_lukS has_lukF has_both no_pvl
+   <chr>      <dbl>    <dbl>    <dbl>  <dbl>
+ 1 sd_0001      549      626      113   5969
+ 2 sd_0003      592      703      119   6672
+ 3 sd_0004      525      647       91   6048
+ 4 sd_0005      550      726      108   6834
+ 5 sd_0006      473      691      106   5998
+ 6 sd_0007      476      605       82   5955
+ 7 sd_0008      529      705      110   6281
+ 8 sd_0009      517      667      105   6348
+ 9 sd_0012      461      664       85   6267
+10 sd_0013      484      683      101   6173
+11 sd_0014      477      637       94   6195
+12 sd_0015      521      644       97   6186
+13 sd_0016      489      659       94   6100
+14 sd_0017      502      686      108   6063
+15 sd_0018      506      736      116   6230
+16 sd_0019      477      703       98   6016
+17 sd_0020      491      664      100   5965
+18 sd_0021      543      659      106   6217
+19 sd_0024      520      642       84   6357
