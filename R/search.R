@@ -432,7 +432,7 @@ branch_and_search <- function(starting_positions = c(),
             BPPARAM = bp)
     depth_1 <- bplapply(scores, function(score) {
             return(score[["result"]])
-    }, BPPARAM = SerialParam())
+    }, BPPARAM = bp)
 
     # Sorting for selection at this depth
     names(depth_1) <- positions
@@ -501,7 +501,7 @@ branch_and_search <- function(starting_positions = c(),
                     BPPARAM = bp)
             depth_1 <- bplapply(scores, function(score) {
                     return(score[["result"]])
-            }, BPPARAM = SerialParam())
+            }, BPPARAM = bp)
 
             names(depth_1) <- positions
             position_order <- order(unlist(depth_1), decreasing = TRUE)

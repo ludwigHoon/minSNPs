@@ -906,10 +906,10 @@ analyse_kmer_matches_2 <- function(kmer_matches, arguments,
         if (gene == "lukF") {
             n_searched_kmer <- 970
         }
-        p_acceptance <- -2.721989e+00 +
-            relevant_reads_check$count * 1.742866e-02 +
-            relevant_reads_check$read_length * -1.288464e-06 +
-            n_searched_kmer * 4.833567e-04
+        p_acceptance <- -2.884885e+00 +
+            relevant_reads_check$count * 2.169074e-02 +
+            relevant_reads_check$read_length * -6.785452e-07 +
+            n_searched_kmer * 5.082490e-04
         p_acceptance <- exp(p_acceptance) / (1 + exp(p_acceptance))
 
         relevant_reads <- relevant_reads_check[

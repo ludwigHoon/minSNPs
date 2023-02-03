@@ -6,9 +6,11 @@
 #' @param file file path
 #' @param force_to_upper whether to transform sequences
 #' to upper case, default to TRUE
+#' @param bp BiocParallel backend, default to SerialParam()
+#' @importFrom BiocParallel bplapply SerialParam
 #' @return Will return list of named character vectors.
 #' @export
-read_fasta <- function(file, force_to_upper=TRUE) {
+read_fasta <- function(file, force_to_upper = TRUE, bp = SerialParam()) {
     lines <- readLines(file)
     ind <- which(substr(lines, 1L, 1L) == ">")
     nseqc <- length(ind)
@@ -18,30 +20,30 @@ read_fasta <- function(file, force_to_upper=TRUE) {
     start <- ind + 1
     end <- ind - 1
     end <- c(end[-1], length(lines))
-    sequences <- lapply(seq_len(nseqc), function(i) {
+    sequences <- bplapply(seq_len(nseqc), function(i, lines) {
         paste(lines[start[i]:end[i]], collapse = "")
-        }
+        }, lines = lines, BPPARAM = bp
     )
 
     if (force_to_upper) {
         sequences <- toupper(sequences)
     }
     sequences <- as.list(sequences)
-    sequences <- lapply(sequences, function(seqc) {
+    sequences <- bplapply(sequences, function(seqc) {
         return(unlist(strsplit(seqc, split = "")))
-    })
+    }, BPPARAM = bp)
 
-    names_sequences <- lapply(seq_len(nseqc), function(i) {
+    names_sequences <- bplapply(seq_len(nseqc), function(i, lines) {
         firstword <- lines[ind[i]]
         return(trimws(substr(firstword, 2, nchar(firstword))))
-    })
+    }, lines = lines, BPPARAM = bp)
 
-    sequences <- lapply(seq_len(length(sequences)),
+    sequences <- bplapply(seq_len(length(sequences)),
         function(i, seqs, names_seqs) {
             attr(seqs[[i]], "name") <- names_seqs[[i]]
             return(seqs[[i]])
         },
-    names_seqs = names_sequences, seqs = sequences)
+    names_seqs = names_sequences, seqs = sequences, BPPARAM = bp)
 
     names(sequences) <- names_sequences
 
@@ -133,12 +135,16 @@ flag_allele <- function(seqc, bp=BiocParallel::SerialParam()) {
 #' @param dash_ignore whether to treat '-' as another type
 #' @param accepted_char character to accept, default to c("A", "C", "T", "G")
 #' @param ignore_case whether to be case insensitive, default to TRUE
-#' @param remove_invariant whether to remove invariant positions, default to FALSE
-#' @param biallelic_only whether to remove positions with more than 2 alleles, default to FALSE
+#' @param remove_invariant whether to remove invariant positions,
+#' default to FALSE
+#' @param biallelic_only whether to remove positions with more than 2 alleles,
+#' default to FALSE
 #' @keywords internal
 #' @return Will return a list of positions that need to be ignored.
-flag_position <- function(pro_seqc, dash_ignore=TRUE,
-    accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE, remove_invariant=FALSE, biallelic_only=FALSE, bp = SerialParam()) {
+flag_position <- function(pro_seqc, dash_ignore = TRUE,
+    accepted_char=c("A", "C", "T", "G"),
+    ignore_case = TRUE, remove_invariant = FALSE,
+    biallelic_only = FALSE, bp = SerialParam()) {
 
     if (dash_ignore == FALSE) {
         accepted_char <- c(accepted_char, "-")
@@ -211,8 +217,9 @@ remove_dup_isolate <- function(seqc) {
 #' @inheritParams flag_position
 #' @return Will return the processed allelic profiles.
 #' @export
-process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
-    dash_ignore=TRUE, accepted_char=c("A", "C", "T", "G"), ignore_case=TRUE, remove_invariant=FALSE, biallelic_only=FALSE) {
+process_allele <- function(seqc, bp = BiocParallel::SerialParam(),
+    dash_ignore = TRUE, accepted_char = c("A", "C", "T", "G"),
+    ignore_case = TRUE, remove_invariant = FALSE, biallelic_only = FALSE) {
 
     processed <- list()
     seqc <- remove_dup_isolate(seqc)

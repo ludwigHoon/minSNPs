@@ -17,11 +17,15 @@ print("DOING OLAP TABLE")
 olap_table <- identify_overlaps(
     selected_snps = unlist(all_snps),
     ref_seq = ref_seq, position_reference = ref_pos, prev = 7,
-    after = 7, extend_length = TRUE, bp = MulticoreParam(workers = 60, progress = TRUE))
+    after = 7, extend_length = TRUE,
+    bp = MulticoreParam(workers = 60, progress = TRUE)
+)
 print("Completed OLAP TABLE")
 print("DOING snp TABLE")
 snp_tables <- generate_snp_search_string(snp_overlap_tables = olap_table,
-    orth_matrix = orth_matrix, ref_seq = ref_seq, bp = MulticoreParam(workers = 60, progress = TRUE))
+    orth_matrix = orth_matrix, ref_seq = ref_seq,
+    bp = MulticoreParam(workers = 60, progress = TRUE)
+)
 print("Completed snp TABLE")
 write.csv(snp_tables$snp_table, "snp_table.csv", row.names = FALSE)
 write.csv(snp_tables$string_table, "snp_string_table.csv", row.names = FALSE)
@@ -30,9 +34,12 @@ write.csv(snp_tables$string_table, "snp_string_table.csv", row.names = FALSE)
 ######################################################
 #################### KMER FOR GENE ###################
 ######################################################
-mecA <- read_fasta("../mecA.fasta")
+mecA <- read_fasta("../mecA.fasta") #nolint
 
-mecA_tables <- generate_kmer_search_string(mecA, ref_seq, 15, id_prefix = "mecA", bp = MulticoreParam(workers = 60, progress = TRUE))
+mecA_tables <- generate_kmer_search_string(mecA, ref_seq, #nolint
+    15, id_prefix = "mecA",
+    bp = MulticoreParam(workers = 60, progress = TRUE)
+)
 
 subunit_1 <- read_fasta("ST93_Toxins_Subunit_1.fasta")
 subunit_2 <- read_fasta("ST93_Toxins_Subunit_2.fasta")
@@ -42,30 +49,34 @@ subunit_2_interest <- list(lukS = subunit_1[["lukS"]])
 subunit_1_others <- subunit_1[names(subunit_1) != "lukF"]
 subunit_2_others <- subunit_2[names(subunit_2) != "lukS"]
 
-lukF_tables <- generate_kmer_search_string(subunit_1_interest, ref_seq, 15,
+lukF_tables <- generate_kmer_search_string(subunit_1_interest, ref_seq, 15, #nolint
     id_prefix = "lukF", bp = MulticoreParam(workers = 60, progress = TRUE))
-lukS_tables <- generate_kmer_search_string(subunit_1_interest, ref_seq, 15,
+lukS_tables <- generate_kmer_search_string(subunit_1_interest, ref_seq, 15, #nolint
     id_prefix = "lukS", bp = MulticoreParam(workers = 60, progress = TRUE))
 
-lukF_others_tables <- generate_kmer_search_string(subunit_1_others, ref_seq, 15,
-    id_prefix = "lukF_other", bp = MulticoreParam(workers = 60, progress = TRUE))
-lukS_others_tables <- generate_kmer_search_string(subunit_2_others, ref_seq, 15,
-    id_prefix = "lukS_other", bp = MulticoreParam(workers = 60, progress = TRUE))
+lukF_others_tables <- generate_kmer_search_string(subunit_1_others, ref_seq, 15, #nolint
+    id_prefix = "lukF_other",
+    bp = MulticoreParam(workers = 60, progress = TRUE)
+)
+lukS_others_tables <- generate_kmer_search_string(subunit_2_others, ref_seq, 15, #nolint
+    id_prefix = "lukS_other",
+    bp = MulticoreParam(workers = 60, progress = TRUE)
+)
 
-lukF_tables$string_table <- lukF_tables$string_table[
+lukF_tables$string_table <- lukF_tables$string_table[ #nolint
     (!lukF_tables$string_table$search_string %in%
     lukF_others_tables$string_table$search_string) &
-    (! grepl("-", lukF_tables$string_table$search_string)),]
+    (! grepl("-", lukF_tables$string_table$search_string)), ]
 
-lukS_tables$string_table <- lukS_tables$string_table[
+lukS_tables$string_table <- lukS_tables$string_table[ #nolint
     (!lukS_tables$string_table$search_string %in%
     lukS_others_tables$string_table$search_string) &
-    (! grepl("-", lukS_tables$string_table$search_string)),]
+    (! grepl("-", lukS_tables$string_table$search_string)), ]
 
-lukF_tables$kmer_table <- lukF_tables$kmer_table[
+lukF_tables$kmer_table <- lukF_tables$kmer_table[ #nolint
     (lukF_tables$kmer_table$string_id %in%
     lukF_tables$string_table$string_id), ]
-lukS_tables$kmer_table <- lukS_tables$kmer_table[
+lukS_tables$kmer_table <- lukS_tables$kmer_table[ #nolint
     (lukS_tables$kmer_table$string_id %in%
     lukS_tables$string_table$string_id), ]
 
@@ -93,7 +104,7 @@ kmer_string <- read.csv("kmer_string_table.csv")
 
 bp <- MulticoreParam(workers = 62, progress = TRUE)
 fastq_files <- list.files(pattern = "sd.*.fastq")
-for (fastq_file in fastq_files[18:24]) {
+for (fastq_file in fastq_files) {
     print(paste("Processing", fastq_file))
     run <- search_from_fastq_reads(fastq_file, list(snp_string, kmer_string),
         output_temp_result = TRUE, temp_result_folder = "./temp_results",
@@ -106,10 +117,10 @@ for (fastq_file in fastq_files[18:24]) {
 source("search_string_generation.r")
 library(BiocParallel)
 bp <- MulticoreParam(workers = 127, progress = TRUE)
-fastq_files <- list.files(pattern = "sd.*.fastq")
+fastq_files <- list.files(pattern = "s.*.fastq")
 results <- bplapply(fastq_files, fastq_reads_length,
-    bp = MulticoreParam(workers = 5), BPPARAM = bp)
-do.call(rbind, results) -> results
+    bp = SerialParam(), BPPARAM = bp)
+results <- do.call(rbind, results)
 write.csv(results, "fastq_reads_length.csv", row.names = FALSE)
 
 #############################
@@ -132,9 +143,9 @@ all_sim_out <- paste0(
     ".*.csv")
 
 res <- list()
-res <- bplapply(all_sim_out, function(a){
+res <- bplapply(all_sim_out, function(a) {
     sim <- list.files(path = "./temp_results", pattern = a)
-    t_results <- lapply(sim, function(f){
+    t_results <- lapply(sim, function(f) {
             read.csv(paste0("./temp_results", "/", f))
         })
     t_results <- do.call(rbind, t_results)
@@ -153,36 +164,41 @@ names(res) <- all_sim_out
 fin_res <- do.call(rbind, res)
 fin_res$ID <- unlist(lapply(strsplit(fin_res$read_id, split = "_"), `[`, 1))
 sim_truth <- read.csv(text = "
-ID	CC	mecA	pvl
-sd_0001	CC5	1	0
-sd_0003	CC8	1	0
-sd_0004	CC8	0	0
-sd_0005	CC8	1	0
-sd_0006	CC45	0	0
-sd_0007	CC45	0	0
-sd_0008	CC8	0	0
-sd_0009	CC8	0	0
-sd_0010	CC1	1	1
-sd_0011	CC1	1	1
-sd_0012	CC30	1	0
-sd_0013	CC30	0	0
-sd_0014	CC30	0	0
-sd_0015	CC8	0	0
-sd_0016	CC1	0	0
-sd_0017	CC1	0	0
-sd_0018	CC1	0	0
-sd_0019	CC1	0	0
-sd_0020	CC8	0	0
-sd_0021	CC5	1	0
-sd_0022	NA	1	1
-sd_0024	NA	1	0
-", sep = "\t")
+ID,CC,mecA,pvl
+sd_0001,CC5,1,0
+sd_0003,CC8,1,0
+sd_0004,CC8,0,0
+sd_0005,CC8,1,0
+sd_0006,CC45,0,0
+sd_0007,CC45,0,0
+sd_0008,CC8,0,0
+sd_0009,CC8,0,0
+sd_0010,CC1,1,1
+sd_0011,CC1,1,1
+sd_0012,CC30,1,0
+sd_0013,CC30,0,0
+sd_0014,CC30,0,0
+sd_0015,CC8,0,0
+sd_0016,CC1,0,0
+sd_0017,CC1,0,0
+sd_0018,CC1,0,0
+sd_0019,CC1,0,0
+sd_0020,CC8,0,0
+sd_0021,CC5,1,0
+sd_0022,NA,1,1
+sd_0024,NA,1,0
+", sep = ",")
 sim_truth$ID <- paste0("S", as.numeric(gsub("sd_", "", sim_truth$ID)))
-read_length$ID <- unlist(lapply(strsplit(read_length$read_id, split = "_"), `[`, 1))
-merge(read_length, sim_truth[,c("ID", "mecA", "pvl")], by.x = "ID", by.y = "ID") -> read_length
-all_reads <- bplapply(read_length$read_id, function(x){
+read_length$ID <- unlist(
+    lapply(
+        strsplit(read_length$read_id, split = "_"),
+        `[`, 1)
+    )
+read_length <- merge(read_length,
+    sim_truth[, c("ID", "mecA", "pvl")], by.x = "ID", by.y = "ID")
 
-    if_found_return_else_0 <- function(x){
+all_reads <- bplapply(read_length$read_id, function(x) {
+    if_found_return_else_0 <- function(x) {
         if (identical(x, integer(0))) {
             return(0)
         } else {
@@ -190,33 +206,41 @@ all_reads <- bplapply(read_length$read_id, function(x){
         }
     }
     result <- read_length[read_length$read_id == x, ]
-    result$mecA_count <- if_found_return_else_0(fin_res[fin_res$read_id == x & fin_res$match_gene == "mecA", ]$count)
-    result$lukS_count <- if_found_return_else_0(fin_res[fin_res$read_id == x & fin_res$match_gene == "lukS", ]$count)
-    result$lukF_count <- if_found_return_else_0(fin_res[fin_res$read_id == x & fin_res$match_gene == "lukF", ]$count)
-    return( 
-        result
-    )
+    result$mecA_count <- if_found_return_else_0(
+        fin_res[fin_res$read_id == x & fin_res$match_gene == "mecA", ]$count)
+    result$lukS_count <- if_found_return_else_0(
+        fin_res[fin_res$read_id == x & fin_res$match_gene == "lukS", ]$count)
+    result$lukF_count <- if_found_return_else_0(
+        fin_res[fin_res$read_id == x & fin_res$match_gene == "lukF", ]$count)
+    return(result)
 }, BPPARAM = MulticoreParam(workers = 124, progress = TRUE))
+
 all_reads <- do.call(rbind, all_reads)
 write.csv(all_reads, "for_cut_off_search_string.csv", row.names = FALSE)
 
-mecA_train <- all_reads[, c("mecA", "read_length", "mecA_count")]
-mecA_train$target_count <- 4936
-colnames(mecA_train) <- c("is_positive", "read_length", "kmer_found", "target_count")
-lukS_train <- all_reads[, c("pvl", "read_length", "lukS_count")]
-lukS_train$target_count <- 1938
-colnames(lukS_train) <- c("is_positive", "read_length", "kmer_found", "target_count")
-lukF_train <- all_reads[, c("pvl", "read_length", "lukF_count")]
-lukF_train$target_count <- 1714
-colnames(lukF_train) <- c("is_positive", "read_length", "kmer_found", "target_count")
-do.call(rbind, list(mecA_train, lukS_train, lukF_train)) -> train_data
+mecA_train <- all_reads[, c("mecA", "read_length", "mecA_count")] #nolint
+mecA_train$target_count <- 4936 #nolint
+colnames(mecA_train) <- c("is_positive", "read_length", "kmer_found", "target_count") #nolint
+lukS_train <- all_reads[, c("pvl", "read_length", "lukS_count")] #nolint
+lukS_train$target_count <- 1938 #nolint
+colnames(lukS_train) <- c("is_positive", "read_length", "kmer_found", "target_count") #nolint
+lukF_train <- all_reads[, c("pvl", "read_length", "lukF_count")] #nolint
+lukF_train$target_count <- 1714 #nolint
+colnames(lukF_train) <- c("is_positive", "read_length", "kmer_found", "target_count") #nolint
+train_data <- do.call(rbind, list(mecA_train, lukS_train, lukF_train))
+train_data <- train_data[train_data$kmer_found > 0, ]   ##### NEWLY ADDED #####
 
-model <- glm(is_positive ~ read_length + kmer_found + target_count, data = train_data, family = binomial(link = "logit"))
+model <- glm(
+    is_positive ~ read_length + kmer_found + target_count,
+    data = train_data, family = binomial(link = "logit"))
 
+# WITHOUT THE NEWLY ADDED LINE
+#  (Intercept)   read_length    kmer_found  target_count
+#-2.721989e+00 -1.288464e-06  1.742866e-02  4.833567e-04
 
-  (Intercept)   read_length    kmer_found  target_count
--2.721989e+00 -1.288464e-06  1.742866e-02  4.833567e-04
-
+# WITH THE NEWLY ADDED LINE
+#  (Intercept)   read_length    kmer_found  target_count
+#-2.884885e+00 -6.785452e-07  2.169074e-02  5.082490e-04
 
 #############################
 ########### STEP 2 ##########
@@ -237,15 +261,99 @@ all_sim_out <- paste0(
     gsub(".fastq", "", list.files(pattern = "*fastq$")),
     ".*.csv")
 
+analyse_kmer_matches_3 <- function(kmer_matches, arguments,
+    bp = MulticoreParam()) {
+    kmer_table <- arguments[["kmer_table"]]
+    min_match_per_read <- arguments[["coeffs"]]
+
+    kmer_matches_with_ID <- merge( #nolint
+        kmer_matches,
+        kmer_table[, c("string_id", "match_gene")],
+    by.x = "string_id", by.y = "string_id")
+
+    read_kmer_count <- kmer_matches_with_ID %>%
+        dplyr::group_by(read_id, match_gene) %>% #nolint
+        dplyr::summarise(
+            count = dplyr::n_distinct(search_string), .groups = "rowwise") #nolint
+
+    read_kmer_count <- merge(read_kmer_count,
+        unique(kmer_matches[, c("read_id", "read_length")])
+    )
+    checked_genes <- unique(kmer_table$match_gene)
+
+    gene_results <- bplapply(checked_genes,
+        function(gene, kmer_matches, min_match_per_read,
+            read_kmer_count) {
+
+        relevant_reads_check <- read_kmer_count[
+            read_kmer_count$match_gene == gene, ]
+
+        n_searched_kmer <- 0
+        if (gene == "mecA") {
+            n_searched_kmer <- 2477
+        }
+        if (gene == "pvl_p") {
+            n_searched_kmer <- 1259
+        }
+        if (gene == "lukS") {
+            n_searched_kmer <- 943
+        }
+        if (gene == "lukF") {
+            n_searched_kmer <- 970
+        }
+        p_acceptance <- -2.884885e+00 +
+            relevant_reads_check$count * 2.169074e-02 +
+            relevant_reads_check$read_length * -6.785452e-07 +
+            n_searched_kmer * 5.082490e-04
+        p_acceptance <- exp(p_acceptance) / (1 + exp(p_acceptance))
+
+        relevant_reads <- relevant_reads_check[
+            which(p_acceptance >= .4), "read_id"]
+
+        kmer_id_count <- kmer_matches %>%
+            dplyr::filter(match_gene == gene) %>% #nolint
+            dplyr::filter(read_id %in% relevant_reads) %>% #nolint
+            dplyr::group_by(search_string) %>% #nolint
+            dplyr::summarise(
+                count = sum(found_string_count), .groups = "keep" #nolint
+            )
+
+        if (nrow(kmer_id_count) < 1) {
+            return(
+                data.frame(gene = gene, total_count = 0,
+                    unique_kmer_count = 0,
+                    unique_kmer = "",
+                    kmer_count = "")
+            )
+        }
+
+        total_count <- sum(kmer_id_count[, "count"])
+
+        unique_kmer <- kmer_id_count[sort(kmer_id_count$count,
+                decreasing = TRUE),
+            "search_string"]
+
+        kmer_count <- kmer_id_count[sort(kmer_id_count$count,
+                decreasing = TRUE),
+            "count"]
+
+        unique_kmer_count <- length(unlist(unique_kmer))
+        return(data.frame(gene = gene, total_count = total_count,
+            unique_kmer_count = unique_kmer_count,
+            unique_kmer = paste0(unlist(unique_kmer), collapse = "_"),
+            kmer_count = paste0(unlist(kmer_count), collapse = "_")))
+    }, read_kmer_count = read_kmer_count,
+        kmer_matches = kmer_matches_with_ID,
+        min_match_per_read = min_match_per_read, BPPARAM = bp)
+
+    result <- do.call(rbind, gene_results)
+    return(result)
+}
+
 sim <- function(sim_iso, seed) {
     arguments <- list(
-        kmer = list(kmer_table = kmer_table,
-                min_match = list(
-                mecA = 155,
-                pvl_p = 315,
-                lukS = 30,
-                lukF = 70
-            )),
+        kmer = list(kmer_table = kmer_table
+               ),
         snp = list(snp_table = snp_table,
             snp_matrix = snp_matrix))
 
@@ -279,7 +387,7 @@ sim <- function(sim_iso, seed) {
         t_results <- do.call(rbind, t_results)
         t_results <- merge(t_results, read_length)
         result <- collapse_result(t_results, matched_type_functions =
-            list(snp = analyse_snps_matches, kmer = analyse_kmer_matches_2),
+            list(snp = analyse_snps_matches, kmer = analyse_kmer_matches_3),
             arguments = arguments,
             bp_per_type = SerialParam())
         total_read_length <- sum(read_length[read_length$read_id %in% all_read_id, "read_length"])
@@ -319,10 +427,77 @@ sim <- function(sim_iso, seed) {
     return(sim_result)
 }
 
+for (i in c(1:10)) {
+    sim_res <- list()
+    b <- txtProgressBar(min = 0, max = length(all_sim_out), style = 3)
+    for (a in all_sim_out){
+        print(paste("DOING", a, "SEED", i))
+        sim_res[[gsub("\\.\\*\\.csv", "", a)]] <-
+            sim(
+                a, seed = i)
+        setTxtProgressBar(b, value = b$getVal() + 1)
+        print(paste("Completed", a, "SEED", i))
+        }
+    close(b)
+
+    fin <- do.call(rbind, sim_res[which(!is.na(sim_res))])
+    write.csv(fin, paste0("sim_res_k3_seed_",
+        i, ".csv"), row.names = FALSE)
+}
 
 
+################################################
+# Analysing the simulation result
+################################################
+sim_truth <- read.csv(text = "
+ID,CC,mecA,pvl
+sd_0001,CC5,1,0
+sd_0003,CC8,1,0
+sd_0004,CC8,0,0
+sd_0005,CC8,1,0
+sd_0006,CC45,0,0
+sd_0007,CC45,0,0
+sd_0008,CC8,0,0
+sd_0009,CC8,0,0
+sd_0010,CC1,1,1
+sd_0011,CC1,1,1
+sd_0012,CC30,1,0
+sd_0013,CC30,0,0
+sd_0014,CC30,0,0
+sd_0015,CC8,0,0
+sd_0016,CC1,0,0
+sd_0017,CC1,0,0
+sd_0018,CC1,0,0
+sd_0019,CC1,0,0
+sd_0020,CC8,0,0
+sd_0021,CC5,1,0
+sd_0022,NA,1,1
+sd_0024,NA,1,0
+", sep = ",")
+sim_res <- read.csv("new_sim_res_1_10.csv", stringsAsFactors=FALSE)
+res_with_id <- merge(sim_res, sim_truth, by.x = "file", by.y = "ID")
+res_with_id$mecA_is_present <- ifelse(res_with_id$mecA_n_unique_kmer >= (4936/2)*0.15, 1, 0)
+res_with_id$pvl_is_present <- ifelse(res_with_id$lukF_n_unique_kmer >= (1714/2)*0.15 &
+    res_with_id$lukS_n_unique_kmer >= (1938/2)*0.15, 1, 0)
+res_with_id$mecA_right_result <- ifelse(res_with_id$mecA_is_present == res_with_id$mecA, 1, 0)
+res_with_id$pvl_right_result <- ifelse(res_with_id$pvl_is_present == res_with_id$pvl, 1, 0)
+plot(res_with_id$n_bases, res_with_id$mecA_right_result)
+plot(res_with_id$n_bases, res_with_id$pvl_right_result)
 
+t_mecA <- res_with_id[, c("n_bases", "mecA_n_unique_kmer", "mecA")]
+t_lukF <- res_with_id[, c("n_bases", "lukF_n_unique_kmer", "pvl")]
+t_lukS <- res_with_id[, c("n_bases", "lukS_n_unique_kmer", "pvl")]
+colnames(t_mecA) <- c("n_bases", "kmer_count", "right_result")
+t_mecA$kmer_pool <- 4936/2
+colnames(t_lukF) <- c("n_bases", "kmer_count", "right_result")
+t_lukF$kmer_pool <- 1714/2
+colnames(t_lukS) <- c("n_bases", "kmer_count", "right_result")
+t_lukS$kmer_pool <- 1938/2
+all_res_data <- do.call(rbind, list(t_mecA, t_lukF, t_lukS))
+model <- glm(right_result ~ n_bases + kmer_count + kmer_pool,
+    data = all_res_data, family = binomial(link = "logit"))
 
+################################################
 
 
 run_spec_gene <- function(){
