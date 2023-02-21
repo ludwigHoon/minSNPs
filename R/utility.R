@@ -38,7 +38,8 @@ reverse_complement <- function(seq) {
 #' @return number of matches
 #' @export
 match_count <- function(target, search_from) {
-    matches <- gregexpr(paste(target, collapse = ""), search_from)
+    matches <- gregexpr(paste(target, collapse = ""),
+        paste(search_from, collapse = ""))
     found <- 0
     if (length(matches[[1]]) == 1) {
         if (matches[[1]][1] != -1) {
