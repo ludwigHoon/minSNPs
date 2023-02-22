@@ -40,13 +40,43 @@ reverse_complement <- function(seq) {
 match_count <- function(target, search_from) {
     matches <- gregexpr(paste(target, collapse = ""),
         paste(search_from, collapse = ""))
-    found <- 0
-    if (length(matches[[1]]) == 1) {
-        if (matches[[1]][1] != -1) {
-            found <- 1
-        }
-    } else {
-        found <- length(matches[[1]])
+    found <- attr(match[[1]], "match.length")
+    if (found == -1) {
+        found <- 0
     }
     return(found)
+}
+
+#' \code{read_sequences_from_fastq}
+#'
+#' @description
+#' \code{read_sequences_from_fastq} get the sequences
+#' from a fastq file, it completely ignores the quality scores
+#' @param fastq_file location of the fastq file
+#' @param force_to_upper whether to transform sequences
+#' to upper case, default to TRUE
+#' @param bp BiocParallel backend to use for parallelization
+#' @return will return a list of sequences
+#' @importFrom BiocParallel bplapply MulticoreParam
+#' @export
+read_sequences_from_fastq <- function(fastq_file, force_to_upper = TRUE,
+    bp = MulticoreParam()) {
+    lines <- readLines(fastq_file)
+    seqs_id <- lines[seq(1, length(lines), 4)]
+    seqs <- lines[seq(2, length(lines), 4)]
+
+    seqs_id <- unlist(bplapply(seqs_id, function(id) {
+        id <- strsplit(id, split = "")[[1]]
+        return(paste0(id[2:length(id)], collapse = ""))
+    }, BPPARAM = bp))
+
+    if (force_to_upper) {
+        seqs <- unlist(bplapply(seqs, function(seq) {
+            return(toupper(seq))
+        }, BPPARAM = bp))
+    }
+
+    seqs <- as.list(seqs)
+    names(seqs) <- seqs_id
+    return(seqs)
 }
