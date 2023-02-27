@@ -41,8 +41,12 @@ match_count <- function(target, search_from) {
     matches <- gregexpr(paste(target, collapse = ""),
         paste(search_from, collapse = ""))
     found <- attr(match[[1]], "match.length")
-    if (found == -1) {
-        found <- 0
+    if (length(found) == 1) {
+        if (found[1] == -1) {
+            found <- 0
+        }
+    } else{
+        found <- length(found)
     }
     return(found)
 }
