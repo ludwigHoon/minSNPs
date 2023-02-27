@@ -43,12 +43,10 @@ match_count <- function(target, search_from) {
     found <- attr(match[[1]], "match.length")
     if (length(found) == 1) {
         if (found[1] == -1) {
-            found <- 0
+           return(0)
         }
-    } else{
-        found <- length(found)
     }
-    return(found)
+    return(length(found))
 }
 
 #' \code{read_sequences_from_fastq}

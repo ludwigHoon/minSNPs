@@ -54,12 +54,10 @@ sequence_reads_match_count <- function(search_sequence, reads) {
         found <- attr(match, "match.length")
         if (length(found) == 1) {
             if (found[1] == -1) {
-                found <- 0
+                return(0)
             }
-        } else{
-            found <- length(found)
         }
-        return(found)
+        return(length(found))
     }, BPPARAM = BiocParallel::SerialParam())
     names(sequence_found_in_reads) <- names(reads)
     return(sequence_found_in_reads)
