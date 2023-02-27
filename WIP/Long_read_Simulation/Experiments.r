@@ -126,3 +126,17 @@ result2$match_ref_seq <- unlist(
 ### Combine everything together
 fin_result <- do.call(rbind, list(result, result2))
 write.csv(fin_result, "all_search_string.csv", row.names = FALSE)
+
+
+
+#### ONLY USING MECA_L and forward strand --> reverse complement reads instead of search strings
+#The following search strings are duplicated, all are removed
+#             id type        sequence strand result extra match_ref_seq
+#2793 lukS_454_+ KMER GGAGGTAATGGTTCA      +   lukS                   0
+#2794 lukS_454_- KMER TGAACCATTACCTCC      -   lukS                   0
+#4609 lukF_437_+ KMER GAGATATTAATATCT      +   lukF                   0
+#4610 lukF_437_- KMER AGATATTAATATCTC      -   lukF                   0
+#4611 lukF_438_+ KMER AGATATTAATATCTC      +   lukF                   0
+#4612 lukF_438_- KMER GAGATATTAATATCT      -   lukF                   0
+#4673 lukF_469_+ KMER GGAGGTAATGGTTCA      +   lukF                   0
+#4674 lukF_469_- KMER TGAACCATTACCTCC      -   lukF                   0

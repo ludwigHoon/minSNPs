@@ -1,0 +1,12 @@
+source("~/n_minsnps/minSNPs/R/utility.R")
+library(BiocParallel)
+
+searches <- read.csv("all_search_sequences_wo_back_dup.csv")
+bp <- MulticoreParam(workers = 63, progress = TRUE)
+
+all_fastq <- list.files(pattern = "*.fastq")
+rresult <- list()
+for (fq in all_fastq) {
+    print(paste("Processing", which(all_fastq == fq)/length(all_fastq), "at", Sys.time()))
+    rresult[[fq]] <- search_from_fastq_reads(fq, searches, bp = bp)
+}
