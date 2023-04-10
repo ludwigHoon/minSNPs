@@ -40,7 +40,7 @@ reverse_complement <- function(seq) {
 match_count <- function(target, search_from) {
     matches <- gregexpr(paste(target, collapse = ""),
         paste(search_from, collapse = ""))
-    found <- attr(match[[1]], "match.length")
+    found <- attr(matches[[1]], "match.length")
     if (length(found) == 1) {
         if (found[1] == -1) {
            return(0)
@@ -58,14 +58,16 @@ match_count <- function(target, search_from) {
 #' @param force_to_upper whether to transform sequences
 #' to upper case, default to TRUE
 #' @param bp BiocParallel backend to use for parallelization
-#' @return will return a list of sequences
+#' @param quality_offset the quality offset to use, default to 33
+#' @return will return a list of sequences, with qualities as attribute
 #' @importFrom BiocParallel bplapply MulticoreParam
 #' @export
 read_sequences_from_fastq <- function(fastq_file, force_to_upper = TRUE,
-    bp = MulticoreParam()) {
+    quality_offset = 33, bp = MulticoreParam()) {
     lines <- readLines(fastq_file)
     seqs_id <- lines[seq(1, length(lines), 4)]
     seqs <- lines[seq(2, length(lines), 4)]
+    qualities_data <- lines[seq(4, length(lines), 4)]
 
     seqs_id <- unlist(bplapply(seqs_id, function(id) {
         id <- strsplit(id, split = "")[[1]]
@@ -78,7 +80,12 @@ read_sequences_from_fastq <- function(fastq_file, force_to_upper = TRUE,
         }, BPPARAM = bp))
     }
 
+    qualities <- bplapply(qualities_data, function(x) {
+        return(utf8ToInt(x) - quality_offset)
+    }, BPPARAM = bp)
+
     seqs <- as.list(seqs)
     names(seqs) <- seqs_id
+    attr(seqs, "qualities") <- qualities
     return(seqs)
 }

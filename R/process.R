@@ -6,9 +6,11 @@
 #' @param file file path
 #' @param force_to_upper whether to transform sequences
 #' to upper case, default to TRUE
+#' @param bp is the biocparallel backend, default to serialParam,
+#' most likely sufficient in most scenario
 #' @return Will return list of named character vectors.
 #' @export
-read_fasta <- function(file, force_to_upper=TRUE) {
+read_fasta <- function(file, force_to_upper=TRUE, bp = SerialParam()) {
     lines <- readLines(file)
     ind <- which(substr(lines, 1L, 1L) == ">")
     nseqc <- length(ind)
@@ -18,18 +20,13 @@ read_fasta <- function(file, force_to_upper=TRUE) {
     start <- ind + 1
     end <- ind - 1
     end <- c(end[-1], length(lines))
-    sequences <- lapply(seq_len(nseqc), function(i) {
-        paste(lines[start[i]:end[i]], collapse = "")
+    sequences <- bplapply(seq_len(nseqc), function(i, force_to_upper) {
+        seq <- unlist(strsplit(lines[start[i]:end[i]], split = ""))
+        if (force_to_upper) {
+            seq <- toupper(seq)
         }
-    )
-
-    if (force_to_upper) {
-        sequences <- toupper(sequences)
-    }
-    sequences <- as.list(sequences)
-    sequences <- lapply(sequences, function(seqc) {
-        return(unlist(strsplit(seqc, split = "")))
-    })
+        return(seq)
+    }, force_to_upper = force_to_upper, BPPARAM = bp)
 
     names_sequences <- lapply(seq_len(nseqc), function(i) {
         firstword <- lines[ind[i]]
@@ -223,20 +220,9 @@ process_allele <- function(seqc, bp=BiocParallel::SerialParam(),
     cat("Ignored samples:", "\n")
     cat(paste(ignored, collapse = ", "), "\n")
 
-    processed$seqc <- within(as.list(processed$seqc), rm(list = ignored))
-
-    processed$seqc <- lapply(processed$seqc, function(seqc) {
-        return(unlist(strsplit(as.character(seqc), split = "")))
-    })
+    processed$seqc <- within(processed$seqc, rm(list = ignored))
 
     names_seqs <-  names(processed$seqc)
-    processed$seqc <- lapply(seq_len(length(processed$seqc)),
-        function(i, seqs, names_seqs) {
-            attr(seqs[[i]], "name") <- names_seqs[[i]]
-            return(seqs[[i]])
-        },
-    names_seqs = names(processed$seqc), seqs = processed$seqc)
-    names(processed$seqc) <- names_seqs
 
     ignored_position <- flag_position(processed$seqc,
         dash_ignore = dash_ignore, accepted_char = accepted_char,
@@ -278,12 +264,14 @@ translation <- list(
 #' @param N_is_any_base whether to treat N as any base or substitute it
 #' with one of the alleles found at the position.
 #' @param output_progress whether to output progress
+#' @param bp the BiocParallel backend
 #' @importFrom utils txtProgressBar setTxtProgressBar
+#' @importFrom BiocParallel bplapply MulticoreParam
 #' @return Will return the processed sequences.
 #' @export
 resolve_IUPAC_missing <- function(seqc, log_operation = TRUE, # nolint
     log_file = "replace.log", max_ambiguity = -1,
-    replace_method = "random", N_is_any_base = FALSE, output_progress = TRUE) { #nolint
+    replace_method = "random", N_is_any_base = FALSE, output_progress = TRUE, bp = MulticoreParam()) { #nolint
 
     accepted_char <- c("A", "C", "T", "G")
 
@@ -299,17 +287,16 @@ resolve_IUPAC_missing <- function(seqc, log_operation = TRUE, # nolint
             file = log_file, append = FALSE)
     }
 
-    if (output_progress) {
-        pb <- txtProgressBar(min = 0, max = length(seqc[[1]]),
-            initial = 0, style = 3)
-    }
-
     if ((max_ambiguity == -1 || max_ambiguity == 1) &&
-        replace_method == "most_common") {
+        (replace_method == "most_common" || replace_method == "most_common_parallel")) {
         stop("most_common must have max_ambiguity < 1")
     }
 
     if (replace_method == "most_common") {
+         if (output_progress) {
+            pb <- txtProgressBar(min = 0, max = length(seqc[[1]]),
+                initial = 0, style = 3)
+        }
         for (p in seq_len(length(seqc[[1]]))) {
             # All the nucleotides at this position
             nucleotides <- lapply(seqc, `[[`, p)
@@ -346,12 +333,74 @@ resolve_IUPAC_missing <- function(seqc, log_operation = TRUE, # nolint
             for (t in to_modify) {
                 seqc[[t]][p] <- most_common
             }
-            if (output_progress) {
-                setTxtProgressBar(pb, p)
+        }
+        if (output_progress) {
+            close(pb)
+        }
+    } else if (replace_method == "most_common_parallel") {
+        bp$progressbar <- output_progress
+
+        to_modify <- bplapply(seq_len(length(seqc[[1]])), function(pos, seqc, accepted_char){
+            all(unlist(lapply(seqc, function(x) x[pos])) %in% accepted_char)
+            
+            
+            
+        }, seqc = seqc, accepted_char = accepted_char, BPPARAM = bp)
+
+        ind_modify <- which(to_modify == FALSE)
+
+        replacements <- bplapply(ind_modify, function(ind, seqc, accepted_char, max_ambiguity){
+            bases <- lapply(seqc, `[`, ind)
+            valids <- which(bases %in% accepted_char)
+            to_modify <- which(!bases %in% accepted_char)
+
+            ambiguity_ratio <- (length(to_modify) / length(seqc))
+            if (ambiguity_ratio >= max_ambiguity) {
+                return("-")
             }
+            b <- data.table(table(as.vector(unlist(bases[valids]))))
+            colnames(b) <- c("base", "count")
+            most_common <- b[order(-count, base)][1,]$base
+            return(most_common)
+        }, seqc = seqc, accepted_char = accepted_char, max_ambiguity = max_ambiguity, BPPARAM = bp)
+
+        modified_seqc <- bplapply(names(seqc), function(seq_name, seqc, ind_modify, replacements, accepted_char, log_operation){
+            modified_seq <- seqc[[seq_name]]
+            for (ind in seq_len(length(ind_modify))) {
+                if (!modified_seq[ind_modify[[ind]]] %in% accepted_char){
+                    if (replacements[[ind]] != "-"){
+                        if (log_operation) {
+                            cat(ind_modify[[ind]], "\t", seq_name, "\t", seqc[[seq_name]][ind_modify[[ind]]],
+                                "\t", replacements[[ind]], "\n",
+                                file = paste0("replace_", seq_name, ".tmp"), append = TRUE)
+                        }
+                        modified_seq[ind_modify[[ind]]] <- replacements[[ind]]
+                    } else {
+                        cat(ind_modify[[ind]], "\t", seq_name, "\t", seqc[[seq_name]][ind_modify[[ind]]],
+                            "\t", "Skipped - >= max_ambiguity", "\n",
+                            file = paste0("replace_", seq_name, ".tmp"), append = TRUE)
+                    }
+                }
+            }
+            return(modified_seq)
+        }, seqc = seqc, ind_modify = ind_modify, replacements = replacements,
+        accepted_char = accepted_char, log_operation = log_operation, BPPARAM = bp)
+
+        names(modified_seqc) <- names(seqc)
+        if (log_operation) {
+            tmp_logs <- list.files(pattern = "replace.*.tmp")
+            lapply(tmp_logs, function(x) {
+                cat(paste(paste(readLines(x), collapse="\n"), "\n"), file = log_file, append = TRUE)
+                file.remove(x)
+            })
         }
 
+        seqc <- modified_seqc
     } else if (replace_method == "random") {
+        if (output_progress) {
+            pb <- txtProgressBar(min = 0, max = length(seqc[[1]]),
+                initial = 0, style = 3)
+        }
         for (p in seq_len(length(seqc[[1]]))) {
             # All the nucleotides at this position
             nucleotides <- lapply(seqc, `[[`, p)
@@ -414,11 +463,11 @@ resolve_IUPAC_missing <- function(seqc, log_operation = TRUE, # nolint
                 setTxtProgressBar(pb, p)
             }
         }
+        if (output_progress) {
+            close(pb)
+        }
     } else {
         stop("Unknown replace method")
-    }
-    if (output_progress) {
-        close(pb)
     }
     return(seqc)
 }
