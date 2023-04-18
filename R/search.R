@@ -266,9 +266,9 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
 
     # Define parameters
     if (inherits(seqc, "processed_seqs")) {
-        all_length <- sapply(seqc[["seqc"]], length)
+        all_length <- unlist(bplapply(seqc[["seqc"]], length, BPPARAM = bp))
     } else {
-        all_length <- sapply(seqc, length)
+        all_length <- unlist(bplapply(seqc, length, BPPARAM = bp))
     }
 
     if (length(unique(all_length)) > 1) {
@@ -385,6 +385,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
 #' @param seqc_len length of the matrix
 #' @param excluded_pos vector of excluded positions
 #' @param traversed vector of positions that is previously selected
+#' @param bp BiocParallel backend
 #' @keywords internal
 #' @importFrom BiocParallel bplapply SerialParam
 #' @return Will return a list of positions to search through
@@ -393,7 +394,7 @@ get_positions_to_search <- function(seqc_len, excluded_pos, traversed) {
     positions <- as.list(positions[! positions %in% c(excluded_pos, traversed)])
     positions <- bplapply(positions, function(pos){
         return(c(traversed, pos))
-    }, BPPARAM = SerialParam()) # Updated
+    }, BPPARAM = bp) # Updated
     return(positions)
 }
 
@@ -425,7 +426,7 @@ branch_and_search <- function(starting_positions = c(),
 
     # Calculate metric
     positions <- get_positions_to_search(length(seqc[[1]]),
-        excluded_positions, starting_positions)
+        excluded_positions, starting_positions, bp = bp)
     scores <- bplapply(positions,
         cal_met_snp, metric = metric, seqc = seqc,
         additional_args,
@@ -556,6 +557,9 @@ cal_met_snp <- function(position, metric, seqc, ...) {
         append_to <- list()
     }
     pattern <- generate_pattern(seqc, c(position), append_to)
+    if (class(metric) == "character") {
+        metric <- get_metric_fun(metric)[["calc"]]
+    }
     metric_function <- match.fun(metric)
     metric_expected_args <- formals(metric_function)
     all_expected_args <- names(additional_args)[
