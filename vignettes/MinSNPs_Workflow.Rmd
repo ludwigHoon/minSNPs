@@ -45,7 +45,7 @@ discriminating_snps <- find_optimised_snps(seqc = processed_from_default,
 ```{r}
 cat("High D SNPs\n")
 output_result(high_d_snps)
-cat("SNPs discriminating against A_D213, H_S1432\n")
+cat("SNPws discriminating against A_D213, H_S1432\n")
 output_result(discriminating_snps)
 ```
 ```{r, eval=FALSE}

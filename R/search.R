@@ -417,7 +417,7 @@ cal_met_snp <- function(position, metric, seqc, prepend_position = c(), ...) {
         append_to <- list()
     }
     pattern <- generate_pattern(seqc, c(prepend_position, position), append_to)
-    if (class(metric) == "character") {
+    if (inherits(metric,  "character")) {
         metric <- get_metric_fun(metric)[["calc"]]
     }
     metric_function <- match.fun(metric)

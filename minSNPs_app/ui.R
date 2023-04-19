@@ -3,11 +3,11 @@ library(shinyjs)
 
 shinyUI(
   pageWithSidebar(
-    headerPanel("MinSNPs Analysis"),
+    headerPanel("MinSNPs Analysis v0.0.4"),
 
     sidebarPanel(
       shinyjs::useShinyjs(),
-      fileInput("file1", "FASTA FILE",
+      fileInput("file1", "FASTA FILE (max 5MB)",
                 accept = c(".fasta", ".fas", ".fa", ".txt")),
       selectInput("metric", "Analysis Mode:",
                   list("%-mode" = "percent",

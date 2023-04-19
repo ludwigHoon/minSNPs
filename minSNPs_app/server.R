@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyjs)
 library(minSNPs)
+library(BiocParallel)
 
 shinyServer(function(input, output, session) {
 
@@ -18,7 +19,7 @@ shinyServer(function(input, output, session) {
     inFile <- input$file1
     if (!is.null(inFile)) {
       analysis_sequences <- read_fasta(inFile$datapath)
-      processed_sequences <- process_allele(analysis_sequences)
+      processed_sequences <- process_allele(analysis_sequences, bp = SerialParam())
       process_mode[["processed_sequences"]] <- processed_sequences
       enable("run")
     } else {
@@ -57,7 +58,8 @@ shinyServer(function(input, output, session) {
         included_positions = as.numeric(input$included_positions),
         excluded_positions = as.numeric(input$excluded_positions),
         number_of_result = input$number_of_result,
-        max_depth = input$max_depth, bp = BiocParallel::MulticoreParam()
+        output_progress = TRUE,
+        max_depth = input$max_depth, bp = SerialParam()
       )
       enable("run")
       shinyjs::hide("status")

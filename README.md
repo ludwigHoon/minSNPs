@@ -4,7 +4,7 @@
 ![last change](https://img.shields.io/github/last-commit/ludwigHoon/MinSNPs)
 
 ***
-For manual, see [here](docs/usermanual.pdf).
+For manual, see [here](https://github.com/ludwigHoon/minSNPs/blob/master/docs/usermanual.pdf).
 
 This is a rebuilt version of minSNPs. Its functionality is similar to the original repository, but has cleaner code and less dependencies.
 

@@ -1,102 +1,225 @@
-source("inference_common.R")
-library(minSNPs)
 library(dplyr)
+library(minSNPs)
 library(BiocParallel)
-library(tictoc)
-args <- commandArgs(trailingOnly = TRUE)
 
-isolate_file <- read.csv("isolate_sim.tsv", sep = "\t",
-    stringsAsFactors = FALSE)
+source("search_string_generation.r")
 
-args <- commandArgs(trailingOnly = TRUE)
-isolate <- isolate_file[as.numeric(args[[1]]), ]
-search_type <- c("hd_200", "all")[as.numeric(args[[2]])]
-seed <- as.numeric(args[[3]])
-search_table <- c("search_hd_200.csv", "search_all.csv")[as.numeric(args[[2]])]
+kmer_table <- read.csv("kmer_table.csv")
+snp_table <- read.csv("snp_table.csv")
+read_length <- read.csv("number_bases_reads.csv")
 
-isolate_name <- isolate$isolate
-isolate$CC
-file_path <- isolate$filename
+snp_matrix <- read_fasta("balanced_mat_without_SRR798725_single_final.fasta")
+names(snp_matrix) <- gsub("_1$", "", names(snp_matrix))
 
-matrix <- read_fasta("balanced_mat_without_SRR798725_single_final.fasta")
-names(matrix) <- unlist(
-    lapply(strsplit(names(matrix), split = "_"), function(x) {
-        return(x[1])
-    }))
+kmer_table[grepl("pvl", kmer_table$match_gene), "match_gene"] <- "pvl_p"
+kmer_table[grepl("mecA", kmer_table$match_gene), "match_gene"] <- "mecA"
+kmer_table[grepl("lukS", kmer_table$string_id), "match_gene"] <- "lukS"
 
-print(search_table)
-searches <- read.csv(search_table, stringsAsFactors = FALSE)
+arguments <- list(kmer =
+    list(kmer_table = kmer_table,
+        min_match = list(
+            mecA = 155,
+            pvl_p = 315,
+            lukS = 30,
+            lukF = 70
+        )),
+    snp = list(snp_table = snp_table, snp_matrix = snp_matrix))
 
-bp_backend <- BiocParallel::SerialParam()
+all_sim_out <- paste0(
+    gsub(".fastq", "", list.files(pattern = "*fastq")),
+    ".*.csv")
 
-## echo "sim_id,step,length,elapsed" > time_taken.csv
-sim_id <- paste(isolate_name, search_type, seed, sep = "_")
+n_bases_all <- read.csv("n_bases_all.csv", stringsAsFactors = FALSE)
 
-
-fq_data <- get_data(file_path)
-all_reads <- length(fq_data)
-sampled <- sample(seq_len(all_reads))
-res_file <- paste("./result/", sim_id, ".csv", sep = "")
-
-i <- 1
-sampled_set <- c()
-temp_result_list <- list()
-while (TRUE) {
-    sampled_set <- c(sampled_set, sampled[i])
-    temp_data <- paste(fq_data[sampled[i]], collapse = "")
-    tic()
-    re <- matched_snp(temp_data, searches)
-    re$isolate <- rep(isolate_name, nrow(re))
-    re$read_id <- rep(i, nrow(re))
-    if (nrow(re) == 0) {
-        re$count <- rep(i, nrow(re))
+sim <- function(sim_iso, seed) {
+    fname <- gsub("\\.\\*\\.csv", "", sim_iso)
+    set.seed(seed)
+    sim <- list.files(path = "./temp_results", pattern = sim_iso)
+    reordered <- sample(sim, length(sim))
+    if (length(reordered) < 500) {
+        return(NA)
     }
-    temp_result <- re
-    temp_result_list[[i]] <- temp_result
-    s1_rt <- toc()
-    rt_1 <- unname(s1_rt$toc - s1_rt$tic)
-    cat(paste(
-        paste(sim_id, 1, 1, rt_1, sep = ","),
-        "\n", sep = ""), file =
-            paste("./time_taken/time_taken_", sim_id, ".csv", sep = ""),
-        append = TRUE)
-
-    tic()
-    all_result <- do.call(rbind, temp_result_list)
-    all_result$snp_id <- as.character(all_result$snp_id)
-    all_result$count <- as.numeric(all_result$count)
-    transformed_table <- combine_snps(all_result, matrix)
-    temp <- infer_most_likely(transformed_table)
-    most_likely <- temp$most_likely
-    snp_count <- temp$snp_count
-    n_candidate <- temp$n_candidate
-    min_diff <- temp$min_diff
-    n_groups <- temp$group_count
-    group_diffs <- temp$group_diff
-    cat(paste(paste(isolate_name, length(sampled_set),
-            paste("\"", paste(most_likely, collapse = ", "), "\"", sep = ""),
-            snp_count, n_candidate, min_diff, n_groups, group_diffs,
-        sep = ","), "\n"), file = res_file, append = TRUE)
-    s2_rt <- toc()
-    rt_2 <- unname(s2_rt$toc - s2_rt$tic)
-    cat(paste(
-        paste(sim_id, 2, length(sampled_set), rt_2, sep = ","),
-        "\n", sep = ""), 
-        file = paste("./time_taken/time_taken_", sim_id, ".csv", sep = ""),
-        append = TRUE)
-
-    i <- i + 1
-    if (i > length(sampled)) {
-        break
+    sampling <- c(seq(10, 190, 10),
+        seq(200, 490, 50),
+        seq(500, length(reordered), 100))
+    if (tail(sampling, n = 1) != length(reordered)) {
+        sampling <- c(sampling, length(reordered))
     }
-    if (search_type == "all") {
-        if (snp_count >= 300 && min_diff >= 100 && length(most_likely) == 1) {
-            break
+    sim_result <- bplapply(sampling, function(i){
+        total_read_bases <- sum(as.numeric(
+            unlist(
+                lapply(
+                strsplit(
+                    gsub(".csv", "", reordered[1:i]), split = "_"),
+                `[`, 4)
+            )
+        ))
+        t_results <- lapply(reordered[1:i], function(f){
+            read.csv(paste0("./temp_results", "/", f))
+        })
+        t_results <- do.call(rbind, t_results)
+        t_results <- merge(t_results, n_bases_all)
+        result <- collapse_result(t_results, arguments = arguments,
+            bp_per_type = SerialParam())
+
+        sim_result <- data.frame(file = fname,
+            n_read = i,
+            n_bases = total_read_bases)
+        CC_count <- table(result[["snp"]][["matched"]])
+        T5_CC <- head(CC_count[order(CC_count, decreasing = TRUE)], n = 5)
+        #sim_result$T5_ST <- paste(names(T5_ST), collapse = "_")
+        #sim_result$T5_ST_match_count <- paste(T5_ST, collapse = "_")
+        for (i in 1:5) {
+            sim_result[paste0("T", i, "_CC")] <- ifelse(
+                is.null(names(T5_CC)[i]),
+                NA,
+                names(T5_CC)[i])
+            sim_result[paste0("T", i, "_CC_match_count")] <- T5_CC[i]
         }
-    }
-    if (search_type == "hd_200") {
-        if (snp_count >= 30 && min_diff >= 10 && length(most_likely) == 1) {
-            break
+        kmer_res <- result[["kmer"]]
+        for (gene in unique(kmer_table$match_gene)){
+            if (is.null(kmer_res[kmer_res$gene == gene, ])) {
+                sim_result[[paste(gene, "total", sep = "_")]] <- 0
+                sim_result[[paste(gene, "n_unique_kmer", sep = "_")]] <- 0
+            } else {
+                sim_result[[paste(gene, "total", sep = "_")]] <-
+                    ifelse(
+                    identical(kmer_res[kmer_res$gene == gene, "total_count"],
+                            integer(0)),
+                        0, kmer_res[kmer_res$gene == gene, "total_count"])
+                sim_result[[paste(gene, "n_unique_kmer", sep = "_")]] <-
+                    ifelse(
+                    identical(kmer_res[kmer_res$gene == gene,
+                            "unique_kmer_count"], integer(0)),
+                        0, kmer_res[kmer_res$gene == gene, "unique_kmer_count"])
+            }
         }
+        return(sim_result)
+    }, BPPARAM = MulticoreParam(workers = 62, progress = TRUE))
+    sim_result <- do.call(rbind, sim_result)
+    return(sim_result)
+}
+
+sim_2 <- function(sim_iso, seed){
+    fname <- gsub("\\.\\*\\.csv", "", sim_iso)
+    set.seed(seed)
+    sim <- list.files(path = "./temp_results", pattern = sim_iso)
+    reordered <- sample(sim, length(sim))
+    if (length(reordered) < 500) {
+        return(NA)
     }
+    sampling <- c(seq(10, 190, 10),
+        seq(200, 490, 50),
+        seq(500, length(reordered), 100))
+    if (tail(sampling, n = 1) != length(reordered)) {
+        sampling <- c(sampling, length(reordered))
+    }
+    sim_result <- bplapply(sampling, function(i){
+        total_read_bases <- sum(as.numeric(
+            unlist(
+                lapply(
+                strsplit(
+                    gsub(".csv", "", reordered[1:i]), split = "_"),
+                `[`, 4)
+            )
+        ))
+        t_results <- lapply(reordered[1:i], function(f){
+            read.csv(paste0("./temp_results", "/", f))
+        })
+        t_results <- do.call(rbind, t_results)
+        t_results <- merge(t_results, n_bases_all)
+        result <- collapse_result(t_results, matched_type_functions =
+            list(snp = analyse_snps_matches, kmer = analyse_kmer_matches_2),
+            arguments = arguments,
+            bp_per_type = SerialParam())
+
+        sim_result <- data.frame(file = fname,
+            n_read = i,
+            n_bases = total_read_bases)
+        CC_count <- table(result[["snp"]][["matched"]])
+        T5_CC <- head(CC_count[order(CC_count, decreasing = TRUE)], n = 5)
+        #sim_result$T5_ST <- paste(names(T5_ST), collapse = "_")
+        #sim_result$T5_ST_match_count <- paste(T5_ST, collapse = "_")
+        for (i in 1:5) {
+            sim_result[paste0("T", i, "_CC")] <- ifelse(
+                is.null(names(T5_CC)[i]),
+                NA,
+                names(T5_CC)[i])
+            sim_result[paste0("T", i, "_CC_match_count")] <- T5_CC[i]
+        }
+        kmer_res <- result[["kmer"]]
+        for (gene in unique(kmer_table$match_gene)){
+            if (is.null(kmer_res[kmer_res$gene == gene, ])) {
+                sim_result[[paste(gene, "total", sep = "_")]] <- 0
+                sim_result[[paste(gene, "n_unique_kmer", sep = "_")]] <- 0
+            } else {
+                sim_result[[paste(gene, "total", sep = "_")]] <-
+                    ifelse(
+                    identical(kmer_res[kmer_res$gene == gene, "total_count"],
+                            integer(0)),
+                        0, kmer_res[kmer_res$gene == gene, "total_count"])
+                sim_result[[paste(gene, "n_unique_kmer", sep = "_")]] <-
+                    ifelse(
+                    identical(kmer_res[kmer_res$gene == gene,
+                            "unique_kmer_count"], integer(0)),
+                        0, kmer_res[kmer_res$gene == gene, "unique_kmer_count"])
+            }
+        }
+        return(sim_result)
+    }, BPPARAM = MulticoreParam(workers = 62, progress = TRUE))
+    sim_result <- do.call(rbind, sim_result)
+    return(sim_result)
+}
+
+sim_kmer_only <- function(sim_iso, seed, arguments_list) {
+    fname <- gsub("\\.\\*\\.csv", "", sim_iso)
+    set.seed(seed)
+    sim <- list.files(path = "./temp_results", pattern = sim_iso)
+    reordered <- sample(sim, length(sim))
+    if (length(reordered) < 500) {
+        return(NA)
+    }
+    sampling <- c(seq(10, 190, 10),
+        seq(200, 490, 50),
+        seq(500, length(reordered), 100))
+    if (tail(sampling, n = 1) != length(reordered)) {
+        sampling <- c(sampling, length(reordered))
+    }
+
+    sim_result <- bplapply(sampling, function(i) {
+        t_results <- lapply(reordered[1:i], function(f){
+            read.csv(paste0("./temp_results", "/", f))
+        })
+        t_results <- do.call(rbind, t_results)
+        result <- collapse_result(t_results,
+            matched_type_functions = list(kmer = analyse_kmer_matches),
+            arguments = arguments_list,
+            bp_per_type = SerialParam())
+
+        sim_result <- data.frame(file = fname,
+            n_read = i)
+        kmer_res <- result[["kmer"]]
+        for (gene in names(arguments_list$kmer$min_match)){
+            sim_result[[paste(gene, "min_match", sep = "_")]] <-
+                arguments_list$kmer$min_match
+            if (is.null(kmer_res[kmer_res$gene == gene, ])) {
+                sim_result[[paste(gene, "total", sep = "_")]] <- 0
+                sim_result[[paste(gene, "n_unique_kmer", sep = "_")]] <- 0
+            } else {
+                sim_result[[paste(gene, "total", sep = "_")]] <-
+                    ifelse(
+                    identical(kmer_res[kmer_res$gene == gene, "total_count"],
+                            integer(0)),
+                        0, kmer_res[kmer_res$gene == gene, "total_count"])
+                sim_result[[paste(gene, "n_unique_kmer", sep = "_")]] <-
+                    ifelse(
+                    identical(kmer_res[kmer_res$gene == gene,
+                            "unique_kmer_count"], integer(0)),
+                        0, kmer_res[kmer_res$gene == gene, "unique_kmer_count"])
+            }
+        }
+        return(sim_result)
+    }, BPPARAM = MulticoreParam(workers = 62, progress = TRUE))
+    sim_result <- do.call(rbind, sim_result)
+    return(sim_result)
 }

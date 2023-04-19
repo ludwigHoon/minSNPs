@@ -85,7 +85,7 @@ generate_snp_search_string <-
 
     # Take the first sequence of the reference genome
     # if there are multiple sequences
-    if (class(ref_seq) == "list") {
+    if (inherits(ref_seq, "list")) {
         ref_seq <- ref_seq[[1]]
     }
     if (position_type == "fasta") {
