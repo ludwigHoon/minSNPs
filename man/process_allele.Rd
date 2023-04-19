@@ -7,6 +7,8 @@
 process_allele(
   seqc,
   bp = BiocParallel::SerialParam(),
+  check_length = TRUE,
+  check_bases = TRUE,
   dash_ignore = TRUE,
   accepted_char = c("A", "C", "T", "G"),
   ignore_case = TRUE,
@@ -20,6 +22,10 @@ use provided read_fasta to import the fasta file.}
 
 \item{bp}{is the biocparallel backend, default to serialParam,
 most likely sufficient in most scenario}
+
+\item{check_length}{Check the length of each sample in the matrix, default to TRUE}
+
+\item{check_bases}{Check the bases of each sample in the matrix, default to TRUE}
 
 \item{dash_ignore}{whether to treat '-' as another type}
 

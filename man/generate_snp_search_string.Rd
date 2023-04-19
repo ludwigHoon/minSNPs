@@ -24,6 +24,8 @@ reference genome positions and orthologous SNP matrix positions}
 
 \item{ref_seq}{the reference genome sequence}
 
+\item{snp_matrix}{the orthologous SNP matrix}
+
 \item{prev}{number of characters before the SNP}
 
 \item{after}{number of characters after the SNP}

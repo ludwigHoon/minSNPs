@@ -20,7 +20,7 @@ the longer length is taken as normal should there be 2 modes."><!-- mathjax --><
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
       </span>
     </div>
 
@@ -75,6 +75,8 @@ the longer length is taken as normal should there be 2 modes.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">process_allele</span><span class="op">(</span>
   <span class="va">seqc</span>,
   bp <span class="op">=</span> <span class="fu">BiocParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/SerialParam-class.html" class="external-link">SerialParam</a></span><span class="op">(</span><span class="op">)</span>,
+  check_length <span class="op">=</span> <span class="cn">TRUE</span>,
+  check_bases <span class="op">=</span> <span class="cn">TRUE</span>,
   dash_ignore <span class="op">=</span> <span class="cn">TRUE</span>,
   accepted_char <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"C"</span>, <span class="st">"T"</span>, <span class="st">"G"</span><span class="op">)</span>,
   ignore_case <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -93,6 +95,14 @@ use provided read_fasta to import the fasta file.</p></dd>
 <dt>bp</dt>
 <dd><p>is the biocparallel backend, default to serialParam,
 most likely sufficient in most scenario</p></dd>
+
+
+<dt>check_length</dt>
+<dd><p>Check the length of each sample in the matrix, default to TRUE</p></dd>
+
+
+<dt>check_bases</dt>
+<dd><p>Check the bases of each sample in the matrix, default to TRUE</p></dd>
 
 
 <dt>dash_ignore</dt>

@@ -1,3 +1,6 @@
+# minSNPs v0.0.4
+Fixed bug in `find_optimised_snps` when there are included SNPs.
+
 # minSNPs v0.0.3
 Minor changes & bug removal
 

@@ -7,6 +7,7 @@
 read_sequences_from_fastq(
   fastq_file,
   force_to_upper = TRUE,
+  quality_offset = 33,
   bp = MulticoreParam()
 )
 }
@@ -16,10 +17,12 @@ read_sequences_from_fastq(
 \item{force_to_upper}{whether to transform sequences
 to upper case, default to TRUE}
 
+\item{quality_offset}{the quality offset to use, default to 33}
+
 \item{bp}{BiocParallel backend to use for parallelization}
 }
 \value{
-will return a list of sequences
+will return a list of sequences, with qualities as attribute
 }
 \description{
 \code{read_sequences_from_fastq} get the sequences

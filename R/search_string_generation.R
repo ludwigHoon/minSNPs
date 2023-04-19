@@ -64,6 +64,7 @@ generate_kmer_search_string <- function(gene_seq, k,
 #' \code{generate_snp_search_string} identify the SNPs that will overlap
 #' the search strings generated from the targeted SNPs
 #' @param selected_snps list of targeted SNPs
+#' @param snp_matrix the orthologous SNP matrix
 #' @param position_reference the mapping between
 #' reference genome positions and orthologous SNP matrix positions
 #' @param ref_seq the reference genome sequence
@@ -218,6 +219,7 @@ identify_overlaps <- function(
 #' \code{extend_length} extend the search sequence such that
 #' there will always be (prev) bases before the SNPs and
 #' (after) bases after the SNPs.
+#' @param overlaps Overlappings
 #' @param position_reference the mapping of position
 #' in SNP matrix to reference genome
 #' @param genome_position the position of the SNP in the reference genome

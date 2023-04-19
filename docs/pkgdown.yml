@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   MinSNPs_Workflow: MinSNPs_Workflow.html
   user_manual: user_manual.html
-last_built: 2022-09-05T06:14Z
+last_built: 2023-04-19T04:40Z
 urls:
   reference: https://ludwighoon.github.io/minSNPs/reference
   article: https://ludwighoon.github.io/minSNPs/articles

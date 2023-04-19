@@ -4,7 +4,7 @@
 \alias{get_positions_to_search}
 \title{\code{get_positions_to_search}}
 \usage{
-get_positions_to_search(seqc_len, excluded_pos, traversed)
+get_positions_to_search(seqc_len, excluded_pos, traversed, bp)
 }
 \arguments{
 \item{seqc_len}{length of the matrix}
@@ -12,6 +12,8 @@ get_positions_to_search(seqc_len, excluded_pos, traversed)
 \item{excluded_pos}{vector of excluded positions}
 
 \item{traversed}{vector of positions that is previously selected}
+
+\item{bp}{BiocParallel backend}
 }
 \value{
 Will return a list of positions to search through

@@ -16,31 +16,27 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(minSNPs)
-library(Biostrings) # optional
 library(BiocParallel) # optional, but needed for parallel processing
 ```
 ## Reading & processing input for further analysis
 `read_fasta` is provided as a way to read fasta file, equivalent function, e.g.,
 from `Biostrings` and `read.fasta` from `seqinr` can be used.
 ```{r}
-isolates_from_biostring <- readBStringSet(
-  system.file("extdata", "Chlamydia_mapped.fasta", package = "minSNPs"))
 isolates_from_default <- read_fasta(
   system.file("extdata", "Chlamydia_mapped.fasta", package = "minSNPs"))
-processed_from_biostring <- process_allele(isolates_from_biostring)
 processed_from_default <- process_allele(isolates_from_default)
 ```
 Subsequent analyses can use output from `process_allele`.
 
 ## Identifying SNPs with high Simpson's index
 ```{r}
-high_d_snps <- find_optimised_snps(seqc = processed_from_biostring,
+high_d_snps <- find_optimised_snps(seqc = processed_from_default,
   metric = "simpson", number_of_result = 1, max_depth = 1,
   included_positions = c(), excluded_positions = c())
 ```
 ## Identifying SNPs discriminating a group of interest
 ```{r}
-discriminating_snps <- find_optimised_snps(seqc = processed_from_biostring,
+discriminating_snps <- find_optimised_snps(seqc = processed_from_default,
   metric = "percent", number_of_result = 1, max_depth = 1,
   included_positions = c(), excluded_positions = c(),
   goi = c("A_D213", "H_S1432"))

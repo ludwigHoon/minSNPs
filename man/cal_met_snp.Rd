@@ -4,7 +4,7 @@
 \alias{cal_met_snp}
 \title{\code{cal_met_snp}}
 \usage{
-cal_met_snp(position, metric, seqc, ...)
+cal_met_snp(position, metric, seqc, prepend_position = c(), ...)
 }
 \arguments{
 \item{position}{position to check}
@@ -13,6 +13,8 @@ cal_met_snp(position, metric, seqc, ...)
 
 \item{seqc}{list of sequences, either passed directly from
 \code{process_allele} or \code{read_fasta} or equivalence}
+
+\item{prepend_position}{is the position to be added to the}
 
 \item{...}{other parameters as needed}
 }

@@ -9,3 +9,8 @@
 ^Meta$
 ^MinSNPs_app
 ^WIP
+^.lintr
+^vignettes/.build.timestamp
+^.devcontainer
+^.vscode
+^pkgdown

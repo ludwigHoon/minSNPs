@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
       </span>
     </div>
 
@@ -66,7 +66,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cal_met_snp</span><span class="op">(</span><span class="va">position</span>, <span class="va">metric</span>, <span class="va">seqc</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cal_met_snp</span><span class="op">(</span><span class="va">position</span>, <span class="va">metric</span>, <span class="va">seqc</span>, prepend_position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -82,6 +82,10 @@
 <dt>seqc</dt>
 <dd><p>list of sequences, either passed directly from
 <code>process_allele</code> or <code>read_fasta</code> or equivalence</p></dd>
+
+
+<dt>prepend_position</dt>
+<dd><p>is the position to be added to the</p></dd>
 
 
 <dt>...</dt>

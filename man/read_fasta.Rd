@@ -4,13 +4,16 @@
 \alias{read_fasta}
 \title{\code{read_fasta}}
 \usage{
-read_fasta(file, force_to_upper = TRUE)
+read_fasta(file, force_to_upper = TRUE, bp = SerialParam())
 }
 \arguments{
 \item{file}{file path}
 
 \item{force_to_upper}{whether to transform sequences
 to upper case, default to TRUE}
+
+\item{bp}{is the biocparallel backend, default to serialParam,
+most likely sufficient in most scenario}
 }
 \value{
 Will return list of named character vectors.

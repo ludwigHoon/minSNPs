@@ -18,7 +18,7 @@ to loop through, used by branch_and_search and find_optimised_snps"><!-- mathjax
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@ to loop through, used by <code>branch_and_search</code> and <code>find_optimised
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_positions_to_search</span><span class="op">(</span><span class="va">seqc_len</span>, <span class="va">excluded_pos</span>, <span class="va">traversed</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_positions_to_search</span><span class="op">(</span><span class="va">seqc_len</span>, <span class="va">excluded_pos</span>, <span class="va">traversed</span>, <span class="va">bp</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -83,6 +83,10 @@ to loop through, used by <code>branch_and_search</code> and <code>find_optimised
 
 <dt>traversed</dt>
 <dd><p>vector of positions that is previously selected</p></dd>
+
+
+<dt>bp</dt>
+<dd><p>BiocParallel backend</p></dd>
 
 </dl></div>
     <div id="value">

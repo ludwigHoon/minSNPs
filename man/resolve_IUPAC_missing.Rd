@@ -11,7 +11,8 @@ resolve_IUPAC_missing(
   max_ambiguity = -1,
   replace_method = "random",
   N_is_any_base = FALSE,
-  output_progress = TRUE
+  output_progress = TRUE,
+  bp = MulticoreParam()
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ current supported methods:random and most_common, default to "random".}
 with one of the alleles found at the position.}
 
 \item{output_progress}{whether to output progress}
+
+\item{bp}{the BiocParallel backend}
 }
 \value{
 Will return the processed sequences.

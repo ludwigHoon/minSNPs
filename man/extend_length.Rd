@@ -17,6 +17,8 @@ extend_length(
 )
 }
 \arguments{
+\item{overlaps}{Overlappings}
+
 \item{position_reference}{the mapping of position
 in SNP matrix to reference genome}
 

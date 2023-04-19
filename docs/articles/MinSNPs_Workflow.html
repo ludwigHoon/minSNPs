@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
       </span>
     </div>
 
@@ -93,56 +93,15 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ludwigHoon/minSNPs" class="external-link">minSNPs</a></span><span class="op">)</span>
-<span class="co">#&gt; The minSNPs version loaded is: 0.0.3</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">Biostrings</span><span class="op">)</span> <span class="co"># optional</span>
-<span class="co">#&gt; Loading required package: BiocGenerics</span>
-<span class="co">#&gt; Loading required package: parallel</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'BiocGenerics'</span>
-<span class="co">#&gt; The following objects are masked from 'package:parallel':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,</span>
-<span class="co">#&gt;     clusterExport, clusterMap, parApply, parCapply, parLapply,</span>
-<span class="co">#&gt;     parLapplyLB, parRapply, parSapply, parSapplyLB</span>
-<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     IQR, mad, sd, var, xtabs</span>
-<span class="co">#&gt; The following objects are masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     anyDuplicated, append, as.data.frame, basename, cbind, colnames,</span>
-<span class="co">#&gt;     dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,</span>
-<span class="co">#&gt;     grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,</span>
-<span class="co">#&gt;     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span>
-<span class="co">#&gt;     rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,</span>
-<span class="co">#&gt;     union, unique, unsplit, which, which.max, which.min</span>
-<span class="co">#&gt; Loading required package: S4Vectors</span>
-<span class="co">#&gt; Loading required package: stats4</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'S4Vectors'</span>
-<span class="co">#&gt; The following object is masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     expand.grid</span>
-<span class="co">#&gt; Loading required package: IRanges</span>
-<span class="co">#&gt; Loading required package: XVector</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'Biostrings'</span>
-<span class="co">#&gt; The following object is masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     strsplit</span>
+<span class="co">#&gt; The minSNPs version loaded is: 0.0.4</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Bioconductor/BiocParallel" class="external-link">BiocParallel</a></span><span class="op">)</span> <span class="co"># optional, but needed for parallel processing</span></code></pre></div>
 <div class="section level2">
 <h2 id="reading-processing-input-for-further-analysis">Reading &amp; processing input for further analysis<a class="anchor" aria-label="anchor" href="#reading-processing-input-for-further-analysis"></a>
 </h2>
 <p><code>read_fasta</code> is provided as a way to read fasta file, equivalent function, e.g., from <code>Biostrings</code> and <code>read.fasta</code> from <code>seqinr</code> can be used.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">isolates_from_biostring</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Biostrings/man/XStringSet-io.html" class="external-link">readBStringSet</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">isolates_from_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_fasta.html">read_fasta</a></span><span class="op">(</span>
   <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"Chlamydia_mapped.fasta"</span>, package <span class="op">=</span> <span class="st">"minSNPs"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">isolates_from_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_fasta.html">read_fasta</a></span><span class="op">(</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"Chlamydia_mapped.fasta"</span>, package <span class="op">=</span> <span class="st">"minSNPs"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">processed_from_biostring</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/process_allele.html">process_allele</a></span><span class="op">(</span><span class="va">isolates_from_biostring</span><span class="op">)</span>
-<span class="co">#&gt; Ignored samples: </span>
-<span class="co">#&gt;  </span>
-<span class="co">#&gt; Ignored  0  positions</span>
 <span class="va">processed_from_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/process_allele.html">process_allele</a></span><span class="op">(</span><span class="va">isolates_from_default</span><span class="op">)</span>
 <span class="co">#&gt; Ignored samples: </span>
 <span class="co">#&gt;  </span>
@@ -153,18 +112,18 @@
 <h2 id="identifying-snps-with-high-simpsons-index">Identifying SNPs with high Simpson’s index<a class="anchor" aria-label="anchor" href="#identifying-snps-with-high-simpsons-index"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">high_d_snps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/find_optimised_snps.html">find_optimised_snps</a></span><span class="op">(</span>seqc <span class="op">=</span> <span class="va">processed_from_biostring</span>,
+<code class="sourceCode R"><span class="va">high_d_snps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/find_optimised_snps.html">find_optimised_snps</a></span><span class="op">(</span>seqc <span class="op">=</span> <span class="va">processed_from_default</span>,
   metric <span class="op">=</span> <span class="st">"simpson"</span>, number_of_result <span class="op">=</span> <span class="fl">1</span>, max_depth <span class="op">=</span> <span class="fl">1</span>,
-  included_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>, excluded_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+  included_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>, excluded_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="identifying-snps-discriminating-a-group-of-interest">Identifying SNPs discriminating a group of interest<a class="anchor" aria-label="anchor" href="#identifying-snps-discriminating-a-group-of-interest"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">discriminating_snps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/find_optimised_snps.html">find_optimised_snps</a></span><span class="op">(</span>seqc <span class="op">=</span> <span class="va">processed_from_biostring</span>,
+<code class="sourceCode R"><span class="va">discriminating_snps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/find_optimised_snps.html">find_optimised_snps</a></span><span class="op">(</span>seqc <span class="op">=</span> <span class="va">processed_from_default</span>,
   metric <span class="op">=</span> <span class="st">"percent"</span>, number_of_result <span class="op">=</span> <span class="fl">1</span>, max_depth <span class="op">=</span> <span class="fl">1</span>,
-  included_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>, excluded_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,
-  goi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A_D213"</span>, <span class="st">"H_S1432"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+  included_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>, excluded_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,
+  goi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A_D213"</span>, <span class="st">"H_S1432"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="displayingsaving-result">Displaying/saving result<a class="anchor" aria-label="anchor" href="#displayingsaving-result"></a>

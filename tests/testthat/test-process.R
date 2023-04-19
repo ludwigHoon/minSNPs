@@ -12,20 +12,6 @@ setup_built_in_read <- function() {
   return(built_in_env)
 }
 
-setup_biostrings <- function() {
-  built_in_env <- new.env()
-  chlamydia <- Biostrings::readBStringSet(file =
-    system.file("extdata", "Chlamydia_mapped.fasta", package = "minSNPs"))
-  error_file_1 <- Biostrings::readBStringSet(file =
-    system.file("extdata", "Chlamydia_1.fasta", package = "minSNPs"))
-  error_file_2 <- Biostrings::readBStringSet(file =
-    system.file("extdata", "Chlamydia_2.fasta", package = "minSNPs"))
-  built_in_env$chlamydia <- chlamydia
-  built_in_env$error_file_1 <- error_file_1
-  built_in_env$error_file_2 <- error_file_2
-  return(built_in_env)
-}
-
 set_test <- function(tests) {
 
   def_env <- setup_built_in_read()
@@ -35,12 +21,6 @@ set_test <- function(tests) {
     }
   )
 
-  bstring_env <- setup_biostrings()
-  withr::with_environment(
-    bstring_env, {
-      tests()
-    }
-  )
 }
 
 test_that("read fasta file", {

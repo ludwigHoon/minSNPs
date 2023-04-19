@@ -236,147 +236,6 @@ get_metric_fun <- function(metric_name = "") {
     return(MinSNPs_metrics[[metric_name]])
 }
 
-#' \code{find_optimised_snps}
-#'
-#' @description
-#' \code{find_optimised_snps} is used to find optimised SNPs set.
-#' @param seqc list of sequences, either passed directly from
-#' \code{process_allele} or \code{read_fasta} or equivalence
-#' @param bp BiocParallel backend.
-#' Rule of thumbs: use MulticoreParam(workers = ncpus - 2)
-#' @param metric either `simpson` or `percent`
-#' @param goi group of interest, if creteria is percent,
-#' must be specified, ignored otherwise
-#' @param accept_multiallelic whether include positions with > 1 state in goi
-#' @param number_of_result number of results to return, 0 will be coerced to 1
-#' @param max_depth maximum depth to go before terminating,
-#' 0 means it will only calculate the metric for included position
-#' @param included_positions included positions
-#' @param excluded_positions excluded positions
-#' @param iterate_included whether to calculate index
-#' at each level of the included SNPs
-#' @param ... other parameters as needed
-#' @importFrom BiocParallel SerialParam bplapply
-#' @return Will return the resolution-optimised SNPs set, based on the metric.
-#' @export
-find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
-    accept_multiallelic = TRUE, number_of_result = 1, max_depth = 1,
-    included_positions = c(), excluded_positions = c(),
-    iterate_included = FALSE, bp = SerialParam(), ...) {
-
-    # Define parameters
-    if (inherits(seqc, "processed_seqs")) {
-        all_length <- unlist(bplapply(seqc[["seqc"]], length, BPPARAM = bp))
-    } else {
-        all_length <- unlist(bplapply(seqc, length, BPPARAM = bp))
-    }
-
-    if (length(unique(all_length)) > 1) {
-        warning("Sequences are not of the same length; ",
-        "Only the first ", min(all_length), " positions will be used")
-    }
-
-    positions <- seq_len(min(all_length))
-    result <- list()
-    original_excluded <- excluded_positions
-    included <- ifelse(length(included_positions) > 0, TRUE, FALSE)
-    included_reached_1 <- FALSE
-    additional_exclude <- numeric()
-    # Automatically exclude ignored positions from processed sequences
-    if (inherits(seqc, "processed_seqs")) {
-        excluded_positions <- c(excluded_positions, seqc[["ignored_position"]])
-        sequences <- seqc[["seqc"]]
-    } else {
-        sequences <- seqc
-    }
-    positions <- positions[! positions %in% excluded_positions]
-
-    # Add multiallelic position to exclusion if percent mode
-    if (!accept_multiallelic) {
-        additional_exclude <- bplapply(positions, check_multistate,
-            seqc[goi], BPPARAM = bp)
-        names(additional_exclude) <- positions
-        additional_exclude <- additional_exclude[additional_exclude == TRUE]
-        additional_exclude <- as.numeric(names(additional_exclude))
-        positions <- positions[! positions %in%
-            additional_exclude]
-    }
-
-    # Check if any of the included positions are in excluded positions
-    if (any(included_positions %in% excluded_positions)) {
-        errors <- included_positions[included_positions %in% excluded_positions]
-        stop(paste(errors, collapse = ", "),
-            " found in both included & excluded positions")
-    }
-
-    # Check if all required parameters are provided
-    all_parameters <- list(...)
-    all_parameters[["goi"]] <- goi
-
-    metric_fun <- get_metric_fun(metric)[["calc"]]
-    check_args <- get_metric_fun(metric)[["args"]]
-    if (! is.null(check_args)) {
-        if (! check_args(all_parameters)) {
-            stop("GOI must be defined in percent mode")
-        }
-    }
-
-    # Perform analysis on the included positions first
-    # existing_pattern <- list()
-    if (included) {
-        if (iterate_included) {
-            iterations <- list()
-            for (n in seq_along(included_positions)) {
-                iterations[[n]] <- included_positions[1:n]
-            }
-            scores <- bplapply(iterations, cal_met_snp, metric = metric_fun,
-                seqc = sequences, all_parameters, BPPARAM = bp)
-
-            #existing_pattern <- scores[[
-            #    length(included_positions)]][["patterns"]]
-            scores <- bplapply(scores, function(score) {
-                return(score[["result"]])
-            }, BPPARAM = bp)
-            names(scores) <- bplapply(iterations, paste, collapse = ", ",
-                BPPARAM = bp)
-            result <- scores
-        } else {
-            score <- cal_met_snp(included_positions, metric_fun,
-                    sequences, all_parameters)
-            result[[paste(included_positions, collapse = ", ")]] <-
-                score[["result"]]
-            #existing_pattern <- score[["patterns"]]
-        }
-    excluded_positions <- c(excluded_positions, included_positions)
-    if (result[[paste(included_positions, collapse = ", ")]] >= 1) {
-            included_reached_1 <- TRUE
-        }
-    }
-
-    if (max_depth == 0 ||
-        included_reached_1
-        ) {
-        all_result <- list(result = result)
-    } else {
-        #all_parameters[["existing_pattern"]] <- existing_pattern
-        branch_result <- branch_and_search(included_positions,
-            c(additional_exclude, excluded_positions),  sequences, metric_fun,
-            number_of_result, max_depth,
-            bp, all_parameters)
-        all_result <- bplapply(branch_result, function(branch_r, inc_r) {
-            return(c(inc_r, branch_r))
-        }, inc_r = result, BPPARAM = SerialParam())
-    }
-
-    return(list(results = all_result,
-        excluded_positions = sort(unique(
-            c(additional_exclude, original_excluded))),
-        included_positions = included_positions,
-        seqc_name = deparse(substitute(seqc)), goi = goi,
-        all_sequences = names(sequences),
-        max_depth = max_depth, metric = metric))
-}
-
 #' \code{get_positions_to_search}
 #'
 #' @description
@@ -389,7 +248,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
 #' @keywords internal
 #' @importFrom BiocParallel bplapply SerialParam
 #' @return Will return a list of positions to search through
-get_positions_to_search <- function(seqc_len, excluded_pos, traversed) {
+get_positions_to_search <- function(seqc_len, excluded_pos, traversed, bp) {
     positions <- seq_len(seqc_len)
     positions <- as.list(positions[! positions %in% c(excluded_pos, traversed)])
     positions <- bplapply(positions, function(pos){
@@ -428,7 +287,7 @@ branch_and_search <- function(starting_positions = c(),
     positions <- get_positions_to_search(length(seqc[[1]]),
         excluded_positions, starting_positions, bp = bp)
     scores <- bplapply(positions,
-        cal_met_snp, metric = metric, seqc = seqc,
+        cal_met_snp, metric = metric, seqc = seqc, prepend_position = c(),
         additional_args,
             BPPARAM = bp)
     depth_1 <- bplapply(scores, function(score) {
@@ -494,10 +353,10 @@ branch_and_search <- function(starting_positions = c(),
             #additional_args[["existing_pattern"]] <- existing_pattern[[1]]
             positions <- get_positions_to_search(length(seqc[[1]]),
                 c(excluded_positions, selected_positions[1]),
-                traversed[[1]])
+                traversed[[1]], bp)
 
             scores <- bplapply(positions,
-                cal_met_snp, metric = metric, seqc = seqc,
+                cal_met_snp, metric = metric, seqc = seqc, c(),
                 additional_args,
                     BPPARAM = bp)
             depth_1 <- bplapply(scores, function(score) {
@@ -543,20 +402,21 @@ check_multistate <- function(position, sequences) {
 #'
 #' @description
 #' \code{cal_met_snp} is used to calculate the metric at each position
+#' @param prepend_position is the position to be added to the
 #' @inheritParams find_optimised_snps
 #' @inheritParams check_multistate
 #' @return return the value at that position,
 #' as well as base pattern for next iteration.
 #' @keywords internal
 #' @export
-cal_met_snp <- function(position, metric, seqc, ...) {
+cal_met_snp <- function(position, metric, seqc, prepend_position = c(), ...) {
     additional_args <- list(...)[[1]]
     if ("existing_pattern" %in% names(additional_args)) {
         append_to <- additional_args[["existing_pattern"]]
     } else {
         append_to <- list()
     }
-    pattern <- generate_pattern(seqc, c(position), append_to)
+    pattern <- generate_pattern(seqc, c(prepend_position, position), append_to)
     if (class(metric) == "character") {
         metric <- get_metric_fun(metric)[["calc"]]
     }
@@ -582,5 +442,257 @@ cal_met_snp <- function(position, metric, seqc, ...) {
                 additional_data = res$additional_data))
         }
     }
-    return(list(result = res$result))#, patterns = pattern)) ## Updated this
+    return(list(result = res$result, positions = c(prepend_position, position)))
+}
+
+#' \code{select_n_set_i_depth}
+#'
+#' @description
+#' \code{select_n_set_i_depth} is the actual function used to
+#' find optimised SNPs set. This function is called by
+#' \code{find_optimised_snps}, after preprocessing.
+#' @inheritParams find_optimised_snps
+#' @param starting_positions the starting positions that is already in
+#' the SNP set.
+#' @param seqc_length the length to iterate through.
+#' @keywords internal
+#' @importFrom BiocParallel SerialParam bplapply
+#' @return Will return the resolution-optimised SNPs set, based on the metric.
+select_n_set_i_depth <- function(starting_positions = c(),
+    excluded_positions = c(), seqc, metric,
+    number_of_result = 1, max_depth = 1, seqc_length, 
+    bp = SerialParam(), ...) {
+
+    additional_args <- list(...)[[1]]
+    
+    traversed <- list()
+    #existing_pattern <- list()
+    output_progress <- ifelse(
+        is.null(additional_args[["output_progress"]]),
+    FALSE, additional_args[["output_progress"]])
+
+    # Calculate the score for the starting positions and select N best
+    positions <- seq_len(seqc_length)
+    positions <- as.list(positions[! positions %in% c(excluded_positions, starting_positions)])
+    scores <- bplapply(positions,
+        cal_met_snp, metric = metric, seqc = seqc,
+        prepend_position = starting_positions, additional_args, 
+            BPPARAM = bp)
+    depth_1 <- bplapply(scores, function(score) {
+            return(score[["result"]])
+    }, BPPARAM = bp)
+    snps_1 <- bplapply(scores, function(score) {
+            return(score[["positions"]])
+    }, BPPARAM = bp)
+
+    # Sorting for selection at this depth
+    names(depth_1) <- snps_1
+    position_order <- order(unlist(depth_1), decreasing = TRUE)
+    
+    selected_positions <- numeric()
+
+    multi_result <- list()
+    result_d1 <- list()
+    # For each result, create the 1st selected SNP
+    for (n in seq_len(number_of_result)) {
+        result_d1[[n]] <- list()
+        traversed[[n]] <- c(
+            snps_1[position_order[n]][[1]])
+        result_d1[[n]][[
+                paste(traversed[[n]], collapse = ", ")]] <-
+                    depth_1[position_order][[n]]
+        selected_positions <- c(selected_positions,
+            positions[position_order[n]][[1]])
+    }
+    if (output_progress) {
+        first_pos <- paste(sapply(positions[position_order[1:number_of_result]], `[[`, 1), collapse = ", ")
+        cat("First SNPs for results are: ", first_pos, "\n")
+    }
+    for (n in seq_len(number_of_result)) {
+        current_level <- length(starting_positions) + 1
+        current_selected_positions <- c()
+        while (((current_level - length(starting_positions)) < max_depth) &&
+               (depth_1[position_order][[n]] < 1)) {
+            
+            ###***
+            positions <- seq_len(seqc_length)
+            positions <- as.list(positions[! positions %in% c(excluded_positions, selected_positions[1:n])])
+            scores <- bplapply(positions,
+                cal_met_snp, metric = metric, seqc = seqc,
+                prepend_position = traversed[[n]], additional_args,
+                    BPPARAM = bp)
+            depth_1 <- bplapply(scores, function(score) {
+                    return(score[["result"]])
+            }, BPPARAM = bp)
+            snps_1 <- bplapply(scores, function(score) {
+                    return(score[["positions"]])
+            }, BPPARAM = bp)
+
+            # Sorting for selection at this depth
+            names(depth_1) <- snps_1
+            position_order <- order(unlist(depth_1), decreasing = TRUE)
+
+            traversed[[n]] <- c(
+                snps_1[position_order[1]][[1]])
+            result_d1[[n]][[
+                    paste(traversed[[n]], collapse = ", ")]] <-
+                        depth_1[position_order][[1]]
+
+            ###***
+            current_level = current_level + 1
+            current_selected_positions <- c(current_selected_positions, snps_1[position_order[1]][[1]])
+        }
+
+        multi_result[[paste("result", n)]] <- 
+            result_d1[[n]]
+        if (output_progress) {
+            cat("Generated", n, "result\n")
+            cat("Selected SNPs are: ", traversed[[n]], "\n")
+        }
+    }
+    return(multi_result)
+}
+
+#' \code{find_optimised_snps}
+#'
+#' @description
+#' \code{find_optimised_snps} is used to find optimised SNPs set.
+#' @param seqc list of sequences, either passed directly from
+#' \code{process_allele} or \code{read_fasta} or equivalence
+#' @param bp BiocParallel backend.
+#' Rule of thumbs: use MulticoreParam(workers = ncpus - 2)
+#' @param metric either `simpson` or `percent`
+#' @param goi group of interest, if creteria is percent,
+#' must be specified, ignored otherwise
+#' @param accept_multiallelic whether include positions with > 1 state in goi
+#' @param number_of_result number of results to return, 0 will be coerced to 1
+#' @param max_depth maximum depth to go before terminating,
+#' 0 means it will only calculate the metric for included position
+#' @param included_positions included positions
+#' @param excluded_positions excluded positions
+#' @param iterate_included whether to calculate index
+#' at each level of the included SNPs
+#' @param ... other parameters as needed
+#' @importFrom BiocParallel SerialParam bplapply
+#' @return Will return the resolution-optimised SNPs set, based on the metric.
+#' @export
+find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
+    accept_multiallelic = TRUE, number_of_result = 1, max_depth = 1,
+    included_positions = c(), excluded_positions = c(),
+    iterate_included = FALSE, bp = SerialParam(), ...) {
+
+    # Define parameters
+    if (inherits(seqc, "processed_seqs")) {
+        if (seqc$check_length){
+            all_length <- seqc$length
+        } else {
+            all_length <- unlist(bplapply(seqc[["seqc"]], length, BPPARAM = bp))
+        }
+    } else {
+        all_length <- unlist(bplapply(seqc, length, BPPARAM = bp))
+    }
+
+    if (length(unique(all_length)) > 1) {
+        warning("Sequences are not of the same length; ",
+        "Only the first ", min(all_length), " positions will be used")
+    }
+
+    positions <- seq_len(min(all_length))
+    result <- list()
+    original_excluded <- excluded_positions
+    included <- ifelse(length(included_positions) > 0, TRUE, FALSE)
+    included_reached_1 <- FALSE
+    additional_exclude <- numeric()
+    # Automatically exclude ignored positions from processed sequences
+    if (inherits(seqc, "processed_seqs")) {
+        excluded_positions <- c(excluded_positions, seqc[["ignored_position"]])
+        sequences <- seqc[["seqc"]]
+    } else {
+        sequences <- seqc
+    }
+    positions <- positions[! positions %in% excluded_positions]
+
+    # Add multiallelic position to exclusion if percent mode
+    if (!accept_multiallelic) {
+        additional_exclude <- bplapply(positions, check_multistate,
+            seqc[goi], BPPARAM = bp)
+        names(additional_exclude) <- positions
+        additional_exclude <- additional_exclude[additional_exclude == TRUE]
+        additional_exclude <- as.numeric(names(additional_exclude))
+        positions <- positions[! positions %in%
+            additional_exclude]
+    }
+
+    # Check if any of the included positions are in excluded positions
+    if (any(included_positions %in% excluded_positions)) {
+        errors <- included_positions[included_positions %in% excluded_positions]
+        stop(paste(errors, collapse = ", "),
+            " found in both included & excluded positions")
+    }
+
+    # Check if all required parameters are provided
+    all_parameters <- list(...)
+    all_parameters[["goi"]] <- goi
+
+    metric_fun <- get_metric_fun(metric)[["calc"]]
+    check_args <- get_metric_fun(metric)[["args"]]
+    if (! is.null(check_args)) {
+        if (! check_args(all_parameters)) {
+            stop("GOI must be defined in percent mode")
+        }
+    }
+
+    # Perform analysis on the included positions first
+    # existing_pattern <- list()
+    if (included) {
+        if (iterate_included) {
+            iterations <- list()
+            for (n in seq_along(included_positions)) {
+                iterations[[n]] <- included_positions[1:n]
+            }
+            scores <- bplapply(iterations, cal_met_snp, metric = metric_fun,
+                seqc = sequences, prepend_position = c(), all_parameters, BPPARAM = bp)
+
+            #existing_pattern <- scores[[
+            #    length(included_positions)]][["patterns"]]
+            scores <- bplapply(scores, function(score) {
+                return(score[["result"]])
+            }, BPPARAM = bp)
+            names(scores) <- bplapply(iterations, paste, collapse = ", ",
+                BPPARAM = bp)
+            result <- scores
+        } else {
+            score <- cal_met_snp(included_positions, metric_fun,
+                    sequences, c(), all_parameters)
+            result[[paste(included_positions, collapse = ", ")]] <-
+                score[["result"]]
+            #existing_pattern <- score[["patterns"]]
+        }
+    excluded_positions <- c(excluded_positions, included_positions)
+    if (result[[paste(included_positions, collapse = ", ")]] >= 1) {
+            included_reached_1 <- TRUE
+        }
+    }
+
+    if (max_depth == 0 ||
+        included_reached_1
+        ) {
+        all_result <- list(result = result)
+    } else {
+        branch_result <- select_n_set_i_depth(included_positions,
+            c(additional_exclude, excluded_positions),  sequences, metric_fun,
+            number_of_result, max_depth, min(all_length),
+            bp, all_parameters)
+        all_result <- bplapply(branch_result, function(branch_r, inc_r) {
+            return(c(inc_r, branch_r))
+        }, inc_r = result, BPPARAM = SerialParam())
+    }
+
+    return(list(results = all_result,
+        excluded_positions = sort(unique(
+            c(additional_exclude, original_excluded))),
+        included_positions = included_positions,
+        seqc_name = deparse(substitute(seqc)), goi = goi,
+        all_sequences = names(sequences),
+        max_depth = max_depth, metric = metric))
 }
