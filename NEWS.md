@@ -1,3 +1,6 @@
+# minSNPs v0.0.5
+Fixed bug in `find_optimised_snps` where when multiple SNPs sets are looked, not all SNPs set will iterate to the next depth even if max_depth has not been reached and resolving power is not 1.
+
 # minSNPs v0.0.4
 Fixed bug in `find_optimised_snps` when there are included SNPs.
 

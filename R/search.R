@@ -389,7 +389,7 @@ branch_and_search <- function(starting_positions = c(),
 #' @param position position to check
 #' @param sequences sequences from group of interest
 #' @return return `TRUE` if the position contains multistate otherwise `FALSE`
-#' @keywords internal
+#' @export
 check_multistate <- function(position, sequences) {
     pattern <- generate_pattern(sequences, c(position))
     if (length(unique(pattern)) > 1) {
@@ -407,7 +407,6 @@ check_multistate <- function(position, sequences) {
 #' @inheritParams check_multistate
 #' @return return the value at that position,
 #' as well as base pattern for next iteration.
-#' @keywords internal
 #' @export
 cal_met_snp <- function(position, metric, seqc, prepend_position = c(), ...) {
     additional_args <- list(...)[[1]]
@@ -464,7 +463,6 @@ select_n_set_i_depth <- function(starting_positions = c(),
     bp = SerialParam(), ...) {
 
     additional_args <- list(...)[[1]]
-    
     traversed <- list()
     #existing_pattern <- list()
     output_progress <- ifelse(
@@ -512,8 +510,7 @@ select_n_set_i_depth <- function(starting_positions = c(),
         current_level <- length(starting_positions) + 1
         current_selected_positions <- c()
         while (((current_level - length(starting_positions)) < max_depth) &&
-               (depth_1[position_order][[n]] < 1)) {
-            
+               (tail(result_d1[[n]], n = 1)[[1]] < 1)) {
             ###***
             positions <- seq_len(seqc_length)
             positions <- as.list(positions[! positions %in% c(excluded_positions, selected_positions[1:n])])
@@ -527,7 +524,7 @@ select_n_set_i_depth <- function(starting_positions = c(),
             snps_1 <- bplapply(scores, function(score) {
                     return(score[["positions"]])
             }, BPPARAM = bp)
-
+            
             # Sorting for selection at this depth
             names(depth_1) <- snps_1
             position_order <- order(unlist(depth_1), decreasing = TRUE)
@@ -537,7 +534,6 @@ select_n_set_i_depth <- function(starting_positions = c(),
             result_d1[[n]][[
                     paste(traversed[[n]], collapse = ", ")]] <-
                         depth_1[position_order][[1]]
-
             ###***
             current_level = current_level + 1
             current_selected_positions <- c(current_selected_positions, snps_1[position_order[1]][[1]])
