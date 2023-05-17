@@ -513,7 +513,7 @@ select_n_set_i_depth <- function(starting_positions = c(),
                (tail(result_d1[[n]], n = 1)[[1]] < 1)) {
             ###***
             positions <- seq_len(seqc_length)
-            positions <- as.list(positions[! positions %in% c(excluded_positions, selected_positions[1:n])])
+            positions <- as.list(positions[! positions %in% c(excluded_positions, selected_positions[1:n], current_selected_positions)])
             scores <- bplapply(positions,
                 cal_met_snp, metric = metric, seqc = seqc,
                 prepend_position = traversed[[n]], additional_args,
