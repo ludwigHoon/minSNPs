@@ -18,4 +18,3 @@ return `TRUE` if the position contains multistate otherwise `FALSE`
 \code{check_multistate} is used to remove positions where there are
 more than 1 state within the group of interest.
 }
-\keyword{internal}

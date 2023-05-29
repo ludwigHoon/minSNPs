@@ -23,13 +23,13 @@ generate_kmers <- function(final_string, k) {
 #' \code{generate_kmer_search_string} generate the search strings
 #' to detect genes' presence
 #' @param gene_seq sequences to generate k_mers from
-#' @param k kmer length
+#' @param k kmer length, default to 15
 #' @param id_prefix prefix for the gene id
 #' @param bp BiocParallel backend to use
 #' @return a dataframe containing the search strings
 #' @importFrom BiocParallel bplapply MulticoreParam
 #' @export
-generate_kmer_search_string <- function(gene_seq, k,
+generate_kmer_search_string <- function(gene_seq, k = 15,
     id_prefix = NULL, bp = MulticoreParam()) {
 
     kmers <- generate_kmers(final_string = gene_seq, k = k)
@@ -67,8 +67,8 @@ generate_kmer_search_string <- function(gene_seq, k,
 #' @param position_reference the mapping between
 #' reference genome positions and orthologous SNP matrix positions
 #' @param ref_seq the reference genome sequence
-#' @param prev number of characters before the SNP
-#' @param after number of characters after the SNP
+#' @param prev number of characters before the SNP, default to 7
+#' @param after number of characters after the SNP, default to 7
 #' @param position_type type of SNPs input, "fasta"
 #' (orthologous SNP matrix based) or "genome"
 #' (reference genome based); Default to "fasta"
@@ -79,7 +79,7 @@ generate_kmer_search_string <- function(gene_seq, k,
 #' @export
 generate_snp_search_string <-
     function(selected_snps, position_reference, ref_seq,
-            snp_matrix, prev, after, position_type = "fasta",
+            snp_matrix, prev = 7, after = 7, position_type = "fasta",
             extend_length = TRUE, bp = MulticoreParam()) {
 
     # Take the first sequence of the reference genome
@@ -181,6 +181,17 @@ generate_snp_search_string <-
     return(result)
 }
 
+#' \code{identify_overlaps}
+#'
+#' @description
+#' \code{identify_overlaps} identify the bystander SNPs in the search sequences
+#' @param position_reference the mapping between
+#' reference genome positions and orthologous SNP matrix positions
+#' @param genome_position the SNPs in reference genome positions
+#' @param prev number of characters before the SNP
+#' @param after number of characters after the SNP
+#' @return a list of overlaps before and after the SNPs
+#' @export
 identify_overlaps <- function(
     position_reference, genome_position, prev, after) {
 
@@ -201,6 +212,22 @@ identify_overlaps <- function(
     return(list(before = overlaps_before, after = overlaps_after))
 }
 
+#' \code{extend_length_fun}
+#'
+#' @description
+#' \code{extend_length_fun} identify the bystander SNPs in the search sequences
+#' and return the new starting and stopping positions of the search sequences
+#' @param overlaps the result from \code{identify_overlaps}
+#' @param position_reference the mapping between
+#' reference genome positions and orthologous SNP matrix positions
+#' @param genome_position the SNPs in reference genome positions
+#' @param prev number of characters before the SNP
+#' @param after number of characters after the SNP
+#' @param ori_string_start the original starting position of the search string
+#' @param ori_string_end the original ending position of the search string
+#' @param genome_max the maximum position in the reference genome
+#' @return a dataframe containing the search strings
+#' @export
 extend_length_fun <- function(overlaps,
     position_reference, genome_position, prev, after,
     ori_string_start, ori_string_end, ori_snp_pos, genome_max) {
@@ -310,3 +337,29 @@ extend_length_fun <- function(overlaps,
             snps_in_string = oth_snps_pos
         ))
 }
+
+#' \code{identify_fasta_match}
+#'
+#' @description
+#' \code{identify_fasta_match} identify the number of matches of
+#' the search string in the reference genome
+#' @param search_table the result from \code{generate_snp_search_string}
+#' or \code{generate_kmer_search_string} or a combined table from the 2
+#' @param reference the reference genome
+#' @param bp the BiocParallel backend
+#' @return a dataframe containing the search strings with the number of match in reference genome
+#' @export
+identify_fasta_match <- function(search_table, reference, bp) {
+    search_table$match_ref_seq <- unlist(
+        bplapply(result$sequence, match_count,
+            search_from = paste(reference[[1]], collapse = ""),
+            BPPARAM = bp)
+    )
+    return(search_table)
+}
+
+
+
+############
+# Examples #
+############

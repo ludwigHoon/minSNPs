@@ -25,4 +25,3 @@ as well as base pattern for next iteration.
 \description{
 \code{cal_met_snp} is used to calculate the metric at each position
 }
-\keyword{internal}

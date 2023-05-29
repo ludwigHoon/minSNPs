@@ -421,9 +421,12 @@ cal_met_snp <- function(position, metric, seqc, prepend_position = c(), ...) {
     }
     metric_function <- match.fun(metric)
     metric_expected_args <- formals(metric_function)
+
+    metric_expected_args_no_default <- names(metric_expected_args[sapply(metric_expected_args, is.symbol)])
+
     all_expected_args <- names(additional_args)[
         names(additional_args) %in% names(metric_expected_args)]
-    if (!all(names(metric_expected_args)
+    if (!all(names(metric_expected_args_no_default)
         [!names(metric_expected_args) == "pattern"] %in%
             all_expected_args)) {
 
@@ -433,6 +436,7 @@ cal_met_snp <- function(position, metric, seqc, prepend_position = c(), ...) {
               (!names(metric_expected_args) == "pattern")], collapse = ", "))
     }
     sub_args <- additional_args[all_expected_args]
+    sub_args <- sub_args[!is.na(names(sub_args))]
     sub_args[["pattern"]] <- pattern
     res <- do.call(metric_function, args = sub_args)
     if ("get_addn" %in% names(additional_args)) {
@@ -629,7 +633,6 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
     # Check if all required parameters are provided
     all_parameters <- list(...)
     all_parameters[["goi"]] <- goi
-
     metric_fun <- get_metric_fun(metric)[["calc"]]
     check_args <- get_metric_fun(metric)[["args"]]
     if (! is.null(check_args)) {
