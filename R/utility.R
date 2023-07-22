@@ -89,3 +89,37 @@ read_sequences_from_fastq <- function(fastq_file, force_to_upper = TRUE,
     attr(seqs, "qualities") <- qualities
     return(seqs)
 }
+
+#' \code{get_snps_set}
+#'
+#' @description
+#' \code{get_snps_set} extract the SNP sets from the output of
+#' `find_optimised_snps`.
+#' @param results output from `find_optimised_snps`
+#' @param as output format, either `data.frame` or `list`.
+#' @return will return either 
+#' 1. a dataframe containing SNPs_set (SNP position separated by ",") and score
+#' 2. a list containing SNPs_set (SNP position as numeric vector) and score (attr of the list)
+#' @export
+get_snps_set <- function(results, as = "data.frame") {
+    if (!as %in% c("data.frame", "list"))
+        stop("as must be either data.frame or list")
+
+    snp_sets <- sapply(results$results, function(x){
+        return(
+            tail(names(x), n = 1)
+        )
+    })
+    score <- sapply(results$results, function(x){
+        return(
+            tail(x, n = 1)[[1]]
+        )
+    })
+    if (as == "data.frame"){
+        result <- data.frame(SNPs_set = snp_sets, score = score)
+    } else {
+        result <- unname(lapply(strsplit(snp_sets, split = ", "), as.numeric))
+        attr(result, "score") <- unname(score)
+    }
+    return(result)
+}

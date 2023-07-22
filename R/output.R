@@ -72,8 +72,9 @@ output_result <- function(result, view = "", ...) {
 #' \code{output_result}
 #' @keywords internal
 #' @param seqc_obj the sequences object.
+#' @param additional_details whether to print additional details.
 #' @return NULL, result either printed or saved as tsv.
-output_parsed <- function(parsed_view, seqc_obj, result, file_name) {
+output_parsed <- function(parsed_view, seqc_obj, result, file_name, additional_details = TRUE) {
     write_output <- function(text, new_file = FALSE) {
         cat(paste(text, "\n", sep = ""),
             sep = "", file = file_name, append = !new_file)
@@ -109,21 +110,22 @@ output_parsed <- function(parsed_view, seqc_obj, result, file_name) {
         }
         write_output("\n")
     }
-
-    write_output("Additional details")
-    write_output(paste("Metric:\t", result$metric))
-    write_output(paste("Excluded Positions:\t",
-        paste("\"", paste(result$excluded, collapse = ", "), "\"", sep = "")
-        ))
-    write_output(paste("Excluded Positions From process_allele:\t",
-        paste("\"", paste(seqc_obj$ignored_position, collapse = ", "),
-            "\"", sep = "")
-        ))
-    write_output(paste("Included Positions:\t",
-        paste("\"", paste(result$included, collapse = ", "), "\"", sep = "")))
-    write_output(paste("Group of interest:\t",
-        paste("\"", paste(result$goi, collapse = ", "), "\"", sep = "")))
-    write_output(paste("All analysed sequences:\t",
-        paste("\"", paste(result$all_sequences, collapse = ", "), "\"",
-        sep = "")))
+    if (additional_details){
+        write_output("Additional details")
+        write_output(paste("Metric:\t", result$metric))
+        write_output(paste("Excluded Positions:\t",
+            paste("\"", paste(result$excluded, collapse = ", "), "\"", sep = "")
+            ))
+        write_output(paste("Excluded Positions From process_allele:\t",
+            paste("\"", paste(seqc_obj$ignored_position, collapse = ", "),
+                "\"", sep = "")
+            ))
+        write_output(paste("Included Positions:\t",
+            paste("\"", paste(result$included, collapse = ", "), "\"", sep = "")))
+        write_output(paste("Group of interest:\t",
+            paste("\"", paste(result$goi, collapse = ", "), "\"", sep = "")))
+        write_output(paste("All analysed sequences:\t",
+            paste("\"", paste(result$all_sequences, collapse = ", "), "\"",
+            sep = "")))
+    }
 }

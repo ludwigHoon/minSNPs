@@ -235,6 +235,7 @@ process_allele <- function(seqc, bp=BiocParallel::SerialParam(), check_length=TR
     ignored_position <- c()
     if (check_bases) {
         ignored_position <- flag_position(processed$seqc,
+            remove_invariant = remove_invariant, biallelic_only = biallelic_only,
             dash_ignore = dash_ignore, accepted_char = accepted_char,
             ignore_case = ignore_case, bp = bp)    
     }
