@@ -781,7 +781,7 @@ calculate_variant_within_group <- function(pattern, meta, target, get_count = FA
 #' @importFrom BiocParallel MulticoreParam bplapply
 #' @return return a dataframe containing the position and result.
 #' @export
-iterate_through <- function(metric, seqc, bp = MulticoreParam()...){
+iterate_through <- function(metric, seqc, bp = MulticoreParam(), ...){
     if (inherits(seqc, "processed_seqs")) {
         if (seqc$check_length){
             all_length <- seqc$length
