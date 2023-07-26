@@ -778,9 +778,10 @@ calculate_variant_within_group <- function(pattern, meta, target, get_count = FA
 #' \code{iterate_through} is used to calculate the metric at each position
 #' @inheritParams find_optimised_snps
 #' @inheritParams check_multistate
+#' @importFrom BiocParallel MulticoreParam bplapply
 #' @return return a dataframe containing the position and result.
 #' @export
-iterate_through <- function(metric, seqc, ...){
+iterate_through <- function(metric, seqc, bp = MulticoreParam()...){
     if (inherits(seqc, "processed_seqs")) {
         if (seqc$check_length){
             all_length <- seqc$length
@@ -797,10 +798,10 @@ iterate_through <- function(metric, seqc, ...){
     positions <- seq_len(min(all_length))
     scores <- bplapply(positions, cal_met_snp, metric = metric, seqc = seqc,
         prepend_position = c(), list(...),
-            BPPARAM = SerialParam())
+            BPPARAM = bp)
     rr <- bplapply(scores, function(x){
         res <- x$result
         return(cbind(position = x$position, res))
-    })
+    }, BPPARAM = bp)
     return(rbindlist(rr))
 }
