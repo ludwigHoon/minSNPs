@@ -231,6 +231,7 @@ identify_overlaps <- function(
 #' @param genome_max length of the reference genome
 #' @return a list containing the new `string_start`,
 #' `string_end`, `snp_pos`, `snps_in_string`.
+#' @export
 extend_length <- function(overlaps,
     position_reference, genome_position, prev, after,
     ori_string_start, ori_string_end, ori_snp_pos, genome_max) {

@@ -123,3 +123,34 @@ get_snps_set <- function(results, as = "data.frame") {
     }
     return(result)
 }
+
+process_result_file <- function(result_filepath) {
+    f <- file(result_filepath, "r")
+    preparse <- readLines(f)
+    result <- list()
+    cur <- 1
+    is_result <- FALSE
+    for (i in seq_len(length(preparse))) {
+        if (length(grep("^Result", preparse[[i]])) >= 1) {
+            is_result <- TRUE
+        }
+        if (is_result) {
+            if (gsub("\\s+", "", preparse[[i + 1]]) == "") {
+                result[[cur]] <- as.numeric(
+                    strsplit(
+                        gsub(
+                            "\"", "",
+                            strsplit(preparse[[i]], split = "\t")[[1]][1]
+                        ),
+                        split = ", "
+                    )[[1]]
+                )
+                cur <- cur + 1
+                is_result <- FALSE
+            }
+        }
+    }
+    close(f)
+    final_selected <- (result)
+    return(final_selected)
+}

@@ -24,7 +24,7 @@ generate_pattern <- function(seqc, ordered_index=c(), append_to=list()) {
 #' \code{calculate_percent} is used to calculate dissimilarity index,
 #' proportion of isolates not in goi that have been discriminated against.
 #' 1 being all and 0 being none.
-#' @param pattern list of sequences
+#' @param pattern list of sequences' pattern (profile)
 #' @param goi group of interest
 #' @return Will return the dissimilarity index of the list of patterns.
 #' @export
@@ -558,7 +558,7 @@ select_n_set_i_depth <- function(starting_positions = c(),
             result_d1[[n]]
         if (output_progress) {
             cat("Generated", n, "result\n")
-            cat("Selected SNPs are: ", traversed[[n]], "\n")
+            cat("Selected SNPs are: ", traversed[[n]], "\n", sep = "")
         }
     }
     return(multi_result)
@@ -601,10 +601,10 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
         if (seqc$check_length){
             all_length <- seqc$length
         } else {
-            all_length <- unlist(bplapply(seqc[["seqc"]], length, BPPARAM = bp))
+            all_length <- lengths(seqc[["seqc"]])
         }
     } else {
-        all_length <- unlist(bplapply(seqc, length, BPPARAM = bp))
+        all_length <- lengths(seqc)
     }
 
     if (length(unique(all_length)) > 1) {
@@ -707,7 +707,7 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
                     c(new_excluded, additional_exclude, excluded_positions),  sequences, metric_fun,
                     1, max_depth, min(all_length),
                     bp, all_parameters)
-                SSNPS <- suppressWarnings(as.numeric(strsplit(names(temp_result[[1]]), split = ", ")[[1]]))
+                SSNPS <- suppressWarnings(as.numeric(tail(strsplit(names(temp_result[[1]]), split = ", "), n = 1)[[1]]))
                 SSNPS <- SSNPS[!is.na(SSNPS)]
                 new_excluded <- c(new_excluded, SSNPS)
                 branch_result[[n_res]] <- temp_result[[1]]
@@ -732,4 +732,75 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
         seqc_name = deparse(substitute(seqc)), goi = goi,
         all_sequences = names(sequences),
         max_depth = max_depth, metric = metric))
+}
+
+
+
+#' \code{identify_group_variant_breakdown}
+#'
+#' @description
+#' \code{calculate_variant_within_group} is used to identify proportion of different samples
+#' having the same profile.
+#' @param pattern list of sequences' pattern (profile)
+#' @param meta metadata of the sequences
+#' @param target column name of the target group
+#' @param get_count whether to return the count of samples rather than the raw number, default to FALSE.
+#' @return Will return the Simpson's index of the list of patterns.
+#' @importFrom data.table setDT, cube, dcast
+#' @export
+calculate_variant_within_group <- function(pattern, meta, target, get_count = FALSE) {
+    setDT(meta)
+    colnames(meta)[colnames(meta) == target] <- "target"
+    npattern <- data.table(pattern = unname(unlist(pattern)),
+        target = meta[match(names(pattern), meta$isolate), ]$target)
+    cubed <- cube(npattern, .(count = .N), by = c("pattern", "target"))
+    cubed <- cubed[!is.na(cubed$pattern) & !is.na(cubed$target), ]
+    res <- dcast(cubed, cubed$pattern ~ cubed$target, value.var = "count")
+    res[is.na(res)] <- 0
+    colnames(res)[1] <- "allele"
+    if (get_count) {
+        return(list(result = res))
+    }
+    alleles <- res[,1]
+    columns <- colnames(res)[-1]
+    res <- do.call(cbind, lapply(res[,..columns], function(col) {
+        sapply(col, function(cell){
+            return(cell/sum(col))
+        })
+    }))
+
+    return(list(result = cbind(alleles, res)))
+}
+
+#' \code{iterate_through}
+#'
+#' @description
+#' \code{iterate_through} is used to calculate the metric at each position
+#' @inheritParams find_optimised_snps
+#' @inheritParams check_multistate
+#' @return return a dataframe containing the position and result.
+#' @export
+iterate_through <- function(metric, seqc, ...){
+    if (inherits(seqc, "processed_seqs")) {
+        if (seqc$check_length){
+            all_length <- seqc$length
+        } else {
+            all_length <- lengths(seqc[["seqc"]])
+        }
+    } else {
+        all_length <- lengths(seqc)
+    }
+    if (length(unique(all_length)) > 1) {
+        warning("Sequences are not of the same length; ",
+        "Only the first ", min(all_length), " positions will be used")
+    }
+    positions <- seq_len(min(all_length))
+    scores <- bplapply(positions, cal_met_snp, metric = metric, seqc = seqc,
+        prepend_position = c(), list(...),
+            BPPARAM = SerialParam())
+    rr <- bplapply(scores, function(x){
+        res <- x$result
+        return(cbind(position = x$position, res))
+    })
+    return(rbindlist(rr))
 }
