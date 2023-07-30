@@ -558,7 +558,7 @@ select_n_set_i_depth <- function(starting_positions = c(),
             result_d1[[n]]
         if (output_progress) {
             cat("Generated", n, "result\n")
-            cat("Selected SNPs are: ", traversed[[n]], "\n", sep = "")
+            cat("Selected SNPs are: ", paste(traversed[[n]], collapse = ","), "\n", sep = "")
         }
     }
     return(multi_result)
@@ -746,14 +746,14 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
 #' @param target column name of the target group
 #' @param get_count whether to return the count of samples rather than the raw number, default to FALSE.
 #' @return Will return the Simpson's index of the list of patterns.
-#' @importFrom data.table setDT, cube, dcast
+#' @importFrom data.table dcast
 #' @export
 calculate_variant_within_group <- function(pattern, meta, target, get_count = FALSE) {
-    setDT(meta)
+    data.table::setDT(meta)
     colnames(meta)[colnames(meta) == target] <- "target"
     npattern <- data.table(pattern = unname(unlist(pattern)),
         target = meta[match(names(pattern), meta$isolate), ]$target)
-    cubed <- cube(npattern, .(count = .N), by = c("pattern", "target"))
+    cubed <- data.table::cube(npattern, .(count = .N), by = c("pattern", "target"))
     cubed <- cubed[!is.na(cubed$pattern) & !is.na(cubed$target), ]
     res <- dcast(cubed, cubed$pattern ~ cubed$target, value.var = "count")
     res[is.na(res)] <- 0
