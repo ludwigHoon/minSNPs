@@ -7,6 +7,9 @@
 read_sequences_from_fastq(
   fastq_file,
   force_to_upper = TRUE,
+  skip_n_reads = 0,
+  max_n_reads = -1,
+  output_quality = TRUE,
   quality_offset = 33,
   bp = MulticoreParam()
 )
@@ -16,6 +19,12 @@ read_sequences_from_fastq(
 
 \item{force_to_upper}{whether to transform sequences
 to upper case, default to TRUE}
+
+\item{skip_n_reads}{number of reads to skip, default to 0}
+
+\item{max_n_reads}{maximum number of reads to read, default to -1 (all)}
+
+\item{output_quality}{whether to output the quality scores, default to TRUE}
 
 \item{quality_offset}{the quality offset to use, default to 33}
 

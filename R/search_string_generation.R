@@ -75,13 +75,16 @@ generate_kmer_search_string <- function(gene_seq, k,
 #' (reference genome based); Default to "fasta"
 #' @param extend_length whether to extend the search string
 #' before and after the SNP and ignore overlapping SNPs
+#' @param fasta_name_as_result Whether the result should use 
+#' the fasta matching sequence name or the fasta position and allele,
+#' default to using fasta sequence name (TRUE)
 #' @param bp BiocParallel backend to use
 #' @return a dataframe containing the search strings
 #' @export
 generate_snp_search_string <-
     function(selected_snps, position_reference, ref_seq,
             snp_matrix, prev, after, position_type = "fasta",
-            extend_length = TRUE, bp = MulticoreParam()) {
+            extend_length = TRUE, fasta_name_as_result = TRUE, bp = MulticoreParam()) {
 
     # Take the first sequence of the reference genome
     # if there are multiple sequences
@@ -149,8 +152,14 @@ generate_snp_search_string <-
                 paste(snps_in_string, collapse = ","))
         for (i in seq_len(length(alleles))) {
             allele <- alleles[i]
-            genotype_result <- generate_pattern(snp_matrix, snp_pos)
-            genotype_result <- names(which(genotype_result == allele))
+            if (fasta_name_as_result){
+                genotype_result <- generate_pattern(snp_matrix, snp_pos)
+                genotype_result <- names(which(genotype_result == allele))
+                genotype_result <- paste(genotype_result, collapse = ",")
+            } else{
+                genotype_result <- paste(snp_pos, allele, sep = ":")
+            }
+
             for (strand in c("+", "-")) {
                 search_seq <- ref_seq[string_start:string_end] #nolint
                 # Replace allele
@@ -168,7 +177,7 @@ generate_snp_search_string <-
                         "type" = "SNP",
                         "sequence" = search_seq,
                         "strand" = strand,
-                        "result" = paste(genotype_result, collapse = ","),
+                        "result" = genotype_result,
                         "extra" = paste(ext_info, sep = ",", collapse = "|")
                     )
             }
@@ -176,7 +185,7 @@ generate_snp_search_string <-
         single_result <- do.call(rbind, single_result)
         return(single_result)
     }, snp_genome_pos = snp_genome_pos, prev = prev, after = after,
-    position_reference = position_reference,
+    position_reference = position_reference, fasta_name_as_result = fasta_name_as_result,
     extend_length = extend_length, genome_max = genome_max, BPPARAM = bp)
     result <- do.call(rbind, result)
     return(result)

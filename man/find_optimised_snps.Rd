@@ -13,7 +13,9 @@ find_optimised_snps(
   max_depth = 1,
   included_positions = c(),
   excluded_positions = c(),
+  search_from = NULL,
   iterate_included = FALSE,
+  completely_unique = FALSE,
   bp = SerialParam(),
   ...
 )
@@ -38,8 +40,14 @@ must be specified, ignored otherwise}
 
 \item{excluded_positions}{excluded positions}
 
+\item{search_from}{search only from these positions, i.e.,
+any positions not in here are excluded, default to NULL}
+
 \item{iterate_included}{whether to calculate index
 at each level of the included SNPs}
+
+\item{completely_unique}{whether to identify completely unique SNPs set,
+default to FALSE, only the 1st SNP must be different}
 
 \item{bp}{BiocParallel backend.
 Rule of thumbs: use MulticoreParam(workers = ncpus - 2)}

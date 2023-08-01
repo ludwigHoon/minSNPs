@@ -13,6 +13,7 @@ generate_snp_search_string(
   after,
   position_type = "fasta",
   extend_length = TRUE,
+  fasta_name_as_result = TRUE,
   bp = MulticoreParam()
 )
 }
@@ -36,6 +37,10 @@ reference genome positions and orthologous SNP matrix positions}
 
 \item{extend_length}{whether to extend the search string
 before and after the SNP and ignore overlapping SNPs}
+
+\item{fasta_name_as_result}{Whether the result should use 
+the fasta matching sequence name or the fasta position and allele,
+default to using fasta sequence name (TRUE)}
 
 \item{bp}{BiocParallel backend to use}
 }

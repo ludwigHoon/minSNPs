@@ -7,7 +7,7 @@
 calculate_simpson(pattern)
 }
 \arguments{
-\item{pattern}{list of sequences}
+\item{pattern}{list of sequences' pattern (profile)}
 }
 \value{
 Will return the Simpson's index of the list of patterns.

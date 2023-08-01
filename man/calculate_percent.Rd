@@ -7,7 +7,7 @@
 calculate_percent(pattern, goi)
 }
 \arguments{
-\item{pattern}{list of sequences}
+\item{pattern}{list of sequences' pattern (profile)}
 
 \item{goi}{group of interest}
 }

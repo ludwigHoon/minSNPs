@@ -4,7 +4,13 @@
 \alias{output_parsed}
 \title{\code{output_parsed}}
 \usage{
-output_parsed(parsed_view, seqc_obj, result, file_name)
+output_parsed(
+  parsed_view,
+  seqc_obj,
+  result,
+  file_name,
+  additional_details = TRUE
+)
 }
 \arguments{
 \item{parsed_view}{the result from \code{get_metric_fun}, passed from
@@ -15,6 +21,8 @@ output_parsed(parsed_view, seqc_obj, result, file_name)
 \item{result}{is the result from \code{find_optimised_snps}}
 
 \item{file_name}{file name, either tsv or "" for terminal output}
+
+\item{additional_details}{whether to print additional details.}
 }
 \value{
 NULL, result either printed or saved as tsv.
