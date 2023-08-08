@@ -1,3 +1,7 @@
+# minSNPs v0.1.0
+- Added method to generate search strings (`generate_snp_search_string`) from identified SNPs set.
+- Added method to search through long read sequence (`search_from_fastq_reads`).
+
 # minSNPs v0.0.5
 Fixed bug in `find_optimised_snps` where when multiple SNPs sets are looked, not all SNPs set will iterate to the next depth even if max_depth has not been reached and resolving power is not 1.
 

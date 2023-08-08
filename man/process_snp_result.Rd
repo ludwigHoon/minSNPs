@@ -24,7 +24,7 @@ process_snp_result(
 \value{
 a list containing:
 - result: a dataframe containing the following columns:
- - type, rank, result, reads_count, proportion_matched, pass_filter
+ - type, rank, result, reads_count, proportion_matched, pass_filter, proportion_scheme_found, details
 - snps_found: a vector containing the SNPs ID that have been identified without conflict
 - proportion_snps_found: the proportion of SNPs found without conflict
 }

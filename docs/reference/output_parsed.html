@@ -18,7 +18,7 @@ to present the result and save the result as tsv."><!-- mathjax --><script src="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -34,9 +34,6 @@ to present the result and save the result as tsv."><!-- mathjax --><script src="
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/MinSNPs_Workflow.html">MinSNPs Workflow</a>
-    </li>
-    <li>
-      <a href="../articles/user_manual.html">MinSNPs User Manual</a>
     </li>
   </ul></li>
 <li>
@@ -68,7 +65,13 @@ to present the result and save the result as tsv.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">output_parsed</span><span class="op">(</span><span class="va">parsed_view</span>, <span class="va">seqc_obj</span>, <span class="va">result</span>, <span class="va">file_name</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">output_parsed</span><span class="op">(</span>
+  <span class="va">parsed_view</span>,
+  <span class="va">seqc_obj</span>,
+  <span class="va">result</span>,
+  <span class="va">file_name</span>,
+  additional_details <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -88,6 +91,10 @@ to present the result and save the result as tsv.</p>
 
 <dt>file_name</dt>
 <dd><p>file name, either tsv or "" for terminal output</p></dd>
+
+
+<dt>additional_details</dt>
+<dd><p>whether to print additional details.</p></dd>
 
 </dl></div>
     <div id="value">

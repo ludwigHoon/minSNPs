@@ -75,6 +75,9 @@ read_sequences_from_fastq <- function(fastq_file, force_to_upper = TRUE, skip_n_
     }
 
     lines <- readLines(fastq_file, n = n_lines)
+    if (skip_n_reads != 0){
+        lines <- lines[seq(4 * skip_n_reads + 1, length(lines), 1)]
+    }
     seqs_id <- lines[seq(1, length(lines), 4)]
     seqs <- lines[seq(2, length(lines), 4)]
     

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -33,9 +33,6 @@
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/MinSNPs_Workflow.html">MinSNPs Workflow</a>
-    </li>
-    <li>
-      <a href="../articles/user_manual.html">MinSNPs User Manual</a>
     </li>
   </ul></li>
 <li>
@@ -61,7 +58,16 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.0.4" id="minsnps-v004">minSNPs v0.0.4<a class="anchor" aria-label="anchor" href="#minsnps-v004"></a></h2>
+<h2 class="page-header" data-toc-text="0.1.0" id="minsnps-v010">minSNPs v0.1.0<a class="anchor" aria-label="anchor" href="#minsnps-v010"></a></h2>
+<ul><li>Added method to generate search strings (<code>generate_snp_search_string</code>) from identified SNPs set.</li>
+<li>Added method to search through long read sequence (<code>search_from_fastq_reads</code>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.5" id="minsnps-v005">minSNPs v0.0.5<a class="anchor" aria-label="anchor" href="#minsnps-v005"></a></h2>
+<p>Fixed bug in <code>find_optimised_snps</code> where when multiple SNPs sets are looked, not all SNPs set will iterate to the next depth even if max_depth has not been reached and resolving power is not 1.</p>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0.4" id="minsnps-v004">minSNPs v0.0.4<small>2023-04-19</small><a class="anchor" aria-label="anchor" href="#minsnps-v004"></a></h2>
 <p>Fixed bug in <code>find_optimised_snps</code> when there are included SNPs.</p>
 </div>
     <div class="section level2">

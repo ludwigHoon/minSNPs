@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -33,9 +33,6 @@
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/MinSNPs_Workflow.html">MinSNPs Workflow</a>
-    </li>
-    <li>
-      <a href="../articles/user_manual.html">MinSNPs User Manual</a>
     </li>
   </ul></li>
 <li>
@@ -75,7 +72,9 @@
   max_depth <span class="op">=</span> <span class="fl">1</span>,
   included_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,
   excluded_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,
+  search_from <span class="op">=</span> <span class="cn">NULL</span>,
   iterate_included <span class="op">=</span> <span class="cn">FALSE</span>,
+  completely_unique <span class="op">=</span> <span class="cn">FALSE</span>,
   bp <span class="op">=</span> <span class="fu">SerialParam</span><span class="op">(</span><span class="op">)</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
@@ -118,9 +117,19 @@ must be specified, ignored otherwise</p></dd>
 <dd><p>excluded positions</p></dd>
 
 
+<dt>search_from</dt>
+<dd><p>search only from these positions, i.e.,
+any positions not in here are excluded, default to NULL</p></dd>
+
+
 <dt>iterate_included</dt>
 <dd><p>whether to calculate index
 at each level of the included SNPs</p></dd>
+
+
+<dt>completely_unique</dt>
+<dd><p>whether to identify completely unique SNPs set,
+default to FALSE, only the 1st SNP must be different</p></dd>
 
 
 <dt>bp</dt>

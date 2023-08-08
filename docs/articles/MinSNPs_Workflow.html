@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -51,9 +51,6 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="../articles/MinSNPs_Workflow.html">MinSNPs Workflow</a>
-    </li>
-    <li>
-      <a href="../articles/user_manual.html">MinSNPs User Manual</a>
     </li>
   </ul>
 </li>
@@ -93,7 +90,7 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ludwigHoon/minSNPs" class="external-link">minSNPs</a></span><span class="op">)</span>
-<span class="co">#&gt; The minSNPs version loaded is: 0.0.4</span>
+<span class="co">#&gt; The minSNPs version loaded is: 0.1.0</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Bioconductor/BiocParallel" class="external-link">BiocParallel</a></span><span class="op">)</span> <span class="co"># optional, but needed for parallel processing</span></code></pre></div>
 <div class="section level2">
 <h2 id="reading-processing-input-for-further-analysis">Reading &amp; processing input for further analysis<a class="anchor" aria-label="anchor" href="#reading-processing-input-for-further-analysis"></a>
@@ -150,8 +147,8 @@
 <span class="co">#&gt; Included Positions:   ""</span>
 <span class="co">#&gt; Group of interest:    ""</span>
 <span class="co">#&gt; All analysed sequences:   "A_D213, H_S1432, Ia_SotoGIa3, B_Aus3, Ia_SotoGIa1, C_UW1, F_SW5, L2b_CV204, L1_440, A_7249, Ba_Aus25, L2_LST, B_TZ1A828, A_HAR-13, E_150, E_Bour, C_Aus10, H_R31975, E_SotoGE4, L2b_UCH-1, L2b_795, A_2497, Ba_Apache2, E_SW2, L3_404, L1_224, D_UW-3, G_11074, Ds_2923, F_70, K_SotoGK1, E_SW3, L2b_C1, E_SotoGE8, G_SotoGG1, G_11222, A_363, L1_SA16, L2b_8200, J_6276, F_SW4, G_9301, L2b_C2, A_5291, G_9768, L2_434, F_SotoGF3, C_TW3, E_11023, L1_115, B_Har36, L2b_UCH-2, D_SotoGD6, D_SotoGD5, B_Jali20, D_SotoGD1"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"SNPs discriminating against A_D213, H_S1432\n"</span><span class="op">)</span>
-<span class="co">#&gt; SNPs discriminating against A_D213, H_S1432</span>
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"SNPws discriminating against A_D213, H_S1432\n"</span><span class="op">)</span>
+<span class="co">#&gt; SNPws discriminating against A_D213, H_S1432</span>
 <span class="fu"><a href="../reference/output_result.html">output_result</a></span><span class="op">(</span><span class="va">discriminating_snps</span><span class="op">)</span>
 <span class="co">#&gt; Result - 1</span>
 <span class="co">#&gt; Position(s)  Score</span>

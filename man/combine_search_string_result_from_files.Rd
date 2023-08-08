@@ -7,7 +7,8 @@
 combine_search_string_result_from_files(
   result_files,
   search_table,
-  append_to_current_result = data.frame(),
+  read_length_files = c(),
+  append_to_current_result = NULL,
   bp = MulticoreParam()
 )
 }
@@ -17,12 +18,14 @@ combine_search_string_result_from_files(
 \item{search_table}{a dataframe with the following columns:
 - "id","type","sequence","strand","result","extra","match_ref_seq"}
 
-\item{append_to_current_result}{the dataframe of result to append to}
+\item{read_length_files}{the read_length output files from \code{search_from_fastq_reads}}
+
+\item{append_to_current_result}{the fastq_search_result of result to append to}
 
 \item{bp}{BiocParallel backend to use for parallelization}
 }
 \value{
-will return a dataframe containing: -
+will return a fastq_search_result object containing read_lengths and a dataframe containing: -
 `sequence`, `search_id`, `reads`, `raw_match`, `mean_qualities`, `indexes`, `id`, `type`,
 `strand`, `result`, `extra`, `match_ref_seq`, `n_reads`
 }

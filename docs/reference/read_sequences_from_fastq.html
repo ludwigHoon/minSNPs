@@ -18,7 +18,7 @@ from a fastq file, it completely ignores the quality scores"><!-- mathjax --><sc
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -34,9 +34,6 @@ from a fastq file, it completely ignores the quality scores"><!-- mathjax --><sc
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/MinSNPs_Workflow.html">MinSNPs Workflow</a>
-    </li>
-    <li>
-      <a href="../articles/user_manual.html">MinSNPs User Manual</a>
     </li>
   </ul></li>
 <li>
@@ -71,6 +68,9 @@ from a fastq file, it completely ignores the quality scores</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">read_sequences_from_fastq</span><span class="op">(</span>
   <span class="va">fastq_file</span>,
   force_to_upper <span class="op">=</span> <span class="cn">TRUE</span>,
+  skip_n_reads <span class="op">=</span> <span class="fl">0</span>,
+  max_n_reads <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,
+  output_quality <span class="op">=</span> <span class="cn">TRUE</span>,
   quality_offset <span class="op">=</span> <span class="fl">33</span>,
   bp <span class="op">=</span> <span class="fu">MulticoreParam</span><span class="op">(</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
@@ -85,6 +85,18 @@ from a fastq file, it completely ignores the quality scores</p>
 <dt>force_to_upper</dt>
 <dd><p>whether to transform sequences
 to upper case, default to TRUE</p></dd>
+
+
+<dt>skip_n_reads</dt>
+<dd><p>number of reads to skip, default to 0</p></dd>
+
+
+<dt>max_n_reads</dt>
+<dd><p>maximum number of reads to read, default to -1 (all)</p></dd>
+
+
+<dt>output_quality</dt>
+<dd><p>whether to output the quality scores, default to TRUE</p></dd>
 
 
 <dt>quality_offset</dt>

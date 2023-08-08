@@ -139,11 +139,11 @@ search_from_fastq_reads <- function(fastq_file, search_tables, skip_n_reads = 0,
         bp$progressbar <- old_pr
     }
     names(temp_result) <- search_tables$sequence
-    
-    return(
-        list(result = temp_result,
+    result <- list(result = temp_result,
         read_length = read_length_data)
-    )
+    class(result) <- "fastq_search_result"
+
+    return(result)
 }
 
 ######### COMBINED FUNCTIONS #########
@@ -198,6 +198,54 @@ combine_search_string_result <- function(results, search_table,
     }
 }
 
+#' \code{combine_fastq_search_result}
+#'
+#' @description
+#' \code{combine_fastq_search_result} combines the search results from \code{search_from_fastq_reads}
+#' @param results the result (fastq_search_result) from \code{search_from_fastq_reads} to combine.
+#' @param search_table a dataframe with the following columns:
+#' - "id","type","sequence","strand","result","extra","match_ref_seq"
+#' @param bp BiocParallel backend to use for parallelization
+#' @param previous_result the result (fastq_search_result) to append to
+#' @return will return a dataframe containing: -
+#' `sequence`, `search_id`, `reads`, `raw_match`, `mean_qualities`, `indexes`, `id`, `type`,
+#' `strand`, `result`, `extra`, `match_ref_seq`, `n_reads`
+#' @importFrom BiocParallel bplapply MulticoreParam
+#' @importFrom data.table rbindlist
+#' @export
+combine_fastq_search_result <- function(results, search_table,
+    previous_result = NULL, bp = MulticoreParam()){
+    if (!inherits(results, "fastq_search_result")){
+        stop("results must be a fastq_search_result object")
+    }
+    if (inherits(results, "fastq_search_result")) {
+        results_result <- results$result
+        results_read_length <- results$read_length
+    }
+    if (!is.null(previous_result)){
+        if (!inherits(previous_result, "fastq_search_result") &&
+            !inherits(previous_result, "combined_fastq_search_result")){
+            stop("previous_result must be a fastq_search_result or combined_fastq_search_result object")
+        }
+        if (inherits(previous_result, "fastq_search_result")) {
+            previous_result <- combine_fastq_search_result(
+                previous_result, search_table, NULL, bp)
+        }
+        append_to_current_result <- previous_result$result
+        current_read_length <- previous_result$read_length
+    } else{
+        append_to_current_result <- data.frame()
+        current_read_length <- NULL
+    }
+    result <- combine_search_string_result_from_list(results_result, search_table,
+        append_to_current_result = append_to_current_result, bp = bp)
+    read_length_data <- rbindlist(list(current_read_length, results_read_length))
+    final_result <- list(result = result, read_length = read_length_data)
+    class(final_result) <- "combined_fastq_search_result"
+    return(final_result)
+}
+
+
 #' \code{combine_search_string_result_from_list}
 #'
 #' @description
@@ -235,6 +283,7 @@ combine_search_string_result_from_list <- function(results, search_table,
         return(result)
     }, BPPARAM = bp)
     
+    
     return(
         combine_search_string_result(
             results = rbindlist(temp_result),
@@ -244,7 +293,7 @@ combine_search_string_result_from_list <- function(results, search_table,
         )
     )
 
-}      
+}
 
 
 #' \code{combine_search_string_result_from_files}
@@ -254,43 +303,101 @@ combine_search_string_result_from_list <- function(results, search_table,
 #' @param result_files the output files from \code{search_from_fastq_reads} to combine
 #' @param search_table a dataframe with the following columns:
 #' - "id","type","sequence","strand","result","extra","match_ref_seq"
+#' @param read_length_files the read_length output files from \code{search_from_fastq_reads}
 #' @param bp BiocParallel backend to use for parallelization
-#' @param append_to_current_result the dataframe of result to append to
-#' @return will return a dataframe containing: -
+#' @param append_to_current_result the fastq_search_result of result to append to
+#' @return will return a fastq_search_result object containing read_lengths and a dataframe containing: -
 #' `sequence`, `search_id`, `reads`, `raw_match`, `mean_qualities`, `indexes`, `id`, `type`,
 #' `strand`, `result`, `extra`, `match_ref_seq`, `n_reads`
 #' @importFrom BiocParallel bplapply MulticoreParam
 #' @importFrom data.table rbindlist
 #' @export
 combine_search_string_result_from_files <- function(result_files, search_table,
-    append_to_current_result = data.frame(), bp = MulticoreParam()) {
+    read_length_files = c(), append_to_current_result = NULL, bp = MulticoreParam()) {
     temp_result <- bplapply(result_files, function(file) {
         temp <- read.csv(file, header = TRUE, row.names = NULL, sep = ",")
         return(temp)
     }, BPPARAM = bp)
-
+    if (length(read_length_files) > 0){
+        temp_read_length <- bplapply(read_length_files, function(file) {
+            temp <- read.csv(file, header = TRUE, row.names = NULL, sep = ",")
+            return(temp)
+        }, BPPARAM = bp)
+        temp_read_length <- rbindlist(temp_read_length)
+    } else{
+        temp_read_length <- NULL
+    }
+    t_result <- list(result = temp_result, read_length = temp_read_length)
+    class(t_result) <- "fastq_search_result"
+    if (!is.null(append_to_current_result)){
+        if (!all(c("result", "read_length") %in% names(append_to_current_result))){
+            stop("append_to_current_result must be a combined_fastq_search_result object")
+        } else {
+            if (!inherits(append_to_current_result$result, "data.frame")){
+                stop("append_to_current_result must be a combined_fastq_search_result object")
+            } else{
+                class(append_to_current_result) <- "combined_fastq_search_result"
+            }
+        }
+    }
     return(
-        combine_search_string_result_from_list(
-            results = temp_result,
+        combine_fastq_search_result(
+            results = t_result,
             search_table = search_table,
-            append_to_current_result = append_to_current_result,
+            previous_result = append_to_current_result,
             bp  = bp
         )
     )
 }
 
+#' \code{estimate_coverage}
+#'
+#' \code{estimate_coverage}
+#' \code{estimate_coverage} estimate the average coverage by comparing number of bases from reads to genome size
+#' @param read_lengths the lengths of the reads
+#' @param genome_size the genome size
+#' @return will return an estimated average coverage
+#' @export
+estimate_coverage <- function(read_lengths, genome_size){
+    read_bases <- sum(read_lengths)
+    return((read_bases) / genome_size)
+}
+
 #' \code{infer_from_combined}
 #' @description
 #' \code{infer_from_combined} infers the results (presence/absense of genes & CC) from the combined result
-#' @param combined_result the combined result from \code{combine_search_string_result}
+#' @param combined_result the combined result from \code{combine_fastq_search_result} or equivalent,
+#' with a list containing:
+#' - result: a dataframe containing the following columns:
+#' `sequence`, `search_id`, `reads`, `raw_match`, `mean_qualities`, `indexes`, `id`, `type`,
+#' `strand`, `result`, `extra`, `match_ref_seq`, `n_reads`
+#' - read_length:
+#' `reads_id`, `reads_length`
 #' @param search_table a dataframe with the following columns:
 #' - "id","type","sequence","strand","result","extra","match_ref_seq"
+#' @param genome_size estimated genome size for coverage calculation
+#' @param ... additional arguments to pass to the process methods
 #' @return a dataframe containing the following columns:
 #' - type, rank, result, reads_count, proportion_matched, pass_filter
-infer_from_combined <- function(combined_result, search_table, ...) {
+#' @export
+infer_from_combined <- function(combined_result, search_table, genome_size, ...) {
     result <- list()
     arguments <- list(...)
-    analysis_types <- unique(combined_result$type)
+
+    if (!inherits(combined_result, "combined_fastq_search_result")){
+        if (!c("result", "read_length") %in% names(combined_result)){
+            stop("combined_result must be a combined_fastq_search_result object")
+        }
+        if (!inherits(combined_result$result, "data.frame")){
+            stop("combined_result must be a combined_fastq_search_result object")
+        }
+        else {
+            class(combined_result) <- "combined_fastq_search_result"
+        }
+    }
+    estimated_coverage <- estimate_coverage(combined_result$read_length$reads_length, genome_size)
+    combined_result <- combined_result$result
+    analysis_types <- unique(search_table$type)
     arguments[["search_table"]] <- search_table
 
     for (type in analysis_types){
@@ -299,15 +406,21 @@ infer_from_combined <- function(combined_result, search_table, ...) {
             warning(paste0("No process method for type: ", type))
             next
         }
-        arguments[["partial_result"]] <- combined_result[combined_result$type == "KMER", ]
-        result[[type]] <- do.call(process_method, args = arguments)
+        arguments[["partial_result"]] <- combined_result[combined_result$type == type, ]
+        if (nrow(arguments[["partial_result"]]) < 1){
+            warning(paste0("Insufficient data for type: ", type))
+            result[[type]] <- data.frame(type = type, rank = 1, result = NA, reads_count = NA,
+            proportion_matched = NA, pass_filter = NA)
+            next
+        }
+        t_result <- do.call(process_method, args = arguments)
+        result[[type]] <- t_result$result
     }
     result_df <- rbindlist(result)
     
     return(list(
         result = result_df,
-        snps_found = p_snp_result$snps_found,
-        proportion_snps_found = p_snp_result$proportion_snps_found
+        estimated_coverage = estimated_coverage
         )
     )
 }
@@ -326,7 +439,7 @@ get_all_process_methods <- function(process_name = ""){
     if (! exists("MinSNPs_process_methods")) {
         MinSNPs_process_methods <- list( #nolint
             "SNP" = process_snp_result,
-            "KMER" = process_kmer_result,
+            "KMER" = process_kmer_result
         )
     }
     if (process_name == "") {
@@ -345,7 +458,7 @@ get_all_process_methods <- function(process_name = ""){
 #' @param min_match_per_read the minimum number of kmer matches in a read, discarding reads with less than this number
 #' @param ... ignored
 #' @return a dataframe containing the following columns:
-#' - type, rank, result, reads_count, proportion_matched, pass_filter
+#' - type, rank, result, reads_count, proportion_matched, pass_filter, proportion_scheme_found, details
 #' @importFrom data.table rbindlist
 #' @export
 process_kmer_result <- function(partial_result, search_table, min_match_per_read = 1, ...) {
@@ -364,10 +477,11 @@ process_kmer_result <- function(partial_result, search_table, min_match_per_read
         prop <- length(unique(kmer_only2[kmer_only2$result == gene, "sequence"])) / total_searched
         r_count <- length(unique(unlist(strsplit(kmer_only2[kmer_only2$result == gene, "reads"], split = ";|,"))))
         result[[gene]] <- data.frame(type = "KMER", rank = 1, result = gene, reads_count = r_count,
-            proportion_matched = prop, pass_filter = prop >= 0.8)
+            proportion_matched = prop, pass_filter = prop >= 0.8, proportion_scheme_found = prop, details = NA)
     }
     result_df <- rbindlist(result)
-    return(result_df)
+    return(
+        list(result = result_df))
 }
 
 
@@ -378,6 +492,7 @@ process_kmer_result <- function(partial_result, search_table, min_match_per_read
 #' @param result the result from \code{infer_from_combined}
 #' @param count_measure the column name of the count measure to use for removing the conflicts
 #' @return a dataframe containing the same columns as the input result with row containing conflicts removed
+#' @export
 remove_snp_conflict <- function(result, count_measure = "n_reads") {
     snp_info <- strsplit(result$id, split = "_")
     snp_id <- sapply(snp_info, `[`, 1)
@@ -407,7 +522,7 @@ remove_snp_conflict <- function(result, count_measure = "n_reads") {
 #' @param ... ignored
 #' @return a list containing:
 #' - result: a dataframe containing the following columns:
-#'  - type, rank, result, reads_count, proportion_matched, pass_filter
+#'  - type, rank, result, reads_count, proportion_matched, pass_filter, proportion_scheme_found, details
 #' - snps_found: a vector containing the SNPs ID that have been identified without conflict
 #' - proportion_snps_found: the proportion of SNPs found without conflict
 #' @export
@@ -422,7 +537,7 @@ process_snp_result <- function(partial_result, search_table, count_measure = "n_
     searched_snps_id <- sapply(strsplit(searched_snps, split = "_"), `[`, 1)
 
     cc_result <- table(unlist(sapply(snp_only[, "result"], strsplit, split = ";|,")))
-    cc_result <- cc_result[order(cc_result, decreasing = TRUE)][1:10]
+    cc_result <- cc_result[order(cc_result, decreasing = TRUE)]
     
     r_count <- sapply(names(cc_result), function(cc){
         temp <- length(
@@ -450,18 +565,18 @@ process_snp_result <- function(partial_result, search_table, count_measure = "n_
         return(sum_n_reads)
     })
 
-    result_df <- data.frame(type = rep("SNP", 10), rank = c(1:10), result = names(cc_result), reads_count = unname(r_count),
+    result_df <- data.frame(type = rep("SNP", length(read_count)), rank = seq_len(length(read_count)), result = names(cc_result), reads_count = unname(r_count),
         proportion_matched = unname(prop), 
         pass_filter = (
             prop >= 0.8 &
             read_count >= 10 * prop * length(unique(snp_id)) # average read-depth of the reads with respective SNPs = 10
-        )
+        ),
+        proportion_scheme_found = length(unique(snp_id)) / length(unique(searched_snps_id)),
+        details = paste0("SNPs found: ", paste0(snp_id, collapse = ","), "\n")
     )
     
     return(list(
-        result = result_df,
-        snps_found = snp_id,
-        proportion_snps_found = length(unique(snp_id)) / length(unique(searched_snps_id)) 
+        result = result_df
         )
     )
 }

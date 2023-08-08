@@ -18,7 +18,7 @@ process_kmer_result(partial_result, search_table, min_match_per_read = 1, ...)
 }
 \value{
 a dataframe containing the following columns:
-- type, rank, result, reads_count, proportion_matched, pass_filter
+- type, rank, result, reads_count, proportion_matched, pass_filter, proportion_scheme_found, details
 }
 \description{
 \code{process_kmer_result} processes the KMER result from \code{infer_from_combined}

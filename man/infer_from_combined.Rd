@@ -4,13 +4,23 @@
 \alias{infer_from_combined}
 \title{\code{infer_from_combined}}
 \usage{
-infer_from_combined(combined_result, search_table, ...)
+infer_from_combined(combined_result, search_table, genome_size, ...)
 }
 \arguments{
-\item{combined_result}{the combined result from \code{combine_search_string_result}}
+\item{combined_result}{the combined result from \code{combine_fastq_search_result} or equivalent,
+with a list containing:
+- result: a dataframe containing the following columns:
+`sequence`, `search_id`, `reads`, `raw_match`, `mean_qualities`, `indexes`, `id`, `type`,
+`strand`, `result`, `extra`, `match_ref_seq`, `n_reads`
+- read_length:
+`reads_id`, `reads_length`}
 
 \item{search_table}{a dataframe with the following columns:
 - "id","type","sequence","strand","result","extra","match_ref_seq"}
+
+\item{genome_size}{estimated genome size for coverage calculation}
+
+\item{...}{additional arguments to pass to the process methods}
 }
 \value{
 a dataframe containing the following columns:
