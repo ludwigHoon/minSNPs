@@ -76,6 +76,10 @@ read_sequences_from_fastq <- function(fastq_file, force_to_upper = TRUE, skip_n_
 
     lines <- readLines(fastq_file, n = n_lines)
     if (skip_n_reads != 0){
+        if ((4 * skip_n_reads + 1) > length(lines)){
+            warning("skip_n_reads is too large: No reads beyond that")
+            return(NULL)
+        }
         lines <- lines[seq(4 * skip_n_reads + 1, length(lines), 1)]
     }
     seqs_id <- lines[seq(1, length(lines), 4)]
@@ -112,6 +116,7 @@ read_sequences_from_fastq <- function(fastq_file, force_to_upper = TRUE, skip_n_
 #' `find_optimised_snps`.
 #' @param results output from `find_optimised_snps`
 #' @param as output format, either `data.frame` or `list`.
+#' @importFrom utils tail
 #' @return will return either 
 #' 1. a dataframe containing SNPs_set (SNP position separated by ",") and score
 #' 2. a list containing SNPs_set (SNP position as numeric vector) and score (attr of the list)

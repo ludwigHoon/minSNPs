@@ -460,6 +460,7 @@ cal_met_snp <- function(position, metric, seqc, prepend_position = c(), ...) {
 #' @param seqc_length the length to iterate through.
 #' @keywords internal
 #' @importFrom BiocParallel SerialParam bplapply
+#' @importFrom utils tail
 #' @return Will return the resolution-optimised SNPs set, based on the metric.
 select_n_set_i_depth <- function(starting_positions = c(),
     excluded_positions = c(), seqc, metric,
@@ -589,6 +590,7 @@ select_n_set_i_depth <- function(starting_positions = c(),
 #' default to FALSE, only the 1st SNP must be different
 #' @param ... other parameters as needed
 #' @importFrom BiocParallel SerialParam bplapply
+#' @importFrom utils tail
 #' @return Will return the resolution-optimised SNPs set, based on the metric.
 #' @export
 find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
@@ -746,10 +748,11 @@ find_optimised_snps <- function(seqc, metric = "simpson", goi = c(),
 #' @param target column name of the target group
 #' @param get_count whether to return the count of samples rather than the raw number, default to FALSE.
 #' @return Will return the Simpson's index of the list of patterns.
-#' @importFrom data.table dcast
+#' @importFrom data.table dcast .N
 #' @export
 calculate_variant_within_group <- function(pattern, meta, target, get_count = FALSE) {
     data.table::setDT(meta)
+    . <- NULL
     colnames(meta)[colnames(meta) == target] <- "target"
     npattern <- data.table(pattern = unname(unlist(pattern)),
         target = meta[match(names(pattern), meta$isolate), ]$target)
@@ -763,7 +766,7 @@ calculate_variant_within_group <- function(pattern, meta, target, get_count = FA
     }
     alleles <- res[,1]
     columns <- colnames(res)[-1]
-    res <- do.call(cbind, lapply(res[,..columns], function(col) {
+    res <- do.call(cbind, lapply(res[,columns, with = FALSE], function(col) {
         sapply(col, function(cell){
             return(cell/sum(col))
         })

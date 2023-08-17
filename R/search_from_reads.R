@@ -59,6 +59,10 @@ search_from_fastq_reads <- function(fastq_file, search_tables, skip_n_reads = 0,
     simplify_id = TRUE, output_read_length = TRUE, bp = MulticoreParam()) {
     
     reads <- read_sequences_from_fastq(fastq_file, quality_offset = quality_offset, max_n_reads = max_n_reads, skip_n_reads = skip_n_reads, bp = bp)
+    if (is.null(reads)){
+        result <- list(result = NULL, read_length = NULL)
+        class(result) <- "fastq_search_result"
+    }
 
     read_ids <- names(reads)
     if (simplify_id){
@@ -260,6 +264,7 @@ combine_fastq_search_result <- function(results, search_table,
 #' `strand`, `result`, `extra`, `match_ref_seq`, `n_reads`
 #' @importFrom BiocParallel bplapply MulticoreParam
 #' @importFrom data.table rbindlist
+#' @importFrom stats setNames
 #' @export
 combine_search_string_result_from_list <- function(results, search_table,
     append_to_current_result = data.frame(), bp = MulticoreParam()) {
@@ -311,6 +316,7 @@ combine_search_string_result_from_list <- function(results, search_table,
 #' `strand`, `result`, `extra`, `match_ref_seq`, `n_reads`
 #' @importFrom BiocParallel bplapply MulticoreParam
 #' @importFrom data.table rbindlist
+#' @importFrom utils read.csv
 #' @export
 combine_search_string_result_from_files <- function(result_files, search_table,
     read_length_files = c(), append_to_current_result = NULL, bp = MulticoreParam()) {
@@ -462,8 +468,8 @@ get_all_process_methods <- function(process_name = ""){
 #' @importFrom data.table rbindlist
 #' @export
 process_kmer_result <- function(partial_result, search_table, min_match_per_read = 1, ...) {
-    partial_result <- kmer_only
     result <- list()
+    kmer_only <- partial_result
     for (gene in unique(search_table[search_table$type == "KMER","result"])) {
         total_searched <- nrow(search_table[search_table$type == "KMER" & search_table$result == gene,])
         
@@ -492,6 +498,7 @@ process_kmer_result <- function(partial_result, search_table, min_match_per_read
 #' @param result the result from \code{infer_from_combined}
 #' @param count_measure the column name of the count measure to use for removing the conflicts
 #' @return a dataframe containing the same columns as the input result with row containing conflicts removed
+#' @importFrom data.table .I
 #' @export
 remove_snp_conflict <- function(result, count_measure = "n_reads") {
     snp_info <- strsplit(result$id, split = "_")
@@ -504,6 +511,7 @@ remove_snp_conflict <- function(result, count_measure = "n_reads") {
     
     ### Drop rows if the maximum count are the same
     ### 1. Identifying all the max value for each snp_id
+    n_reads <- NULL
     temp_result <- n_result[n_result[, .I[n_reads == max(get(count_measure))], by = snp_id]$V1]
     ### 2. Drop all row with duplicated snp_id
     to_drop <- temp_result$snp_id[duplicated(temp_result$snp_id)]
