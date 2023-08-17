@@ -60,8 +60,7 @@ search_from_fastq_reads <- function(fastq_file, search_tables, skip_n_reads = 0,
     
     reads <- read_sequences_from_fastq(fastq_file, quality_offset = quality_offset, max_n_reads = max_n_reads, skip_n_reads = skip_n_reads, bp = bp)
     if (is.null(reads)){
-        result <- list(result = NULL, read_length = NULL)
-        class(result) <- "fastq_search_result"
+        return(NULL)
     }
 
     read_ids <- names(reads)
