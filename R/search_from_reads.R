@@ -469,18 +469,19 @@ get_all_process_methods <- function(process_name = ""){
 process_kmer_result <- function(partial_result, search_table, min_match_per_read = 1, ...) {
     result <- list()
     kmer_only <- partial_result
+    data.table::setDF(kmer_only)
     for (gene in unique(search_table[search_table$type == "KMER","result"])) {
         total_searched <- nrow(search_table[search_table$type == "KMER" & search_table$result == gene,])
         
         # Discard reads with less than min_match_per_read
-        all_reads <- unlist(strsplit(kmer_only[kmer_only$result == gene, "reads"], split = ";|,"))
-        n_match_in_read <- table(kmer_only[kmer_only$result == gene, "reads"])
+        all_reads <- unlist(strsplit(unlist(kmer_only[kmer_only$result == gene, "reads"]), split = ";|,"))
+        n_match_in_read <- table(all_reads)
         filtered_reads <- names(n_match_in_read[n_match_in_read >= min_match_per_read])
-        filtered_index <- apply(sapply(filtered_reads, grepl, x= kmer_only$reads), 1, sum) == length(filtered_reads)
+        filtered_index <- apply(sapply(filtered_reads, grepl, x= kmer_only$reads), 1, sum) > 0
         kmer_only2 <- kmer_only[kmer_only$result == gene & filtered_index, ]
         
         prop <- length(unique(kmer_only2[kmer_only2$result == gene, "sequence"])) / total_searched
-        r_count <- length(unique(unlist(strsplit(kmer_only2[kmer_only2$result == gene, "reads"], split = ";|,"))))
+        r_count <- length(unique(unlist(strsplit(unlist(kmer_only2[kmer_only2$result == gene, "reads"]), split = ";|,"))))
         result[[gene]] <- data.frame(type = "KMER", rank = 1, result = gene, reads_count = r_count,
             proportion_matched = prop, pass_filter = prop >= 0.8, proportion_scheme_found = prop, details = NA)
     }
@@ -534,6 +535,14 @@ remove_snp_conflict <- function(result, count_measure = "n_reads") {
 #' - proportion_snps_found: the proportion of SNPs found without conflict
 #' @export
 process_snp_result <- function(partial_result, search_table, count_measure = "n_reads", ...) {
+    split_tags <- function(tags, as = "vector", split = ";|,"){
+        result <- strsplit(tags, split = split)
+        if (as == "vector"){
+            return(unlist(result))
+        }
+        return(result)
+    }
+
     snp_only <- partial_result
     snp_only <- remove_snp_conflict(snp_only, count_measure = count_measure)
 
@@ -543,32 +552,33 @@ process_snp_result <- function(partial_result, search_table, count_measure = "n_
     searched_snps <- search_table[search_table$type == "SNP", "id"]
     searched_snps_id <- sapply(strsplit(searched_snps, split = "_"), `[`, 1)
 
-    cc_result <- table(unlist(sapply(snp_only[, "result"], strsplit, split = ";|,")))
+    split_result <- unlist(sapply(sapply(snp_only[, "result"], strsplit, split = ";|,")), unique)
+    # tags counting
+    cc_result <- table(split_result)
     cc_result <- cc_result[order(cc_result, decreasing = TRUE)]
     
+    # Reads containing the tag
     r_count <- sapply(names(cc_result), function(cc){
         temp <- length(
-            which(grepl(cc, unlist(snp_only$result))
-                == TRUE)
+            which(sapply(cc, "%in%", x = split_result) == TRUE)
         )
         return(temp)
     })
 
     stopifnot(names(r_count) == names(cc_result))
     setDF(snp_only)
-    prop <- sapply(names(cc_result), function(cc){
-        temp <- length(
-            unique(snp_only[grepl(cc, unlist(snp_only$result)),"sequence"])    
-        ) / length(
-            which(grepl(cc, unlist(search_table$result))
-                == TRUE)
-        )
-        return(temp)
-    })
+    avail_result_tags <- split_tags(snp_only$result, as = "list")
+    all_result_tags <- split_tags(search_table$result, as = "list")
+    n_all <- length(unique(searched_snps_id))
+    prop <- cc_result / n_all
+
     stopifnot(names(prop) == names(cc_result))
 
     read_count <- sapply(names(cc_result), function(cc){
-        sum_n_reads <- sum(snp_only[grepl(cc, unlist(snp_only$result)),"n_reads"])
+        row_id <- sapply(avail_result_tags, function(x) {
+            return(cc %in% x)
+        })
+        sum_n_reads <- sum(snp_only[row_id,"n_reads"])
         return(sum_n_reads)
     })
 
@@ -587,3 +597,4 @@ process_snp_result <- function(partial_result, search_table, count_measure = "n_
         )
     )
 }
+

@@ -153,23 +153,26 @@ flag_position <- function(pro_seqc, dash_ignore=TRUE,
         return(which(! as.vector(iso) %in% charset))
     }, charset = accepted_char, BPPARAM = bp)
 
-    more_pos <- bplapply(
-        seq_len(length(seq[[1]])),
-            function(pos, remove_invariant, biallelic_only) {
-            l_pat <- length(unique(generate_pattern(seq, pos)))
-            if (remove_invariant & biallelic_only & (l_pat != 2)) {
-                return(pos)
-            }
-            if (remove_invariant & l_pat < 2) {
-                return(pos)
-            }
-            if (biallelic_only & l_pat > 2) {
-                return(pos)
-            } else {
-                return(NULL)
-            }
-        }, remove_invariant = remove_invariant, biallelic_only = biallelic_only,
-    BPPARAM = bp)
+    more_pos <- list()
+    if (remove_invariant || biallelic_only){
+        more_pos <- bplapply(
+            seq_len(length(seq[[1]])),
+                function(pos, remove_invariant, biallelic_only) {
+                l_pat <- length(unique(generate_pattern(seq, pos)))
+                if (remove_invariant & biallelic_only & (l_pat != 2)) {
+                    return(pos)
+                }
+                if (remove_invariant & l_pat < 2) {
+                    return(pos)
+                }
+                if (biallelic_only & l_pat > 2) {
+                    return(pos)
+                } else {
+                    return(NULL)
+                }
+            }, remove_invariant = remove_invariant, biallelic_only = biallelic_only,
+            BPPARAM = bp)
+    }
 
     ignored_position <- c(ignored_position, unlist(more_pos))
     result <- sort(unique(unlist(ignored_position)))

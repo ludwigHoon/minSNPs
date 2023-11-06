@@ -106,7 +106,7 @@ generate_snp_search_string <-
 
     result <- BiocParallel::bplapply(seq_len(nrow(snp_genome_pos)),
         function(pos, snp_genome_pos, prev, after,
-        position_reference, extend_length, genome_max) {
+        position_reference, extend_length, genome_max, fasta_name_as_result) {
 
         snp_pos <- snp_genome_pos[pos, "fasta_position"]
         genome_pos <- snp_genome_pos[pos, "genome_position"]

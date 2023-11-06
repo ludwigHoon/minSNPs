@@ -1,5 +1,61 @@
 #Utility functions
 
+#' \code{translate_position}
+#' 
+#' @description
+#' \code{translate_position} translate the scambled position in the alignment
+#' to the original position or vice versa
+#' @param position the position to translate
+#' @param positions_table the table containing the original and scrambled positions
+#' @param to the direction to translate, either "original" or "scrambled"
+#' @return the translated position
+#' @export
+translate_position <- function(position, positions_table, to = "original") {
+    if (to == "original") {
+        return(positions_table$original[match(position, positions_table$scrambled)])
+    } else if (to == "scrambled") {
+        return(positions_table$scrambled[match(position, positions_table$original)])
+    } else {
+        stop("to must be either original or scrambled")
+    }
+}
+
+#' \code{scramble_sequence}
+#' 
+#' @description
+#' \code{scramble_sequence} scramble the orthologous matrix based on a seed
+#' @param seqc the sequence to scramble
+#' @param seed the seed to use for scrambling
+#' @return a named list, containing the scambled sequence and the new positions
+#' @export 
+scramble_sequence <- function(seqc, seed){
+    set.seed(seed)
+
+    result <- seqc
+    if (inherits(seqc, "processed_seqs")) {
+        ### use the seqc & update the excluded position
+        seqc <- seqc$seqc
+    }
+
+    new_order <- sample(seq_len(length(seqc[[1]])), length(seqc[[1]]), replace = FALSE)
+    new_seqc <- lapply(seqc, function(x) {
+        return(x[new_order])
+    })
+
+    positions_table <- data.frame(original = seq_len(length(seqc[[1]])), scrambled = new_order)
+
+    if (inherits(seqc, "processed_seqs")) {
+        result$seqc <- new_seqc
+        result$excluded_positions <- translate_position(result$excluded_positions, positions_table, to = "scrambled")
+        result$positions_table <- positions_table
+    } else {
+        result <- list(new_seqc = new_seqc,
+            positions_table=positions_table)
+    }
+
+    return(result)
+}
+
 #' \code{reverse_complement}
 #'
 #' @description

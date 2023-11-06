@@ -1,3 +1,6 @@
+# minSNPs v0.1.1
+- Modified how `process_snp_result` calculates the number of reads and proportion of search sequences found in the long read sequences to be more accurate. In the previous version, tag that also form part of other tag, e.g., CC15 and CC1, are miscalculated with those matching only CC1 are also used to match CC15. This is now fixed.
+
 # minSNPs v0.1.0
 - Added method to generate search strings (`generate_snp_search_string`) from identified SNPs set.
 - Added method to search through long read sequence (`search_from_fastq_reads`).
