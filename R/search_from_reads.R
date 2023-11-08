@@ -149,6 +149,112 @@ search_from_fastq_reads <- function(fastq_file, search_tables, skip_n_reads = 0,
     return(result)
 }
 
+#' \code{search_from_reads}
+#'
+#' @description
+#' \code{search_from_reads} identify the matches
+#' from a list of search strings
+#' @param all_reads The reads containing the runs to search from
+#' @param search_tables a dataframe with the following columns:
+#' - ["id"],"type",["sequence"],"strand","result","extra","match_ref_seq"
+#' @param bp BiocParallel backend to use for parallelization
+#' @param all_qualities quality data, default to NULL
+#' @param progress whether to show the progress bar
+#' @param ID the ID to use, default to S1
+#' @param output_read_length whether to output the read length, NULL - do not output; csv - output to csv file; data - output to result
+#' @param output_temp_result whether to output the temporary results
+#' @param temp_result_folder directory to output the temporary results
+#' @return will return a list of dataframe containing: -
+#' `search_id`, `sequence`, `reads`, `raw_match`, `mean_qualities`, `indexes`.
+#' @importFrom BiocParallel bplapply MulticoreParam
+#' @export
+search_from_reads <- function(all_reads, search_tables, progress = TRUE, ID = "S1",
+    all_qualities = NULL, output_temp_result = TRUE, temp_result_folder = "./temp_results",
+    output_read_length = TRUE, bp = MulticoreParam()) {
+    
+    read_ids <- names(all_reads)
+
+    if (is.null(all_qualities)) {
+        all_qualities <- lapply(all_reads, function(seq) {
+            return(rep(33, nchar(seq)))
+        })
+    }
+
+    if (output_temp_result) {
+        if (!dir.exists(temp_result_folder)) {
+            dir.create(temp_result_folder)
+        }
+    }
+
+    read_length_data <- NULL
+    if (output_read_length) {
+        reads_length <- nchar(all_reads)
+        read_length_data <- data.frame(reads_id = read_ids, reads_length = as.numeric(reads_length))
+        
+        if (output_temp_result){
+            write.csv(read_length_data,
+                paste0(temp_result_folder, "/", ID, "_read_lengths.csv"),
+                row.names = FALSE)
+        }
+    }
+
+    names(all_reads) <- paste(read_ids, "_+", sep = "")
+    reads_rc <- bplapply(all_reads, function(seq) {
+        return(reverse_complement(seq))
+    }, BPPARAM = bp)
+    qualities_rc <- bplapply(all_qualities, function(seq) {
+        return(rev(seq))
+    }, BPPARAM = bp)
+ 
+    names(reads_rc) <- paste(read_ids, "_-", sep = "")
+    all_reads <- c(all_reads, reads_rc)
+    all_qualities <- c(all_qualities, qualities_rc)
+    names(all_qualities) <- names(all_reads)
+    old_pr <- bp$progressbar
+    if (progress) {
+        bp$progressbar <- progress
+    }
+    print("SEARCHING ...")
+    temp_result <- bplapply(seq_len(nrow(search_tables)), function(i, search_tables, reads, qualities, output_temp, result_folder, id){
+        search_sequence <- search_tables[i, "sequence"]
+        search_id <- search_tables[i, "id"]
+        result <- sequence_reads_match_count(search_sequence, reads, qualities)
+        counts <- sapply(result, function(x) {
+            return(x$count)
+        })
+        mean_qualities <- sapply(result, function(x) {
+            return(paste(x$mean_quality, collapse = ","))
+        })
+        indexes <- sapply(result, function(x){
+            return(paste(x$indexes, collapse = ","))
+        })
+        result_df <- data.frame(
+            search_id = search_id,
+            sequence = search_sequence,
+            reads = names(reads),
+            raw_match = counts,
+            mean_qualities = mean_qualities,
+            indexes = indexes
+        )
+        if (output_temp) {
+            result_file <- file.path(result_folder,
+            paste0(id, "_", search_id, ".csv"))
+            write.csv(result_df, result_file, sep = "\t", row.names = FALSE)
+        }
+        return(result_df)
+    }, output_temp = output_temp_result, search_tables = search_tables, result_folder = temp_result_folder,
+    id = ID, reads = all_reads, qualities = all_qualities, BPPARAM = bp)
+    if (progress) {
+        bp$progressbar <- old_pr
+    }
+    names(temp_result) <- search_tables$sequence
+    result <- list(result = temp_result,
+        read_length = read_length_data)
+    class(result) <- "fastq_search_result"
+
+    return(result)
+}
+
 ######### COMBINED FUNCTIONS #########
 
 #' \code{combine_search_string_result}
