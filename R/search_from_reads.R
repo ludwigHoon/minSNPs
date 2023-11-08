@@ -133,7 +133,7 @@ search_from_fastq_reads <- function(fastq_file, search_tables, skip_n_reads = 0,
         if (output_temp) {
             result_file <- file.path(result_folder,
             paste0(id, "_", search_id, ".csv"))
-            write.csv(result_df, result_file, sep = "\t", row.names = FALSE)
+            write.csv(result_df, result_file, row.names = FALSE)
         }
         return(result_df)
     }, output_temp = output_temp_result, search_tables = search_tables, result_folder = temp_result_folder,
@@ -239,7 +239,7 @@ search_from_reads <- function(all_reads, search_tables, progress = TRUE, ID = "S
         if (output_temp) {
             result_file <- file.path(result_folder,
             paste0(id, "_", search_id, ".csv"))
-            write.csv(result_df, result_file, sep = "\t", row.names = FALSE)
+            write.csv(result_df, result_file, row.names = FALSE)
         }
         return(result_df)
     }, output_temp = output_temp_result, search_tables = search_tables, result_folder = temp_result_folder,
@@ -658,7 +658,7 @@ process_snp_result <- function(partial_result, search_table, count_measure = "n_
     searched_snps <- search_table[search_table$type == "SNP", "id"]
     searched_snps_id <- sapply(strsplit(searched_snps, split = "_"), `[`, 1)
 
-    split_result <- unlist(sapply(sapply(snp_only[, "result"], strsplit, split = ";|,")), unique)
+    split_result <- unlist(sapply(sapply(snp_only[, "result"], strsplit, split = ";|,"), unique))
     # tags counting
     cc_result <- table(split_result)
     cc_result <- cc_result[order(cc_result, decreasing = TRUE)]
