@@ -804,7 +804,12 @@ iterate_through <- function(metric, seqc, bp = MulticoreParam(), ...){
             BPPARAM = bp)
     rr <- bplapply(scores, function(x){
         res <- x$result
-        return(cbind(position = x$position, res))
+        return(cbind(position = x$positions, res))
     }, BPPARAM = bp)
     return(rbindlist(rr))
+}
+
+
+calculate_state <- function(pattern){
+    return(list(result = length(unique(pattern))))
 }
