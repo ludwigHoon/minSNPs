@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
       </span>
     </div>
 
@@ -58,7 +58,10 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.1.0" id="minsnps-v010">minSNPs v0.1.0<a class="anchor" aria-label="anchor" href="#minsnps-v010"></a></h2>
+<h2 class="page-header" data-toc-text="0.1.1" id="minsnps-v011">minSNPs v0.1.1<a class="anchor" aria-label="anchor" href="#minsnps-v011"></a></h2>
+<ul><li>Modified how <code>process_snp_result</code> calculates the number of reads and proportion of search sequences found in the long read sequences to be more accurate. In the previous version, tag that also form part of other tag, e.g., CC15 and CC1, are miscalculated with those matching only CC1 are also used to match CC15. This is now fixed.</li></ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.1.0" id="minsnps-v010">minSNPs v0.1.0<small>2023-08-08</small><a class="anchor" aria-label="anchor" href="#minsnps-v010"></a></h2>
 <ul><li>Added method to generate search strings (<code>generate_snp_search_string</code>) from identified SNPs set.</li>
 <li>Added method to search through long read sequence (<code>search_from_fastq_reads</code>).</li>
 </ul></div>

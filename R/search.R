@@ -210,32 +210,6 @@ view_percent <- function(result, ...) { # nolint
     return(isolates_in_groups)
 }
 
-#' \code{get_metric_fun}
-#'
-#' @description
-#' \code{get_metric_fun} is used to get the metrics function
-#' and required parameters. Additional metric may set by
-#' assigning to `MinSNPs_metrics` variable.
-#' @param metric_name name of the metric, by default percent/simpson
-#' @return a list, including the function to calculate the
-#' metric based on a position (`calc`), and function to check for
-#' additional parameters the function need (`args`)
-#' @export
-get_metric_fun <- function(metric_name = "") {
-    if (! exists("MinSNPs_metrics")) {
-        MinSNPs_metrics <- list( #nolint
-            "percent" = list("calc" = calculate_percent,
-                "args" = check_percent, "view" = view_percent),
-            "simpson" = list("calc" = calculate_simpson,
-                "view" = view_simpson)
-        )
-    }
-    if (metric_name == "") {
-        return(MinSNPs_metrics)
-    }
-    return(MinSNPs_metrics[[metric_name]])
-}
-
 #' \code{get_positions_to_search}
 #'
 #' @description
@@ -782,6 +756,7 @@ calculate_variant_within_group <- function(pattern, meta, target, get_count = FA
 #' @inheritParams find_optimised_snps
 #' @inheritParams check_multistate
 #' @importFrom BiocParallel MulticoreParam bplapply
+#' @importFrom data.table rbindlist
 #' @return return a dataframe containing the position and result.
 #' @export
 iterate_through <- function(metric, seqc, bp = MulticoreParam(), ...){
@@ -804,12 +779,55 @@ iterate_through <- function(metric, seqc, bp = MulticoreParam(), ...){
             BPPARAM = bp)
     rr <- bplapply(scores, function(x){
         res <- x$result
-        return(cbind(position = x$positions, res))
+        return(data.frame(position = x$positions, score = res))
     }, BPPARAM = bp)
     return(rbindlist(rr))
 }
 
-
+#' \code{calculate_state}
+#'
+#' @description
+#' \code{calculate_state} calculate the number of states given the SNP(s)
+#' @param pattern list of sequences' pattern (profile)
+#' @return number of states
 calculate_state <- function(pattern){
     return(list(result = length(unique(pattern))))
+}
+
+#' \code{get_metric_fun}
+#'
+#' @description
+#' \code{get_metric_fun} is used to get the metrics function
+#' and required parameters. Additional metric may set by
+#' assigning to `MinSNPs_metrics` variable.
+#' @param metric_name name of the metric, by default percent/simpson
+#' @return a list, including the function to calculate the
+#' metric based on a position (`calc`), and function to check for
+#' additional parameters the function need (`args`)
+#' @export
+get_metric_fun <- function(metric_name = "") {
+    if (! exists("MinSNPs_metrics")) {
+        MinSNPs_metrics <- list( #nolint
+            "percent" = list("calc" = calculate_percent,
+                "args" = check_percent, "view" = view_percent),
+            "simpson" = list("calc" = calculate_simpson,
+                "view" = view_simpson),
+            "mcc" = list("calc" = calculate_mcc,
+                "args" = check_percent, "view" = view_mcc),
+            "mcc_multi" = list(
+                "calc" = calculate_mcc_multi,
+                "args" = check_meta_target,
+                "view" = view_mcc_multi
+            ),
+            "simpson_by_group" = list(
+                "calc" = calculate_simpson_by_group,
+                "args" = check_meta_target,
+                "view" = view_mcc_multi
+            )
+        )
+    }
+    if (metric_name == "") {
+        return(MinSNPs_metrics)
+    }
+    return(MinSNPs_metrics[[metric_name]])
 }

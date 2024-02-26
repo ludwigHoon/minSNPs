@@ -43,16 +43,31 @@
     <loc>https://ludwighoon.github.io/minSNPs/reference/calculate.simpson.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_mcc.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_mcc_multi.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_percent.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_simpson.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_simpson_by_group.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_state.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/calculate_variant_within_group.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/check_fasta_meta_mapping.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/check_meta_target.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/check_multistate.html</loc>
@@ -103,6 +118,9 @@
     <loc>https://ludwighoon.github.io/minSNPs/reference/generate_pattern.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/generate_prioritisation.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/generate_snp_search_string.html</loc>
   </url>
   <url>
@@ -136,6 +154,9 @@
     <loc>https://ludwighoon.github.io/minSNPs/reference/iterate_through.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/map_profile_to_target.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/match_count.html</loc>
   </url>
   <url>
@@ -149,6 +170,12 @@
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/output_to_files.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/parse_group_mcc.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/parse_group_mcc_multi.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/process_allele.html</loc>
@@ -187,7 +214,13 @@
     <loc>https://ludwighoon.github.io/minSNPs/reference/reverse_complement.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/scramble_sequence.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/search_from_fastq_reads.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/search_from_reads.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/select_n_set_i_depth.html</loc>
@@ -196,7 +229,16 @@
     <loc>https://ludwighoon.github.io/minSNPs/reference/sequence_reads_match_count.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/translate_position.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/usual_length.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/view_mcc.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/view_mcc_multi.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/view_percent.html</loc>
