@@ -25,6 +25,9 @@
     <loc>https://ludwighoon.github.io/minSNPs/news/index.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/binomial_naive_bayes.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/branch_and_search.html</loc>
   </url>
   <url>
@@ -74,6 +77,9 @@
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/check_percent.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/coef.binomial_naive_bayes.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/combine_fastq_search_result.html</loc>
@@ -127,6 +133,9 @@
     <loc>https://ludwighoon.github.io/minSNPs/reference/get_all_process_methods.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/get_binomial_tables.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/get_metric_fun.html</loc>
   </url>
   <url>
@@ -160,6 +169,9 @@
     <loc>https://ludwighoon.github.io/minSNPs/reference/match_count.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/mcc_calculation.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/merge_fasta.html</loc>
   </url>
   <url>
@@ -178,6 +190,15 @@
     <loc>https://ludwighoon.github.io/minSNPs/reference/parse_group_mcc_multi.html</loc>
   </url>
   <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/predict.binomial_naive_bayes.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/predict_balk.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/print.binomial_naive_bayes.html</loc>
+  </url>
+  <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/process_allele.html</loc>
   </url>
   <url>
@@ -188,6 +209,9 @@
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/process_snp_result.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/profile_to_group_result.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/read.fasta.html</loc>
@@ -227,6 +251,18 @@
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/sequence_reads_match_count.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/summarise_result.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/summary.binomial_naive_bayes.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/train_balk.html</loc>
+  </url>
+  <url>
+    <loc>https://ludwighoon.github.io/minSNPs/reference/transform_snp.html</loc>
   </url>
   <url>
     <loc>https://ludwighoon.github.io/minSNPs/reference/translate_position.html</loc>

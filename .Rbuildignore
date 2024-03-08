@@ -14,3 +14,4 @@
 ^.devcontainer
 ^.vscode
 ^pkgdown
+^minsnps_standard_workflow.R

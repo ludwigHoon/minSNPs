@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">minSNPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -85,6 +85,18 @@
 <p>For manual, see <a href="https://github.com/ludwigHoon/minSNPs/blob/master/docs/usermanual.pdf" class="external-link">here</a>.</p>
 <p>This is a rebuilt version of minSNPs. Its functionality is similar to the original repository, but has cleaner code and less dependencies.</p>
 <p>The package has a dependency that is not in CRAN, but in BioC. In order for R to install that, you need to enable BioC repository, this can be done by running <code><a href="https://rdrr.io/r/utils/setRepositories.html" class="external-link">setRepositories()</a></code> and selecting both CRAN &amp; BioC Software.</p>
+<p>This is a simple install script for R packages:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/ludwigHoon/minSNPs" class="external-link">"minSNPs"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/Bioconductor/BiocParallel" class="external-link">"BiocParallel"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://bioconductor.github.io/BiocManager/" class="external-link">"BiocManager"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+      <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
+    <span class="op">}</span>
+    <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="st">"BiocParallel"</span><span class="op">)</span>
+  <span class="op">}</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"minSNPs"</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
+<p>See <a href="https://github.com/ludwigHoon/minSNPs/blob/master/minsnps_standard_workflow.R" class="external-link">standard workflow</a> or <a href="https://colab.research.google.com/drive/15MQFZIGzrnFy12XpUJ3345_VLqPGwgl1?usp=sharing" class="external-link">standard workflow in Google colab</a> for quick start.</p>
 </div>
   </div>
 

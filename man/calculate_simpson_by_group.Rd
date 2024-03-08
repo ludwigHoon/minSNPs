@@ -8,6 +8,10 @@ calculate_simpson_by_group(pattern, meta, target)
 }
 \arguments{
 \item{pattern}{list of sequences' pattern (profile)}
+
+\item{meta}{the metadata}
+
+\item{target}{the target column name}
 }
 \value{
 Will return the Simpson's index of the list of patterns.

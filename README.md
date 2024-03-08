@@ -23,4 +23,4 @@ if (!require("minSNPs", quietly = TRUE)){
 }
 ```
 
-See [standard workflow](./minsnps_standard_workflow.R) or [standard workflow in Google colab]() for quick start.
+See [standard workflow](https://github.com/ludwigHoon/minSNPs/blob/master/minsnps_standard_workflow.R) or [standard workflow in Google colab](https://colab.research.google.com/drive/15MQFZIGzrnFy12XpUJ3345_VLqPGwgl1?usp=sharing) for quick start.
