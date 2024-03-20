@@ -515,6 +515,11 @@ select_n_set_i_depth <- function(starting_positions = c(),
                     return(score[["positions"]])
             }, BPPARAM = bp)
             
+            ### *** if no improvement from previous result
+            if (max(unlist(depth_1)) <= tail(result_d1[[n]], n = 1)[[1]]){
+                break
+            }
+
             # Sorting for selection at this depth
             names(depth_1) <- snps_1
             position_order <- order(unlist(depth_1), decreasing = TRUE)

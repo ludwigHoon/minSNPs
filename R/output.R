@@ -17,7 +17,7 @@ output_result <- function(result, view = "", ...) {
     get_seq_obj <- function(seqc_name, additional_args) {
         if (exists(seqc_name)) {
             seqc_obj <- get(seqc_name)
-        } else if (is.null(additional_args[["seqc"]])) {
+        } else if (!is.null(additional_args[["seqc"]])) {
             seqc_obj <- additional_args[["seqc"]]
         } else {
             seqc_obj <- list()
